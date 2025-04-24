@@ -6,7 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Cấu hình chuỗi kết nối cho DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+// cau hinh jwt
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

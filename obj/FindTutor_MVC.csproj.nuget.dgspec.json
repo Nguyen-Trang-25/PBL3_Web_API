@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\FindTutor_MVC.csproj": {}
+    "G:\\HK2_2425\\PBL3\\BE\\FindTutor_MVC.csproj": {}
   },
   "projects": {
-    "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\FindTutor_MVC.csproj": {
+    "G:\\HK2_2425\\PBL3\\BE\\FindTutor_MVC.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\FindTutor_MVC.csproj",
+        "projectUniqueName": "G:\\HK2_2425\\PBL3\\BE\\FindTutor_MVC.csproj",
         "projectName": "FindTutor_MVC",
-        "projectPath": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\FindTutor_MVC.csproj",
-        "packagesPath": "C:\\Users\\NGUYEN THI TRANG\\.nuget\\packages\\",
-        "outputPath": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\obj\\",
+        "projectPath": "G:\\HK2_2425\\PBL3\\BE\\FindTutor_MVC.csproj",
+        "packagesPath": "C:\\Users\\Miu Miu\\.nuget\\packages\\",
+        "outputPath": "G:\\HK2_2425\\PBL3\\BE\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\NGUYEN THI TRANG\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Miu Miu\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -44,12 +44,16 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.100"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
@@ -92,7 +96,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
