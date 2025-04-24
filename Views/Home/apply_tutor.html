@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng tuyển làm gia sư</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Main -->
+    <div class="post-tutor-form">
+        <h2>Ứng tuyển làm gia sư</h2>
+        <form id="applyForm">
+            <div>
+                <label for="fullname">Họ và tên:</label>
+                <input type="text" id="fullname" name="fullname" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="phone">Số điện thoại:</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div>
+                <label for="major">Chuyên môn:</label>
+                <input type="text" id="major" name="major" required>
+            </div>
+            <div>
+                <label for="cer">Bằng cấp liên quan:</label>
+                <input type="text" id="cer" name="cer" required>
+            </div>
+            <div>
+                <label for="experience">Kinh nghiệm giảng dạy:</label>
+                <textarea id="experience" name="experience" rows="3" required></textarea>
+            </div>
+            <div>
+                <label for="location">Khu vực có thể dạy:</label>
+                <input type="text" id="location" name="location" required>
+            </div>
+            <div>
+                <label for="mode">Hình thức dạy:</label>
+                <select id="mode" name="mode">
+                    <option value="online">Online</option>
+                    <option value="offline">Tại nhà</option>
+                    <option value="both">Cả hai</option>
+                </select>
+            </div>
+            <div>
+                <label for="gender">Giới tính:</label>
+                <select id="gender" name="gender">
+                    <option value="male">Nam</option>
+                    <option value="female">Nữ</option>
+                    <option value="other">Khác</option>
+                </select>
+            </div>
+            <button type="submit">Gửi hồ sơ</button>
+        </form>
+
+        <div id="applyResult" class="message-box" style="display: none;">
+            <h4>✅ Hồ sơ đã được gửi!</h4>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/loadContent.js" defer></script>
+    <script src="js/script.js" defer></script>
+    <script>
+        document.getElementById("applyForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const resultDiv = document.getElementById("applyResult");
+            resultDiv.style.display = 'block';
+            this.reset();
+            setTimeout(() => resultDiv.style.display = 'none', 3000);
+        });
+    </script>
+</body>
+</html>

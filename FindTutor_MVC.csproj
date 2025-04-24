@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Views\Home\node_modules\**" />
+    <Content Remove="Views\Home\node_modules\**" />
+    <EmbeddedResource Remove="Views\Home\node_modules\**" />
+    <None Remove="Views\Home\node_modules\**" />
+    <TypeScriptCompile Remove="Views\Home\node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.8.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\styles.css" />
+    <None Include="wwwroot\css\styles.css.map" />
+    <None Include="wwwroot\css\styles.scss" />
+    <None Include="wwwroot\images\about_best_tutor_1.jpg" />
+    <None Include="wwwroot\images\about_best_tutor_2.jpg" />
+    <None Include="wwwroot\images\about_best_tutor_3.jpg" />
+    <None Include="wwwroot\images\about_best_tutor_4.jpg" />
+    <None Include="wwwroot\images\about_best_tutor_5.jpg" />
+    <None Include="wwwroot\images\about_best_tutor_6.jpg" />
+    <None Include="wwwroot\images\about_class.jpg" />
+    <None Include="wwwroot\images\about_icon_connection.png" />
+    <None Include="wwwroot\images\about_icon_student.png" />
+    <None Include="wwwroot\images\about_icon_tutor.png" />
+    <None Include="wwwroot\images\about_review_man_1.png" />
+    <None Include="wwwroot\images\about_review_man_2.png" />
+    <None Include="wwwroot\images\about_review_man_3.png" />
+    <None Include="wwwroot\images\about_review_man_4.png" />
+    <None Include="wwwroot\images\about_review_woman_1.png" />
+    <None Include="wwwroot\images\about_review_woman_2.png" />
+    <None Include="wwwroot\images\about_tutor_student.jpg" />
+    <None Include="wwwroot\images\avatar\student_boy.png" />
+    <None Include="wwwroot\images\avatar\student_girl.png" />
+    <None Include="wwwroot\images\avatar\tutor_fm.png" />
+    <None Include="wwwroot\images\avatar\tutor_fm2.png" />
+    <None Include="wwwroot\images\avatar\tutor_fm3.png" />
+    <None Include="wwwroot\images\avatar\tutor_m.png" />
+    <None Include="wwwroot\images\avatar\tutor_m2.png" />
+    <None Include="wwwroot\images\avatar\tutor_m3.png" />
+    <None Include="wwwroot\images\contact_tutor_student.jpg" />
+    <None Include="wwwroot\images\home_banner.jpg" />
+    <None Include="wwwroot\images\icons\clock.png" />
+    <None Include="wwwroot\images\icons\email.png" />
+    <None Include="wwwroot\images\icons\location.png" />
+    <None Include="wwwroot\images\icons\phone.png" />
+    <None Include="wwwroot\js\loadContent.js" />
+    <None Include="wwwroot\js\script.js" />
+  </ItemGroup>
+
+</Project>

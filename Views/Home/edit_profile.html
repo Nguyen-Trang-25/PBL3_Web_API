@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+    
+    <section class="edit-profile-form">
+        <h2>Chỉnh sửa thông tin cá nhân</h2>
+      
+        <form id="profileForm">
+          <label for="fullName">Họ và tên:</label>
+          <input type="text" id="fullName" name="fullName">
+      
+          <label for="workplace">Nơi học tập / Làm việc:</label>
+          <input type="text" id="workplace" name="workplace">
+      
+          <label for="age">Độ tuổi:</label>
+          <input type="number" id="age" name="age" min="10" max="100">
+      
+          <label for="phone">Số điện thoại:</label>
+          <input type="tel" id="phone" name="phone" pattern="[0-9]{10}">
+      
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email">
+      
+          <label for="gender">Giới tính:</label>
+          <select id="gender" name="gender">
+            <option value="">-- Chọn giới tính --</option>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+            <option value="Khác">Khác</option>
+          </select>
+      
+          <button type="submit">Lưu thay đổi</button>
+        </form>
+
+        <div id="updateResult" class="message-box" style="display: none;">
+            <h4>🎉 Cập nhật thành công!</h4>
+          </div>
+
+      </section>
+      
+
+    
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    
+
+    <!-- custom js file link -->
+    <script src="js/loadContent.js" defer></script>
+    <script src="js/script.js" defer></script>
+
+    <script>
+        document.getElementById("profileForm").addEventListener("submit", function (e) {
+          e.preventDefault();
+          const resultDiv = document.getElementById("updateResult");
+          resultDiv.style.display = 'block';
+          this.reset();
+      
+          setTimeout(function () {
+            resultDiv.style.display = 'none';
+          }, 3000);
+        });
+      </script>
+    
+</body>
+</html>
+

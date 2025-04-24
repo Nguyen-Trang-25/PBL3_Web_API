@@ -1,0 +1,401 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\css\\styles.css",
+      "PackagePath": "staticwebassets\\css\\styles.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\css\\styles.css.map",
+      "PackagePath": "staticwebassets\\css\\styles.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\css\\styles.scss",
+      "PackagePath": "staticwebassets\\css\\styles.scss"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_best_tutor_1.jpg",
+      "PackagePath": "staticwebassets\\images\\about_best_tutor_1.jpg"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_best_tutor_2.jpg",
+      "PackagePath": "staticwebassets\\images\\about_best_tutor_2.jpg"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_best_tutor_3.jpg",
+      "PackagePath": "staticwebassets\\images\\about_best_tutor_3.jpg"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_best_tutor_4.jpg",
+      "PackagePath": "staticwebassets\\images\\about_best_tutor_4.jpg"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_best_tutor_5.jpg",
+      "PackagePath": "staticwebassets\\images\\about_best_tutor_5.jpg"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_best_tutor_6.jpg",
+      "PackagePath": "staticwebassets\\images\\about_best_tutor_6.jpg"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_class.jpg",
+      "PackagePath": "staticwebassets\\images\\about_class.jpg"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_icon_connection.png",
+      "PackagePath": "staticwebassets\\images\\about_icon_connection.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_icon_student.png",
+      "PackagePath": "staticwebassets\\images\\about_icon_student.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_icon_tutor.png",
+      "PackagePath": "staticwebassets\\images\\about_icon_tutor.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_review_man_1.png",
+      "PackagePath": "staticwebassets\\images\\about_review_man_1.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_review_man_2.png",
+      "PackagePath": "staticwebassets\\images\\about_review_man_2.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_review_man_3.png",
+      "PackagePath": "staticwebassets\\images\\about_review_man_3.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_review_man_4.png",
+      "PackagePath": "staticwebassets\\images\\about_review_man_4.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_review_woman_1.png",
+      "PackagePath": "staticwebassets\\images\\about_review_woman_1.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_review_woman_2.png",
+      "PackagePath": "staticwebassets\\images\\about_review_woman_2.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\about_tutor_student.jpg",
+      "PackagePath": "staticwebassets\\images\\about_tutor_student.jpg"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\avatar\\student_boy.png",
+      "PackagePath": "staticwebassets\\images\\avatar\\student_boy.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\avatar\\student_girl.png",
+      "PackagePath": "staticwebassets\\images\\avatar\\student_girl.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\avatar\\tutor_fm.png",
+      "PackagePath": "staticwebassets\\images\\avatar\\tutor_fm.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\avatar\\tutor_fm2.png",
+      "PackagePath": "staticwebassets\\images\\avatar\\tutor_fm2.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\avatar\\tutor_fm3.png",
+      "PackagePath": "staticwebassets\\images\\avatar\\tutor_fm3.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\avatar\\tutor_m.png",
+      "PackagePath": "staticwebassets\\images\\avatar\\tutor_m.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\avatar\\tutor_m2.png",
+      "PackagePath": "staticwebassets\\images\\avatar\\tutor_m2.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\avatar\\tutor_m3.png",
+      "PackagePath": "staticwebassets\\images\\avatar\\tutor_m3.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\contact_tutor_student.jpg",
+      "PackagePath": "staticwebassets\\images\\contact_tutor_student.jpg"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\home_banner.jpg",
+      "PackagePath": "staticwebassets\\images\\home_banner.jpg"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\icons\\clock.png",
+      "PackagePath": "staticwebassets\\images\\icons\\clock.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\icons\\email.png",
+      "PackagePath": "staticwebassets\\images\\icons\\email.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\icons\\location.png",
+      "PackagePath": "staticwebassets\\images\\icons\\location.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\images\\icons\\phone.png",
+      "PackagePath": "staticwebassets\\images\\icons\\phone.png"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\js\\loadContent.js",
+      "PackagePath": "staticwebassets\\js\\loadContent.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\js\\script.js",
+      "PackagePath": "staticwebassets\\js\\script.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\LICENSE",
+      "PackagePath": "staticwebassets\\lib\\bootstrap"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery-validation-unobtrusive\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\LICENSE.txt"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery-validation\\LICENSE.md",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\LICENSE.md"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.min.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.min.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery\\dist\\jquery.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.js"
+    },
+    {
+      "Id": "D:\\Study\\HK4\\PBL3\\FindTutor_MVC\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.FindTutor_MVC.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.FindTutor_MVC.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.FindTutor_MVC.props",
+      "PackagePath": "build\\FindTutor_MVC.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.FindTutor_MVC.props",
+      "PackagePath": "buildMultiTargeting\\FindTutor_MVC.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.FindTutor_MVC.props",
+      "PackagePath": "buildTransitive\\FindTutor_MVC.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lớp mới</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+    
+    <!-- Account Form -->
+    <div id="reg-log-container"></div>
+
+    <main class="main new-classes-page">
+
+        <section class="section filter-section">
+            <h2>Bộ lọc tìm kiếm</h2>
+            <form id="filter-form">
+                <input type="text" placeholder="Tìm môn học..." class="subject"/>
+
+                <select name="area" id="">
+                    <option value="">Khu vực</option>
+                    <option value="NHS">Ngũ Hành Sơn</option>
+                    <option value="LC">Liên Chiểu</option>
+                    <option value="HC">Hải Châu</option>
+                    <option value="ST">Sơn Trà</option>
+                    <option value="CL">Cẩm Lệ</option>
+                    <option value="TK">Thanh Khê</option>
+                    <option value="HV">Hòa Vang</option>
+                    <option value="HS">Hoàng Sa</option>
+                </select>
+
+                <select name="method" id="">
+                    <option value="">Hình thức</option>
+                    <option value="offline">Offline</option>
+                    <option value="online">Online</option>
+                </select>
+
+                <select name="tutor_gender">
+                    <option value="">Giới tính gia sư</option>
+                    <option value="nam">Nam</option>
+                    <option value="nu">Nữ</option>
+                    <option value="khac">Khác</option>
+                </select>
+
+
+                <input type="text" name="subject" placeholder="Môn học (vd: Toán, Anh, Hóa...)">
+
+                <select name="level" id="">
+                    <option value="">Cấp học</option>
+                    <option value="primary">Tiểu học</option>
+                    <option value="secondary">THCS</option>
+                    <option value="highschool">THPT</option>
+                    <option value="university">Đại học</option>
+                    <option value="adult">Tự do</option>
+                </select>
+
+                <select name="grade">
+                    <option value="">Lớp học</option>
+                    <option value="1">Lớp 1</option>
+                    <option value="2">Lớp 2</option>
+                    <option value="3">Lớp 3</option>
+                    <option value="4">Lớp 4</option>
+                    <option value="5">Lớp 5</option>
+                    <option value="6">Lớp 6</option>
+                    <option value="7">Lớp 7</option>
+                    <option value="8">Lớp 8</option>
+                    <option value="9">Lớp 9</option>
+                    <option value="10">Lớp 10</option>
+                    <option value="11">Lớp 11</option>
+                    <option value="12">Lớp 12</option>
+                </select>
+
+                
+        
+                <button type="submit"><i class="fa fa-search"></i> Tìm kiếm</button>
+            </form>
+        </section>
+
+        <section class="class-list-section">
+            <h2>Các lớp mới chưa nhận</h2>
+            <div class="class-list">
+        
+                <div class="class-card">
+                    <h3>Toán lớp 8</h3>
+                    <p><strong>Khu vực:</strong> Liên Chiểu</p>
+                    <p><strong>Hình thức:</strong> Offline</p>
+                    <p><strong>Thời gian:</strong> Tối 2, 4, 6</p>
+                    <p><strong>Học phí:</strong> 2.000.000đ/tháng</p>
+                    <button class="apply-btn">Đăng ký</button>
+                </div>
+        
+                <div class="class-card">
+                    <h3>Tiếng Anh lớp 6</h3>
+                    <p><strong>Khu vực:</strong> Hải Châu</p>
+                    <p><strong>Hình thức:</strong> Online</p>
+                    <p><strong>Thời gian:</strong> Chiều 3, 5</p>
+                    <p><strong>Học phí:</strong> 1.500.000đ/tháng</p>
+                    <button class="apply-btn">Đăng ký</button>
+                </div>
+        
+                <div class="class-card">
+                    <h3>Lý lớp 10</h3>
+                    <p><strong>Khu vực:</strong> Ngũ Hành Sơn</p>
+                    <p><strong>Hình thức:</strong> Offline</p>
+                    <p><strong>Thời gian:</strong> Tối 3, 5, 7</p>
+                    <p><strong>Học phí:</strong> 2.200.000đ/tháng</p>
+                    <button class="apply-btn">Đăng ký</button>
+                </div>
+        
+                <div class="class-card">
+                    <h3>Hóa lớp 11</h3>
+                    <p><strong>Khu vực:</strong> Sơn Trà</p>
+                    <p><strong>Hình thức:</strong> Online</p>
+                    <p><strong>Thời gian:</strong> Tối thứ 7, Chủ nhật</p>
+                    <p><strong>Học phí:</strong> 1.800.000đ/tháng</p>
+                    <button class="apply-btn">Đăng ký</button>
+                </div>
+        
+                <div class="class-card">
+                    <h3>Văn lớp 9</h3>
+                    <p><strong>Khu vực:</strong> Cẩm Lệ</p>
+                    <p><strong>Hình thức:</strong> Offline</p>
+                    <p><strong>Thời gian:</strong> Sáng thứ 2, 4</p>
+                    <p><strong>Học phí:</strong> 1.700.000đ/tháng</p>
+                    <button class="apply-btn">Đăng ký</button>
+                </div>
+
+                <div class="class-card">
+                    <h3>Tiếng Anh lớp 8</h3>
+                    <p><strong>Khu vực:</strong> Liên Chiểu</p>
+                    <p><strong>Hình thức:</strong> Offline</p>
+                    <p><strong>Thời gian:</strong> Sáng thứ 2, 4</p>
+                    <p><strong>Học phí:</strong> 2.000.000đ/tháng</p>
+                    <button class="apply-btn">Đăng ký</button>
+                </div>
+        
+                <!-- Có thể thêm bao nhiêu card tùy ý -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    
+
+    <!-- custom js file link -->
+    <script src="js/loadContent.js" defer></script>
+    <script src="js/script.js" defer></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const applyButtons = document.querySelectorAll(".apply-btn");
+            applyButtons.forEach(button => {
+                button.addEventListener("click", () => {
+                    window.location.href = "apply_tutor.html";
+            });
+    });
+});
+
+    </script>
+</body>
+</html>
+

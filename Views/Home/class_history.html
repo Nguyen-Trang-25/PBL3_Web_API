@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lịch sử lớp học</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+  <!-- Header -->
+  <div id="header-container"></div>
+
+  <!-- Class History Section -->
+  <section class="class-history">
+    <h2>Lịch sử lớp học</h2>
+    <div id="class-history-list">
+      <!-- Các lớp học sẽ được JS render tại đây -->
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div id="footer-container"></div>
+
+  <!-- JS -->
+  <script src="js/loadContent.js" defer></script>
+  <script src="js/script.js" defer></script>
+
+  <!-- Dữ liệu động từ backend -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('get_classes.php')
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById('class-history-list');
+          container.innerHTML = '';
+
+          data.forEach(cls => {
+            const statusClass = cls.status === 'success' ? 'success'
+                              : cls.status === 'pending' ? 'pending'
+                              : 'waiting';
+            const statusText = cls.status === 'success' ? '✅ Đã có gia sư'
+                              : cls.status === 'pending' ? '⏳ Đang xét duyệt'
+                              : '❌ Chưa có ứng viên';
+
+            const card = document.createElement('div');
+            card.className = 'class-card';
+            card.innerHTML = `
+              <h3>${cls.subject}</h3>
+              <p><strong>Khu vực:</strong> ${cls.location}</p>
+              <p><strong>Học phí:</strong> ${cls.fee} VND/tháng</p>
+              <p><strong>Trạng thái:</strong> <span class="status ${statusClass}">${statusText}</span></p>
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(error => {
+          console.error('Lỗi khi tải dữ liệu lớp học:', error);
+        });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+    
+    <!-- Account Form -->
+    <div id="reg-log-container"></div>
+
+    <!-- Main -->
+    <div class="post-tutor-form">
+        <h2>Đăng bài tìm gia sư</h2>
+        <form id="tutorForm">
+          <div>
+            <label for="subject">Môn học:</label>
+            <input type="text" id="subject" name="subject" required>
+          </div>
+          <div>
+            <label for="grade">Lớp học:</label>
+            <input type="text" id="grade" name="grade" required>
+          </div>
+          <div>
+            <label for="location">Khu vực:</label>
+            <input type="text" id="location" name="location" required>
+          </div>
+          <div>
+            <label for="description">Tình hình học tập của học viên:</label>
+            <textarea id="description" name="description" rows="3" required></textarea>
+          </div>
+          <div>
+            <label for="description">Yêu cầu gia sư:</label>
+            <textarea id="description" name="description" rows="3" required></textarea>
+          </div>
+          <div>
+            <label for="fee">Học phí (VND):</label>
+            <input type="number" id="fee" name="fee" required>
+          </div>
+          <div>
+            <label for="gender">Giới tính gia sư:</label>
+            <select id="gender" name="gender">
+              <option value="male">Nam</option>
+              <option value="female">Nữ</option>
+              <option value="any">Không yêu cầu</option>
+            </select>
+          </div>
+          <div>
+            <label for="mode">Hình thức học:</label>
+            <select id="mode" name="mode">
+              <option value="online">Online</option>
+              <option value="offline">Tại nhà</option>
+            </select>
+          </div>
+          <button type="submit">Đăng bài</button>
+        </form>
+      
+        <div id="postResult" class="message-box" style="display: none;">
+            <h4>🎉 Đăng bài thành công!</h4>
+        </div>
+      </div>        
+    
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    
+
+    <!-- custom js file link -->
+    <script src="js/loadContent.js" defer></script>
+    <script src="js/script.js" defer></script>
+
+    <script>   
+        document.getElementById("tutorForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const resultDiv = document.getElementById("postResult");
+            resultDiv.style.display = 'block';
+             this.reset();
+    
+            // Ẩn thông báo sau 3 giây
+            setTimeout(function() {
+                resultDiv.style.display = 'none';
+            }, 3000);
+        });
+    </script>
+    
+    
+</body>
+</html>
+

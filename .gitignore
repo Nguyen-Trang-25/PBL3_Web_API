@@ -1,0 +1,18 @@
+﻿# Bỏ qua các tệp nhị phân và thư mục tạm thời
+bin/
+obj/
+
+# Bỏ qua các tệp cấu hình cá nhân của Visual Studio
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Bỏ qua các thư mục nhúng trong dự án (nuget, VS)
+.vs/
+.idea/
+.vscode/
+
+# Bỏ qua các tệp nhị phân, tệp log, và các thư mục cấu hình môi trường
+*.log
+*.dat
