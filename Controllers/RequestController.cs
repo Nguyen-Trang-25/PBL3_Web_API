@@ -44,7 +44,7 @@ namespace FindTutor_MVC.Controllers
                     {
                         RequestId = model.RequestId,
                         StudentId = model.StudentId,  // Cần lấy từ session hoặc login thực tế
-                        Subjectid = model.Subjectid,
+                        SubjectId = model.SubjectId,
                         Level = model.Level,
                         Fee = model.Fee,
                         Schedule = model.Schedule,
@@ -64,7 +64,7 @@ namespace FindTutor_MVC.Controllers
                         success = true,
                         message = "Yêu cầu đã được đăng thành công.",
                         requestId = request.RequestId,
-                        subject = request.Subjectid,
+                        subject = request.SubjectId,
                         level = request.Level,
                         fee = request.Fee,
                         schedule = request.Schedule,

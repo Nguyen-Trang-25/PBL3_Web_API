@@ -7,7 +7,7 @@ public partial class Payment
 {
     public string PaymentId { get; set; } = null!;
 
-    public string? ContractId { get; set; }
+    public string ContractId { get; set; } = null!;
 
     public decimal Amount { get; set; }
 
@@ -15,7 +15,7 @@ public partial class Payment
 
     public string? Status { get; set; }
 
-    public virtual Contract? Contract { get; set; }
+    public virtual Contract Contract { get; set; } = null!;
 
-    public virtual ICollection<TransactionHistory> TransactionHistories { get; set; } = new List<TransactionHistory>();
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

@@ -7,8 +7,11 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
 namespace FindTutor_MVC.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class AuthController : ControllerBase
     {
         private readonly ApplicationDbContext _context;// khai báo đối tượng
@@ -26,14 +29,28 @@ namespace FindTutor_MVC.Controllers
                 return BadRequest(new { message = "Số điện thoại đã được đăng ký" });
 
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
+            var lastUser = await _context.Users
+                   .OrderByDescending(u => u.UserId)
+                   .FirstOrDefaultAsync();
 
+            int nextId = 1;
+            if (lastUser != null && int.TryParse(lastUser.UserId, out int lastId))
+            {
+                nextId = lastId + 1;  // Tăng giá trị ID của người dùng cuối cùng
+            }
+
+            // Tạo UserId đảm bảo có đủ 10 ký tự
+            string newUserId = nextId.ToString("D10");  // D10 đảm bảo ID có đủ 10 chữ số
+
+            // Tạo đối tượng người dùng
             var user = new User
             {
-                UserId = Guid.NewGuid().ToString(),
+                UserId = newUserId,
                 Phone = model.Phone,
                 Password = hashedPassword,
                 Role = model.Role
             };
+
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();// chỉ lần lưu vào db, k cần chờ nó lưu xong mà vẫn làm việc khác dc
@@ -52,12 +69,14 @@ namespace FindTutor_MVC.Controllers
             return Ok(new { token });
 
         }
+
+       
         private string GenerateJwtToken(User user)
         {
             var claims = new[]
 
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId),
+                new Claim(ClaimTypes.NameIdentifier, user.UserId),// gán id vào token
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim(ClaimTypes.MobilePhone, user.Phone)
 
@@ -78,5 +97,3 @@ namespace FindTutor_MVC.Controllers
         }
     }
 }
-
-

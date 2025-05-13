@@ -9,7 +9,7 @@ public partial class Request
 
     public string StudentId { get; set; } = null!;
 
-    public string? Subjectid { get; set; }
+    public string? SubjectId { get; set; }
 
     public string Level { get; set; } = null!;
 
@@ -31,5 +31,9 @@ public partial class Request
 
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
+    public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
+
     public virtual Student Student { get; set; } = null!;
+
+    public virtual Subject? Subject { get; set; }
 }

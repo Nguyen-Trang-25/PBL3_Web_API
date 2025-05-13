@@ -15,15 +15,9 @@ public partial class ApplicationDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Admin> Admins { get; set; }
-
     public virtual DbSet<Application> Applications { get; set; }
 
     public virtual DbSet<Contract> Contracts { get; set; }
-
-    public virtual DbSet<Course> Courses { get; set; }
-
-    public virtual DbSet<Enrollment> Enrollments { get; set; }
 
     public virtual DbSet<Message> Messages { get; set; }
 
@@ -33,15 +27,11 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Review> Reviews { get; set; }
 
-    public virtual DbSet<RoleLevel> RoleLevels { get; set; }
-
-    public virtual DbSet<Schedule> Schedules { get; set; }
-
     public virtual DbSet<Student> Students { get; set; }
 
     public virtual DbSet<Subject> Subjects { get; set; }
 
-    public virtual DbSet<TransactionHistory> TransactionHistories { get; set; }
+    public virtual DbSet<Transaction> Transactions { get; set; }
 
     public virtual DbSet<Tutor> Tutors { get; set; }
 
@@ -49,55 +39,26 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<UserCccd> UserCccds { get; set; }
 
-    public virtual DbSet<UserVerification> UserVerifications { get; set; }
+    public virtual DbSet<Verification> Verifications { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=localhost;Database=pbl3;Trusted_Connection=True;TrustServerCertificate=True;");
-
+    public virtual DbSet<Course> Courses { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Admin>(entity =>
-        {
-            entity.HasKey(e => e.AdminId).HasName("PK__Admins__43AA4141CB65744C");
-
-            entity.HasIndex(e => e.UserId, "UQ__Admins__B9BE370E07D001CE").IsUnique();
-
-            entity.Property(e => e.AdminId).HasColumnName("admin_id");
-            entity.Property(e => e.RoleId)
-                .HasMaxLength(3)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("role_id");
-            entity.Property(e => e.UserId)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("user_id");
-
-            entity.HasOne(d => d.Role).WithMany(p => p.Admins)
-                .HasForeignKey(d => d.RoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Admins_RoleLevels");
-
-            entity.HasOne(d => d.User).WithOne(p => p.Admin)
-                .HasForeignKey<Admin>(d => d.UserId)
-                .HasConstraintName("FK_Admins_Users");
-        });
-
         modelBuilder.Entity<Application>(entity =>
         {
-            entity.HasKey(e => e.ApplicationId).HasName("PK__applicat__79FDB1CFAF359DF3");
-
-            entity.ToTable("applications");
+            entity.HasKey(e => e.ApplicationId).HasName("PK__Applicat__79FDB1CF8AA31A4F");
 
             entity.Property(e => e.ApplicationId)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("applicationId");
+            entity.Property(e => e.ApplicationId1)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("application_id");
             entity.Property(e => e.AppliedAt)
-                .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("applied_at");
             entity.Property(e => e.Email)
@@ -128,8 +89,7 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("specialization");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasDefaultValue("pending");
+                .IsUnicode(false);
             entity.Property(e => e.TeachingArea)
                 .HasMaxLength(255)
                 .HasColumnName("teaching_area");
@@ -146,17 +106,17 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.Request).WithMany(p => p.Applications)
                 .HasForeignKey(d => d.RequestId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__applicati__reque__536D5C82");
+                .HasConstraintName("FK__Applicati__reque__59063A47");
 
             entity.HasOne(d => d.Tutor).WithMany(p => p.Applications)
                 .HasForeignKey(d => d.TutorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__applicati__tutor__52793849");
+                .HasConstraintName("FK__Applicati__tutor__5812160E");
         });
 
         modelBuilder.Entity<Contract>(entity =>
         {
-            entity.HasKey(e => e.ContractId).HasName("PK__Contract__F8D66423C7AE96C1");
+            entity.HasKey(e => e.ContractId).HasName("PK__Contract__F8D66423A42E5A7F");
 
             entity.Property(e => e.ContractId)
                 .HasMaxLength(10)
@@ -164,122 +124,37 @@ public partial class ApplicationDbContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("contract_id");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.EndDate).HasColumnName("end_date");
-            entity.Property(e => e.StartDate).HasColumnName("start_date");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasDefaultValue("active")
-                .HasColumnName("status");
-            entity.Property(e => e.StudentId)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("student_id");
-            entity.Property(e => e.TutorId)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("tutor_id");
-
-            entity.HasOne(d => d.Student).WithMany(p => p.Contracts)
-                .HasForeignKey(d => d.StudentId)
-                .HasConstraintName("FK_Contracts_Students");
-
-            entity.HasOne(d => d.Tutor).WithMany(p => p.Contracts)
-                .HasForeignKey(d => d.TutorId)
-                .HasConstraintName("FK_Contracts_Tutors");
-        });
-
-        modelBuilder.Entity<Course>(entity =>
-        {
-            entity.HasKey(e => e.CourseId).HasName("PK__Courses__8F1EF7AE3A98A9D5");
-
-            entity.Property(e => e.CourseId)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("course_id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
             entity.Property(e => e.Fee)
                 .HasColumnType("decimal(18, 0)")
                 .HasColumnName("fee");
-            entity.Property(e => e.Level)
-                .HasMaxLength(50)
-                .HasColumnName("level");
             entity.Property(e => e.Location)
                 .HasMaxLength(250)
                 .HasColumnName("location");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasDefaultValue("open")
-                .HasColumnName("status");
-            entity.Property(e => e.SubjectId)
-                .HasMaxLength(3)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("subject_id");
-            entity.Property(e => e.TutorId)
+            entity.Property(e => e.RequestId)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .IsFixedLength()
-                .HasColumnName("tutor_id");
+                .HasColumnName("request_id");
+            entity.Property(e => e.Schedule)
+                .HasColumnType("text")
+                .HasColumnName("schedule");
+            entity.Property(e => e.StartDate).HasColumnName("start_date");
+            entity.Property(e => e.Status)
+                .HasMaxLength(20)
+                .HasColumnName("status");
 
-            entity.HasOne(d => d.Subject).WithMany(p => p.Courses)
-                .HasForeignKey(d => d.SubjectId)
+            entity.HasOne(d => d.Request).WithMany(p => p.Contracts)
+                .HasForeignKey(d => d.RequestId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Courses_Subjects");
-
-            entity.HasOne(d => d.Tutor).WithMany(p => p.Courses)
-                .HasForeignKey(d => d.TutorId)
-                .HasConstraintName("FK__Courses__tutor_i__5535A963");
-        });
-
-        modelBuilder.Entity<Enrollment>(entity =>
-        {
-            entity.HasKey(e => e.EnrollmentId).HasName("PK__Enrollme__6D24AA7A4446C470");
-
-            entity.Property(e => e.EnrollmentId)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("enrollment_id");
-            entity.Property(e => e.CourseId)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("course_id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasDefaultValue("active")
-                .HasColumnName("status");
-            entity.Property(e => e.StudentId)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("student_id");
-
-            entity.HasOne(d => d.Course).WithMany(p => p.Enrollments)
-                .HasForeignKey(d => d.CourseId)
-                .HasConstraintName("FK_Enrollments_Courses");
-
-            entity.HasOne(d => d.Student).WithMany(p => p.Enrollments)
-                .HasForeignKey(d => d.StudentId)
-                .HasConstraintName("FK_Enrollments_Students");
+                .HasConstraintName("FK__Contracts__reque__5BE2A6F2");
         });
 
         modelBuilder.Entity<Message>(entity =>
         {
-            entity.HasKey(e => e.MessageId).HasName("PK__Messages__0BBF6EE65A5C07ED");
+            entity.HasKey(e => e.MessageId).HasName("PK__Messages__0BBF6EE6E693C91A");
 
             entity.Property(e => e.MessageId)
                 .HasMaxLength(10)
@@ -300,22 +175,23 @@ public partial class ApplicationDbContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("sender_id");
             entity.Property(e => e.SentAt)
-                .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("sent_at");
 
             entity.HasOne(d => d.Receiver).WithMany(p => p.MessageReceivers)
                 .HasForeignKey(d => d.ReceiverId)
-                .HasConstraintName("FK_Messages_Receiver");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Messages__receiv__4222D4EF");
 
             entity.HasOne(d => d.Sender).WithMany(p => p.MessageSenders)
                 .HasForeignKey(d => d.SenderId)
-                .HasConstraintName("FK_Messages_Sender");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Messages__sender__412EB0B6");
         });
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__ED1FC9EA60738E16");
+            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__ED1FC9EAE624791A");
 
             entity.Property(e => e.PaymentId)
                 .HasMaxLength(10)
@@ -333,17 +209,17 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.PaymentDate).HasColumnName("payment_date");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
-                .HasDefaultValue("pending")
                 .HasColumnName("status");
 
             entity.HasOne(d => d.Contract).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.ContractId)
-                .HasConstraintName("FK_Payments_Contracts");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Payments__contra__5EBF139D");
         });
 
         modelBuilder.Entity<Request>(entity =>
         {
-            entity.HasKey(e => e.RequestId).HasName("PK__Requests__18D3B90F708FFAD5");
+            entity.HasKey(e => e.RequestId).HasName("PK__Requests__18D3B90F61ACDEC3");
 
             entity.Property(e => e.RequestId)
                 .HasMaxLength(10)
@@ -351,7 +227,6 @@ public partial class ApplicationDbContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("request_id");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.Fee)
@@ -376,27 +251,31 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("schedule");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
-                .HasDefaultValue("pending")
                 .HasColumnName("status");
             entity.Property(e => e.StudentId)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("student_id");
-            entity.Property(e => e.Subjectid)
+            entity.Property(e => e.SubjectId)
                 .HasMaxLength(3)
                 .IsUnicode(false)
                 .IsFixedLength()
-                .HasColumnName("subjectid");
+                .HasColumnName("subject_id");
 
             entity.HasOne(d => d.Student).WithMany(p => p.Requests)
                 .HasForeignKey(d => d.StudentId)
-                .HasConstraintName("FK__Requests__studen__4F7CD00D");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Requests__studen__534D60F1");
+
+            entity.HasOne(d => d.Subject).WithMany(p => p.Requests)
+                .HasForeignKey(d => d.SubjectId)
+                .HasConstraintName("FK__Requests__subjec__5441852A");
         });
 
         modelBuilder.Entity<Review>(entity =>
         {
-            entity.HasKey(e => e.ReviewId).HasName("PK__Reviews__60883D90C407565F");
+            entity.HasKey(e => e.ReviewId).HasName("PK__Reviews__60883D9083172412");
 
             entity.Property(e => e.ReviewId)
                 .HasMaxLength(10)
@@ -407,7 +286,6 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnType("text")
                 .HasColumnName("comment");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.Rating).HasColumnName("rating");
@@ -424,88 +302,40 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Student).WithMany(p => p.Reviews)
                 .HasForeignKey(d => d.StudentId)
-                .HasConstraintName("FK_Reviews_Students");
+                .HasConstraintName("FK__Reviews__student__4D94879B");
 
             entity.HasOne(d => d.Tutor).WithMany(p => p.Reviews)
                 .HasForeignKey(d => d.TutorId)
-                .HasConstraintName("FK_Reviews_Tutors");
-        });
-
-        modelBuilder.Entity<RoleLevel>(entity =>
-        {
-            entity.HasKey(e => e.RoleId).HasName("PK__RoleLeve__760965CC55FF2BF6");
-
-            entity.HasIndex(e => e.RoleName, "UQ__RoleLeve__783254B1EC455CA6").IsUnique();
-
-            entity.Property(e => e.RoleId)
-                .HasMaxLength(3)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("role_id");
-            entity.Property(e => e.RoleName)
-                .HasMaxLength(50)
-                .HasColumnName("role_name");
-        });
-
-        modelBuilder.Entity<Schedule>(entity =>
-        {
-            entity.HasKey(e => e.ScheduleId).HasName("PK__Schedule__C46A8A6F4E8D0D83");
-
-            entity.Property(e => e.ScheduleId)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("schedule_id");
-            entity.Property(e => e.CourseId)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("course_id");
-            entity.Property(e => e.Date).HasColumnName("date");
-            entity.Property(e => e.EndTime).HasColumnName("end_time");
-            entity.Property(e => e.StartTime).HasColumnName("start_time");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasDefaultValue("pending")
-                .HasColumnName("status");
-
-            entity.HasOne(d => d.Course).WithMany(p => p.Schedules)
-                .HasForeignKey(d => d.CourseId)
-                .HasConstraintName("FK__Schedules__cours__59FA5E80");
+                .HasConstraintName("FK__Reviews__tutor_i__4E88ABD4");
         });
 
         modelBuilder.Entity<Student>(entity =>
         {
-            entity.HasKey(e => e.StudentId).HasName("PK__Students__2A33069A53AB0DF0");
-
-            entity.HasIndex(e => e.StudentCode, "UQ__Students__6DF33C455DF3F271").IsUnique();
-
-            entity.HasIndex(e => e.UserId, "UQ__Students__B9BE370E9D99CF42").IsUnique();
+            entity.HasKey(e => e.StudentId).HasName("PK__Students__2A33069AFD15C711");
 
             entity.Property(e => e.StudentId)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("student_id");
-            entity.Property(e => e.StudentCode)
+            entity.Property(e => e.GradeLevel)
                 .HasMaxLength(20)
-                .HasColumnName("student_code");
+                .HasColumnName("grade_level");
             entity.Property(e => e.UserId)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("user_id");
 
-            entity.HasOne(d => d.User).WithOne(p => p.Student)
-                .HasForeignKey<Student>(d => d.UserId)
-                .HasConstraintName("FK__Students__user_i__49C3F6B7");
+            entity.HasOne(d => d.User).WithMany(p => p.Students)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Students__user_i__4AB81AF0");
         });
 
         modelBuilder.Entity<Subject>(entity =>
         {
-            entity.HasKey(e => e.SubjectId).HasName("PK__Subjects__5004F6605DE26335");
-
-            entity.HasIndex(e => e.Name, "UQ__Subjects__72E12F1BB249D797").IsUnique();
+            entity.HasKey(e => e.SubjectId).HasName("PK__Subjects__5004F6600C04BE77");
 
             entity.Property(e => e.SubjectId)
                 .HasMaxLength(3)
@@ -520,11 +350,9 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("name");
         });
 
-        modelBuilder.Entity<TransactionHistory>(entity =>
+        modelBuilder.Entity<Transaction>(entity =>
         {
-            entity.HasKey(e => e.TransactionId).HasName("PK__Transact__85C600AF8B0CE5EC");
-
-            entity.ToTable("TransactionHistory");
+            entity.HasKey(e => e.TransactionId).HasName("PK__Transact__85C600AF69B62F45");
 
             entity.Property(e => e.TransactionId)
                 .HasMaxLength(10)
@@ -540,20 +368,18 @@ public partial class ApplicationDbContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("payment_id");
             entity.Property(e => e.Timestamp)
-                .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("timestamp");
 
-            entity.HasOne(d => d.Payment).WithMany(p => p.TransactionHistories)
+            entity.HasOne(d => d.Payment).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.PaymentId)
-                .HasConstraintName("FK_TransactionHistory_Payments");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Transacti__payme__628FA481");
         });
 
         modelBuilder.Entity<Tutor>(entity =>
         {
-            entity.HasKey(e => e.TutorId).HasName("PK__Tutors__50DE5D01932534CD");
-
-            entity.HasIndex(e => e.UserId, "UQ__Tutors__B9BE370E6475FEDA").IsUnique();
+            entity.HasKey(e => e.TutorId).HasName("PK__Tutors__50DE5D015AA3A3C4");
 
             entity.Property(e => e.TutorId)
                 .HasMaxLength(10)
@@ -563,31 +389,32 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Experience)
                 .HasColumnType("ntext")
                 .HasColumnName("experience");
-            entity.Property(e => e.Rating)
-                .HasDefaultValue(0.0)
-                .HasColumnName("rating");
-            entity.Property(e => e.SpecialtySubjectId).HasColumnName("specialty_subject_id");
-            entity.Property(e => e.TotalReviews)
-                .HasDefaultValue(0)
-                .HasColumnName("total_reviews");
+            entity.Property(e => e.Rating).HasColumnName("rating");
+            entity.Property(e => e.SpecialtySubjectId)
+                .HasMaxLength(3)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("specialty_subject_id");
+            entity.Property(e => e.TotalReviews).HasColumnName("total_reviews");
             entity.Property(e => e.UserId)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("user_id");
 
-            entity.HasOne(d => d.User).WithOne(p => p.Tutor)
-                .HasForeignKey<Tutor>(d => d.UserId)
-                .HasConstraintName("FK__Tutors__user_id__44FF419A");
+            entity.HasOne(d => d.SpecialtySubject).WithMany(p => p.Tutors)
+                .HasForeignKey(d => d.SpecialtySubjectId)
+                .HasConstraintName("FK__Tutors__specialt__47DBAE45");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Tutors)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Tutors__user_id__46E78A0C");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__B9BE370F275358A6");
-
-            entity.HasIndex(e => e.Email, "UQ__Users__AB6E61649ED720B0").IsUnique();
-
-            entity.HasIndex(e => e.Phone, "UQ__Users__B43B145F04E88052").IsUnique();
+            entity.HasKey(e => e.UserId).HasName("PK__Users__B9BE370FE666BBBC");
 
             entity.Property(e => e.UserId)
                 .HasMaxLength(10)
@@ -595,7 +422,6 @@ public partial class ApplicationDbContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("user_id");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.Email)
@@ -618,17 +444,14 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("role");
             entity.Property(e => e.Status)
                 .HasMaxLength(25)
-                .HasDefaultValue("active")
                 .HasColumnName("status");
         });
 
         modelBuilder.Entity<UserCccd>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__UserCCCD__3213E83FC79B5AB8");
+            entity.HasKey(e => e.Id).HasName("PK__UserCCCD__3213E83FA1AB230A");
 
             entity.ToTable("UserCCCD");
-
-            entity.HasIndex(e => e.CccdNumber, "UQ__UserCCCD__3719081014C99201").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasMaxLength(10)
@@ -644,11 +467,8 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.CccdPlaceOfIssue)
                 .HasMaxLength(255)
                 .HasColumnName("cccd_place_of_issue");
-            entity.Property(e => e.CccdVerified)
-                .HasDefaultValue(false)
-                .HasColumnName("cccd_verified");
+            entity.Property(e => e.CccdVerified).HasColumnName("cccd_verified");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.UserId)
@@ -660,14 +480,12 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.UserCccds)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__UserCCCD__user_i__3E1D39E1");
+                .HasConstraintName("FK__UserCCCD__user_i__3E52440B");
         });
 
-        modelBuilder.Entity<UserVerification>(entity =>
+        modelBuilder.Entity<Verification>(entity =>
         {
-            entity.HasKey(e => e.VerificationId).HasName("PK__UserVeri__24F179697A884E3E");
-
-            entity.ToTable("UserVerification");
+            entity.HasKey(e => e.VerificationId).HasName("PK__Verifica__24F1796960CF754D");
 
             entity.Property(e => e.VerificationId)
                 .HasMaxLength(10)
@@ -686,9 +504,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(10)
                 .HasColumnName("verification_code");
 
-            entity.HasOne(d => d.User).WithMany(p => p.UserVerifications)
+            entity.HasOne(d => d.User).WithMany(p => p.Verifications)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__UserVerif__user___3F466844");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Verificat__user___3B75D760");
         });
 
         OnModelCreatingPartial(modelBuilder);

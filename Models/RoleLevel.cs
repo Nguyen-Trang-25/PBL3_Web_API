@@ -9,5 +9,5 @@ public partial class RoleLevel
 
     public string RoleName { get; set; } = null!;
 
-    public virtual ICollection<Admin> Admins { get; set; } = new List<Admin>();
+    
 }

@@ -9,11 +9,7 @@ public partial class Student
 
     public string UserId { get; set; } = null!;
 
-    public string? StudentCode { get; set; }
-
-    public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
-
-    public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+    public string? GradeLevel { get; set; }
 
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
 

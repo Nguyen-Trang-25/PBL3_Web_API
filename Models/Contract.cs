@@ -7,13 +7,17 @@ public partial class Contract
 {
     public string ContractId { get; set; } = null!;
 
-    public string? TutorId { get; set; }
-
-    public string? StudentId { get; set; }
+    public string RequestId { get; set; } = null!;
 
     public DateOnly StartDate { get; set; }
 
     public DateOnly EndDate { get; set; }
+
+    public decimal Fee { get; set; }
+
+    public string Schedule { get; set; } = null!;
+
+    public string Location { get; set; } = null!;
 
     public string? Status { get; set; }
 
@@ -21,7 +25,5 @@ public partial class Contract
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
-    public virtual Student? Student { get; set; }
-
-    public virtual Tutor? Tutor { get; set; }
+    public virtual Request Request { get; set; } = null!;
 }

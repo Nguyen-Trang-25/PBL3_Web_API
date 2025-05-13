@@ -11,5 +11,7 @@ public partial class Subject
 
     public string? Description { get; set; }
 
-    public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
+    public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
+
+    public virtual ICollection<Tutor> Tutors { get; set; } = new List<Tutor>();
 }
