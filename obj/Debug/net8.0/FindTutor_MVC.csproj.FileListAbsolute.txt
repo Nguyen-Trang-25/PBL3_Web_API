@@ -345,3 +345,6 @@ G:\HK2_2425\PBL3\BE\obj\Debug\net8.0\FindTutor_MVC.pdb
 G:\HK2_2425\PBL3\BE\obj\Debug\net8.0\FindTutor_MVC.genruntimeconfig.cache
 G:\HK2_2425\PBL3\BE\obj\Debug\net8.0\ref\FindTutor_MVC.dll
 G:\HK2_2425\PBL3\BE\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+G:\HK2_2425\PBL3\BE\bin\Debug\net8.0\Microsoft.Bcl.Memory.dll
+G:\HK2_2425\PBL3\BE\bin\Debug\net8.0\Newtonsoft.Json.dll
+G:\HK2_2425\PBL3\BE\bin\Debug\net8.0\Twilio.dll

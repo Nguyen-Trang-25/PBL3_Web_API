@@ -42,6 +42,8 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<Verification> Verifications { get; set; }
 
     public virtual DbSet<Course> Courses { get; set; }
+
+    public virtual DbSet<OtpVerifications> OtpVerifications { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Application>(entity =>

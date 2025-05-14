@@ -92,5 +92,47 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindTutor_MVC.Controllers.VerificationController",
+    "Method": "Index",
+    "RelativePath": "api/Verification",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindTutor_MVC.Controllers.VerificationController",
+    "Method": "ConfirmChangePhone",
+    "RelativePath": "api/Verification/ConfirmChangePhone",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "FindTutor_MVC.Models.ViewModels.ConfirmChangePhone",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindTutor_MVC.Controllers.VerificationController",
+    "Method": "RequestChangePhone",
+    "RelativePath": "api/Verification/RequestChangePhone",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "newPhone",
+        "Type": "FindTutor_MVC.Models.ViewModels.ChangePhone",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FindTutor_MVC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a1414dd2317f633dcea66033bce8ccf3f9179ba3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+43db81f4abbae0f864fa569cb2fcd0a50e86cf93")]
 [assembly: System.Reflection.AssemblyProductAttribute("FindTutor_MVC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FindTutor_MVC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
