@@ -1719,48 +1719,52 @@ section{
 
 // class history
 .class-history {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 24px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-  h2 {
-    text-align: center;
-    font-size: 24px;
-    color: $green;
-    margin-bottom: 24px;
-  }
-
-  .class-card {
-    padding: 20px;
-    margin-bottom: 20px;
-    border-left: 6px solid $green;
-    background: #f9f9f9;
-    border-radius: 10px;
-
-    h3 {
-      margin-bottom: 8px;
-      color: #333;
+    h2 {
+        text-align: center;
+        font-size: 24px;
+        color: $green;
+        margin-bottom: 24px;
     }
 
-    p {
-      margin: 4px 0;
-      font-size: 15px;
+    .class-card {
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 6px solid $green;
+        background: #f9f9f9;
+        border-radius: 10px;
 
-      .status {
-        font-weight: bold;
-        &.success {
-          color: #28a745;
+        h3 {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: rgb(14, 181, 130);
         }
-        &.pending {
-          color: #ffc107;
+
+        p {
+            margin: 4px 0;
+            font-size: 15px;
+
+            .status {
+                font-weight: bold;
+
+                &.success {
+                    color: #28a745;
+                }
+
+                &.pending {
+                    color: #ffc107;
+                }
+
+                &.waiting {
+                    color: #dc3545;
+                }
+            }
         }
-        &.waiting {
-          color: #dc3545;
-        }
-      }
     }
-  }
 }

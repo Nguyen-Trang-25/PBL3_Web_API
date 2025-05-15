@@ -33,8 +33,6 @@ public partial class Application
 
     public bool Gender { get; set; }
 
-    public string? ApplicationId1 { get; set; }
-
     public virtual Request Request { get; set; } = null!;
 
     public virtual Tutor Tutor { get; set; } = null!;

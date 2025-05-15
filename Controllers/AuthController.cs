@@ -62,62 +62,44 @@ namespace BE_Tutor.Controllers
         public async Task<IActionResult> Login([FromBody] Login model)
         {
             var user = await _context.Users
-            .Where(u => u.Phone == model.Phone)
-            .Select(u => new User
-            {
-                UserId = u.UserId,
-                Phone = u.Phone,
-                Password = u.Password,
-                Role = u.Role
-            })
-            .FirstOrDefaultAsync();
+                .Where(u => u.Phone == model.Phone)
+                .FirstOrDefaultAsync();
 
-            if (user == null)
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
                 return Unauthorized(new { message = "Sai số điện thoại hoặc mật khẩu" });
 
-            try
-            {
-                if (!BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
-                    return Unauthorized(new { message = "Sai số điện thoại hoặc mật khẩu" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Lỗi xác thực mật khẩu", detail = ex.Message });
-            }
+            // Tìm studentId (nếu có)
+            var student = await _context.Students
+                .Where(s => s.UserId == user.UserId)
+                .Select(s => s.StudentId)
+                .FirstOrDefaultAsync();
 
-            var token = GenerateJwtToken(user);
+            // Tìm tutorId (nếu có)
+            var tutor = await _context.Tutors
+                .Where(t => t.UserId == user.UserId)
+                .Select(t => t.TutorId)
+                .FirstOrDefaultAsync();
+
+            var token = GenerateJwtToken(user, student, tutor);
+
             return Ok(new { token });
         }
 
-
-        [HttpGet("whoami")]
-        [Authorize]
-        public IActionResult WhoAmI()
+        private string GenerateJwtToken(User user, string? studentId, string? tutorId)
         {
-            var role = User.FindFirst(ClaimTypes.Role)?.Value;
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.UserId),
+        new Claim(ClaimTypes.Role, user.Role),
+        new Claim(ClaimTypes.MobilePhone, user.Phone),
+    };
 
-            return Ok(new
-            {
-                message = $"Bạn đang đăng nhập với role: {role}",
-                userId = userId
-            });
-        }
-        private string GenerateJwtToken(User user)
-        {
+            if (!string.IsNullOrEmpty(studentId))
+                claims.Add(new Claim("studentId", studentId));
+            if (!string.IsNullOrEmpty(tutorId))
+                claims.Add(new Claim("tutorId", tutorId));
 
-            if (string.IsNullOrEmpty(_jwtSettings.Key))
-                throw new Exception("JWT key is not configured");
-
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId),
-                new Claim(ClaimTypes.Role, user.Role),
-                new Claim(ClaimTypes.MobilePhone, user.Phone)
-
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));// tao ra khoa bi mat
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -125,11 +107,13 @@ namespace BE_Tutor.Controllers
                 audience: _jwtSettings.Audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiresInMinutes),
-                signingCredentials: creds// la phần chữ kí tạo ra từ creds
-                );
+                signingCredentials: creds
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+       
     }
 }
 

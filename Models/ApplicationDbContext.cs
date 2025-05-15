@@ -55,11 +55,6 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .IsFixedLength()
-                .HasColumnName("applicationId");
-            entity.Property(e => e.ApplicationId1)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
                 .HasColumnName("application_id");
             entity.Property(e => e.AppliedAt)
                 .HasColumnType("datetime")

@@ -307,8 +307,7 @@ section {
 .home-content .hero .hero-image {
   width: 100%;
   height: 400px;
-  -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
   filter: brightness(0.6);
 }
 .home-content .hero .hero-text {
@@ -608,8 +607,7 @@ section {
 .teachers .slide .image img {
   width: 100%;
   height: 100%;
-  -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
   background-color: #f0fdfa;
   border-radius: 10px;
 }
@@ -679,8 +677,7 @@ section {
 .reviews .swiper .swiper-slide img {
   width: 6rem;
   height: 6rem;
-  -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
   margin-bottom: 1.5rem;
   border-radius: 50%;
 }
@@ -941,8 +938,7 @@ section {
 .contact-content .contact-info-boxes img {
   width: 5rem;
   height: 5rem;
-  -o-object-fit: contain;
-     object-fit: contain;
+  object-fit: contain;
   margin-bottom: 1rem;
 }
 .contact-content .contact-form-wrapper {
@@ -965,8 +961,7 @@ section {
   max-width: 100%;
   height: auto;
   border-radius: 1rem;
-  -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
   max-height: 550px;
 }
 .contact-content .contact-form-wrapper .contact-form {
@@ -1099,8 +1094,7 @@ section {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
 }
 .chat-page .chat-sidebar .conversation-list .conversation-item .conversation-preview {
   display: flex;
@@ -1153,8 +1147,7 @@ section {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
 }
 .chat-page .message-box .message {
   max-width: 65%;
@@ -1444,7 +1437,7 @@ section {
   transition: background 0.2s;
 }
 .edit-profile-form form button:hover {
-  background: #0a8660;
+  background: rgb(10.3384615385, 133.6615384615, 96);
 }
 .edit-profile-form .message-box {
   color: red;
@@ -1484,7 +1477,8 @@ section {
 }
 .class-history .class-card h3 {
   margin-bottom: 8px;
-  color: #333;
+  font-size: 13px;
+  color: rgb(14, 181, 130);
 }
 .class-history .class-card p {
   margin: 4px 0;
@@ -1501,4 +1495,6 @@ section {
 }
 .class-history .class-card p .status.waiting {
   color: #dc3545;
-}/*# sourceMappingURL=styles.css.map */
+}
+
+/*# sourceMappingURL=styles.css.map */

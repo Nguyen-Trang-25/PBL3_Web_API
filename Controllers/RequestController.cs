@@ -179,7 +179,21 @@ namespace BE_Tutor.Controllers
             return Ok(result);
         }
 
+        [HttpGet("historyRequest/{studentId}")]
+        public async Task<IActionResult> GetClassHistoryByStudentId(string studentId)
+        {
+            var requests = await _context.Requests
+                .Where(r => r.StudentId == studentId)
+                .Select(r => new {
+                    subject = r.Subject,
+                    location = r.Location,
+                    fee = r.Fee,
+                    status = r.Status
+                })
+                .ToListAsync();
 
+            return Ok(requests);
+        }
 
     }
 }
