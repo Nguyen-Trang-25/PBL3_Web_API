@@ -5,6 +5,9 @@ namespace FindTutor_MVC.Models.ViewModels
     {
         [Required]
         public string Phone { get; set; }
+
+        public string OtpCode { get; set; }
+
         [Required]
         [StringLength(100, MinimumLength = 8, ErrorMessage = "Mật khẩu phải từ 8 ký tự trở lên")]
         public string Password { get; set; }

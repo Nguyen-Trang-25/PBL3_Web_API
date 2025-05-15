@@ -32,6 +32,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "FindTutor_MVC.Controllers.AuthController",
+    "Method": "RequestRegister",
+    "RelativePath": "api/Auth/RequestRegister",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "FindTutor_MVC.Models.ViewModels.ChangePhone",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "FindTutor_MVC.Controllers.ProfileController",
     "Method": "Index",
     "RelativePath": "api/Profile",
@@ -105,6 +121,38 @@
   },
   {
     "ContainingType": "FindTutor_MVC.Controllers.VerificationController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/Verification/ChangeForgot",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "FindTutor_MVC.Models.ViewModels.PasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindTutor_MVC.Controllers.VerificationController",
+    "Method": "ChangeReset",
+    "RelativePath": "api/Verification/ChangeReset",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "FindTutor_MVC.Models.ViewModels.PasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindTutor_MVC.Controllers.VerificationController",
     "Method": "ConfirmChangePhone",
     "RelativePath": "api/Verification/ConfirmChangePhone",
     "HttpMethod": "PUT",
@@ -121,6 +169,22 @@
   },
   {
     "ContainingType": "FindTutor_MVC.Controllers.VerificationController",
+    "Method": "RequestPass",
+    "RelativePath": "api/Verification/ForgotPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "FindTutor_MVC.Models.ViewModels.ChangePhone",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindTutor_MVC.Controllers.VerificationController",
     "Method": "RequestChangePhone",
     "RelativePath": "api/Verification/RequestChangePhone",
     "HttpMethod": "POST",
@@ -129,6 +193,22 @@
     "Parameters": [
       {
         "Name": "newPhone",
+        "Type": "FindTutor_MVC.Models.ViewModels.ChangePhone",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindTutor_MVC.Controllers.VerificationController",
+    "Method": "RequestResetPassword",
+    "RelativePath": "api/Verification/ResetPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
         "Type": "FindTutor_MVC.Models.ViewModels.ChangePhone",
         "IsRequired": true
       }

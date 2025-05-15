@@ -72,6 +72,8 @@ namespace FindTutor_MVC.Controllers
                 await _context.SaveChangesAsync();
                 return Ok(new { message = "Xóa người dùng thành công." });
         }
+
+        // ng dung xem pro5 cua minh
         [HttpGet("GetMyUser")]
         public async Task<IActionResult> GetProfile()
         {

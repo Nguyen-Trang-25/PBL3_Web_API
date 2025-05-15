@@ -5,5 +5,7 @@
         
         public string newPhone { get; set; }
         public string OtpCode { get; set; }
+
+        
     }
 }

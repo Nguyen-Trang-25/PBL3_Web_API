@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
+using FindTutor_MVC.Helpers;
 namespace FindTutor_MVC.Controllers
 {
     [Route("api/[controller]")]
@@ -22,11 +23,64 @@ namespace FindTutor_MVC.Controllers
             _context = context;
             _jwtSettings = jwt.Value;// lay gia tri thuc cua cau hinh
         }
+
+        [HttpPost("RequestRegister")]
+        public async Task<IActionResult> RequestRegister([FromBody] ChangePhone dto)
+        {
+            if (_context.Users.Any(u => u.Phone == dto.Newphone))
+                return BadRequest(new { message = "Số điện thoại đã được đăng ký" });
+
+            var existOtp = await _context.OtpVerifications
+        .FirstOrDefaultAsync(o =>
+            o.Phone == dto.Newphone &&
+            o.Purpose == "Register" &&
+            o.ExpiredAt > DateTime.UtcNow);
+
+            string otp;
+
+            if (existOtp != null)
+            {
+                otp = existOtp.OtpCode;
+            }
+            else
+            {
+                otp = OtpHelper.GenerateSecureOtp();
+
+                var verification = new OtpVerifications
+                {
+                    UserId = null,
+                    Phone = dto.Newphone,
+                    OtpCode = otp,
+                    Purpose = "Register",
+                    ExpiredAt = DateTime.UtcNow.AddMinutes(5)
+                };
+                _context.OtpVerifications.Add(verification);
+                await _context.SaveChangesAsync();
+            }
+            return Ok(new { message = "OTP đã được gửi đến số điện thoại."});
+        }
+
+
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] Register model)
         {
+            // xac nhan co khop pass hay ko
+            if (model.Password != model.ConfirmPassword)
+                return BadRequest(new { message = "Mật khẩu xác nhận không khớp." });
+
             if (_context.Users.Any(u => u.Phone == model.Phone))
                 return BadRequest(new { message = "Số điện thoại đã được đăng ký" });
+
+            var otpRecord = await _context.OtpVerifications
+            .FirstOrDefaultAsync(o =>
+            o.Phone == model.Phone &&
+            o.OtpCode == model.OtpCode &&
+            o.Purpose == "Register" &&
+            o.ExpiredAt > DateTime.UtcNow);
+
+            if (otpRecord == null)
+                return BadRequest(new { message = "OTP không hợp lệ hoặc đã hết hạn." });
+
 
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
             var lastUser = await _context.Users
@@ -53,6 +107,7 @@ namespace FindTutor_MVC.Controllers
 
 
             _context.Users.Add(user);
+            _context.OtpVerifications.Remove(otpRecord);
             await _context.SaveChangesAsync();// chỉ lần lưu vào db, k cần chờ nó lưu xong mà vẫn làm việc khác dc
 
             return Ok(new { message = "Đăng ký thành công" });
@@ -69,6 +124,8 @@ namespace FindTutor_MVC.Controllers
             return Ok(new { token });
 
         }
+
+       
 
        
         private string GenerateJwtToken(User user)

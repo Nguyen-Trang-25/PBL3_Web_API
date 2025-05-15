@@ -5,19 +5,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Xml;
+using BCrypt.Net;
+using FindTutor_MVC.Services;
 namespace FindTutor_MVC.Controllers
+   
 {
     [Route("api/[controller]")]// create url
     [ApiController]//  auto Validate Modelstate,...
-    [Authorize]//force to user login
+
     public class VerificationController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public VerificationController(ApplicationDbContext context)
+        private readonly IOtpService _otpService;
+        public VerificationController(ApplicationDbContext context, IOtpService otpService)
         {
             _context = context;
+            _otpService = otpService;// DI: inject
         }
 
+        [Authorize]//force to user login
         [HttpPost("RequestChangePhone")]
         public async Task<IActionResult> RequestChangePhone([FromBody] ChangePhone newPhone)
         {
@@ -56,6 +63,7 @@ namespace FindTutor_MVC.Controllers
             return Ok(new { messgage = "OTP đã được gửi đến số điện thoại mới." });
         }
 
+        [Authorize]//force to user login
         [HttpPut("ConfirmChangePhone")]
         public async Task<IActionResult> ConfirmChangePhone([FromBody] ConfirmChangePhone dto)
         {
@@ -91,9 +99,90 @@ namespace FindTutor_MVC.Controllers
 
             return Ok(new { message = "Cập nhật số điện thoại thành công." });
         }
-        public IActionResult Index()
+        // ng dùng quên pass
+        [AllowAnonymous]
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> RequestPass([FromBody] ChangePhone dto)
         {
-            return View();
+            var user = await _context.Users.FirstOrDefaultAsync(u =>
+            u.Phone == dto.Newphone);
+            if (user == null)
+                return NotFound(new { message = "Không tìm thấy người dùng với số điện thoại này." });
+
+            var otp = await _otpService.RequestOtpAsync(user.UserId, dto.Newphone, "Forgot Password");
+           
+            return Ok(new { message = "OTP đã được gửi." });
+
         }
+        //ng dùng muốn đổi pass chứ kh phải quên
+        [Authorize]
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> RequestResetPassword([FromBody] ChangePhone dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u =>
+            u.Phone == dto.Newphone);
+            if (user == null)
+                return NotFound(new { message = "Không tìm thấy người dùng với số điện thoại này." });
+
+            var otp = await _otpService.RequestOtpAsync(user.UserId, dto.Newphone, "Reset Password");
+
+            return Ok(new { message = "OTP đã được gửi." });
+        }
+
+            //quên
+        [AllowAnonymous]
+        [HttpPut("ChangeForgot")]
+        public async Task<IActionResult> ResetPassword([FromBody] PasswordDto dto)
+        {
+            if (dto.NewPass != dto.ConfirmNew)
+                return BadRequest(new { message = "Mật khẩu xác nhận không khớp." });
+
+            var user = await _context.Users.FirstOrDefaultAsync(u =>
+            u.Phone == dto.Phone);
+            if (user == null)
+                return NotFound(new { message = "Không tìm thấy người dùng." });
+
+            var isValidOtp = await _otpService.VerifyOtpAsync(dto.Phone, dto.OtpCode, "Forgot Password");
+            if (!isValidOtp)
+                return BadRequest(new { message = "Mã OTP không hợp lệ hoặc đã hết hạn." });
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPass);
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đổi mật khẩu thành công." });
+        }// có thể tách ra để clean. Nhưng sau tính
+
+
+        // đổi
+        [Authorize]
+        [HttpPut("ChangeReset")]
+        public async Task<IActionResult> ChangeReset([FromBody] PasswordDto dto)
+        {
+            if (dto.NewPass != dto.ConfirmNew)
+                return BadRequest(new { message = "Mật khẩu xác nhận không khớp." });
+
+            var user = await _context.Users.FirstOrDefaultAsync(u =>
+            u.Phone == dto.Phone);
+            if (user == null)
+                return NotFound(new { message = "Không tìm thấy người dùng." });
+
+            var isValidOtp = await _otpService.VerifyOtpAsync(dto.Phone, dto.OtpCode, "Reset Password");
+            if (!isValidOtp)
+                return BadRequest(new { message = "Mã OTP không hợp lệ hoặc đã hết hạn." });
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPass);
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đổi mật khẩu thành công." });
+        }// có thể tách ra để clean. Nhưng sau tính
+
+        public IActionResult Index()
+                { 
+                    return View();
+                }
     }
 }
