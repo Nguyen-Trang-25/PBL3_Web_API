@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace BE_Tutor.Models;
+
+public partial class Verification
+{
+    public string VerificationId { get; set; } = null!;
+
+    public string UserId { get; set; } = null!;
+
+    public string VerificationCode { get; set; } = null!;
+
+    public DateTime ExpiresAt { get; set; }
+
+    public virtual User User { get; set; } = null!;
+}

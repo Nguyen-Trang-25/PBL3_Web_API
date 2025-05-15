@@ -1,0 +1,36 @@
+<!-- Account Form -->
+<div class="account-form">
+
+    <div id="close-form" class="fas fa-times"></div>
+
+    <div class="buttons">
+        <span class = "btn active login-btn">Đăng nhập</span>
+        <span class = "btn register-btn">Đăng ký</span>
+    </div>
+
+    <form class = "login-form active" action="">
+        <h3>Đăng nhập</h3>
+        <input id="login-phone" type="tel" placeholder="Nhập số điện thoại" class="box" pattern="[0-9]{10}" required>
+        <input id="login-password" type="password" placeholder="Nhập mật khẩu" class="box">
+        <div class="flex">
+            <input type="checkbox" name="" id="remember-me">
+            <label for="remember-me">Nhớ tài khoản</label>
+            <a href="#">Quên mật khẩu?</a>
+        </div>
+        <input type="button" value="Đăng nhập" class= "btn" id="ac_log">
+    </form>
+
+    <form class = "register-form" action="">
+        <h3>Đăng ký</h3>
+        <input id="register-phone" type="tel" placeholder="Nhập số điện thoại" class="box" pattern="[0-9]{10}" required>
+        <input id="register-password" type="password" placeholder="Nhập mật khẩu" class="box">
+        <input id="confirm_pass" type="password" placeholder="Xác nhận lại mật khẩu" class="box">
+        <div class="box" style="margin-top: 10px;">
+            <label><input type="radio" name="role" value="tutor" required> Gia sư</label>
+            <label style="margin-left: 20px;"><input type="radio" name="role" value="student" required> Học viên</label>
+        </div>
+        
+        <input type="button" value="Đăng ký" class= "btn" id="ac_reg">
+    </form>
+
+</div>

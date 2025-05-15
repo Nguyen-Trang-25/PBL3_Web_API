@@ -1,0 +1,6 @@
+@BE_Tutor_HostAddress = http://localhost:5128
+
+GET {{BE_Tutor_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
