@@ -1,6 +1,9 @@
-﻿using BE_Tutor.Models;
+﻿using System.Security.Claims;
+using BE_Tutor.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BE_Tutor.DTO;
 
 namespace BE_Tutor.Controllers
 {
@@ -131,7 +134,10 @@ namespace BE_Tutor.Controllers
      string? learningFormat,
      bool? genderTutor)
         {
-            var query = _context.Requests.Include(r => r.Subject).AsQueryable();
+            var query = _context.Requests
+                .Include(r => r.Subject)
+                .Where(r => r.Status == "pending") // Chỉ lấy các lớp đang chờ duyệt
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(subjectName))
             {
@@ -179,21 +185,85 @@ namespace BE_Tutor.Controllers
             return Ok(result);
         }
 
-        [HttpGet("historyRequest/{studentId}")]
-        public async Task<IActionResult> GetClassHistoryByStudentId(string studentId)
+        [Authorize]
+        [HttpGet("historyRequest")]
+        public async Task<IActionResult> GetHistory()
         {
-            var requests = await _context.Requests
-                .Where(r => r.StudentId == studentId)
-                .Select(r => new {
-                    subject = r.Subject,
-                    location = r.Location,
-                    fee = r.Fee,
-                    status = r.Status
-                })
-                .ToListAsync();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var role = User.FindFirstValue(ClaimTypes.Role);
 
-            return Ok(requests);
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(role))
+                return Unauthorized(new { message = "Không thể xác thực người dùng" });
+
+            if (role == "student")
+            {
+                var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId);
+                if (student == null)
+                    return NotFound(new { message = "Không tìm thấy học sinh" });
+
+                var studentHistory = await _context.Requests
+                    .Include(r => r.Subject)
+                    .Where(r => r.StudentId == student.StudentId)
+                    .Select(r => new RequestHistoryDto
+                    {
+                        RequestId = r.RequestId,
+                        StudentId = r.StudentId,
+                        SubjectName = r.Subject != null ? r.Subject.Name : null,
+                        Level = r.Level,
+                        Fee = r.Fee,
+                        Schedule = r.Schedule,
+                        Status = r.Status,
+                        CreatedAt = r.CreatedAt,
+                        Location = r.Location,
+                        GenderTutor = r.GenderTutor,
+                        Requirement = r.Requirement,
+                        LearningFormat = r.LearningFormat
+                    })
+                    .ToListAsync();
+
+                return Ok(studentHistory);
+
+            }
+            else if (role == "tutor")
+            {
+                var tutor = await _context.Tutors.FirstOrDefaultAsync(t => t.UserId == userId);
+                if (tutor == null)
+                    return NotFound(new { message = "Không tìm thấy gia sư" });
+
+                // Lấy danh sách các lớp mà tutor đã ứng tuyển
+                var appliedRequestIds = await _context.Applications
+                    .Where(a => a.TutorId == tutor.TutorId)
+                    .Select(a => a.RequestId)
+                    .Distinct()
+                    .ToListAsync();
+
+                var history = await _context.Requests
+                    .Include(r => r.Subject)
+                    .Where(r => appliedRequestIds.Contains(r.RequestId))
+                    .Select(r => new RequestHistoryDto
+                    {
+                        RequestId = r.RequestId,
+                        StudentId = r.StudentId,
+                        SubjectName = r.Subject != null ? r.Subject.Name : null,
+                        Level = r.Level,
+                        Fee = r.Fee,
+                        Schedule = r.Schedule,
+                        Status = r.Status,
+                        CreatedAt = r.CreatedAt,
+                        Location = r.Location,
+                        GenderTutor = r.GenderTutor,
+                        Requirement = r.Requirement,
+                        LearningFormat = r.LearningFormat
+                    })
+                    .ToListAsync();
+
+
+                return Ok(history);
+            }
+
+            return BadRequest(new { message = "Role không hợp lệ" });
         }
+
 
     }
 }

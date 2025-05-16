@@ -11,7 +11,7 @@
 <body>
     <!-- Header -->
     <div id="header-container"></div>
-    
+
     <!-- Account Form -->
     <div id="reg-log-container"></div>
 
@@ -19,10 +19,10 @@
     <div class="post-tutor-form">
         <h2>Đăng bài tìm gia sư</h2>
         <form id="tutorForm">
-            <div>
-                <label for="subject">Môn học:</label>
-                <input type="text" id="subject" name="subject" required>
-            </div>
+            <select id="subject" name="subject" required>
+                <option value="">-- Chọn môn học --</option>
+            </select>
+
             <div>
                 <label for="grade">Lớp học:</label>
                 <input type="text" id="grade" name="grade" required>
@@ -65,31 +65,50 @@
         <div id="postResult" class="message-box" style="display: none;">
             <h4>🎉 Đăng bài thành công!</h4>
         </div>
-    </div>        
-    
+    </div>
+
     <!-- Footer -->
     <div id="footer-container"></div>
-    
+
 
     <!-- custom js file link -->
     <script src="/js/loadContent.js" defer></script>
     <script src="/js/script.js" defer></script>
 
-    <script>   
+    <script>
         document.getElementById("tutorForm").addEventListener("submit", function (e) {
             e.preventDefault();
             const resultDiv = document.getElementById("postResult");
             resultDiv.style.display = 'block';
-             this.reset();
-    
+            this.reset();
+
             // Ẩn thông báo sau 3 giây
-            setTimeout(function() {
+            setTimeout(function () {
                 resultDiv.style.display = 'none';
             }, 3000);
         });
     </script>
-    
-    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const response = await fetch("http://localhost:7128/api/subject/subjects"); // Thay bằng đúng URL API của bạn
+                const subjects = await response.json();
+
+                const subjectSelect = document.getElementById("subject");
+                subjects.forEach(sub => {
+                    const option = document.createElement("option");
+                    option.value = sub.subjectId;
+                    option.textContent = sub.name;
+                    subjectSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Lỗi khi tải danh sách môn học:", error);
+            }
+        });
+    </script>
+
+
 </body>
 </html>
 

@@ -45,8 +45,8 @@ namespace BE_Tutor.Controllers
             var application = new Application
             {
                 ApplicationId = newId,
-                TutorId = "0000000001",
-                RequestId = "0000000001",
+                TutorId = model.TutorId,
+                RequestId = model.RequestId,
                 FullName = model.FullName,
                 Email = model.Email,
                 Phone = model.Phone,

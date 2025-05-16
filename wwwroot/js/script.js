@@ -12,11 +12,12 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
 
         let genderT = form.gender.value === "true";
+        console.log(form.subject.value)
 
         const requestData = {
             requestId: "0000000001",
-            studentId: localStorage.getItem("studentId"), // Cần đảm bảo đã có trong localStorage
-            subjectId: "001",
+            studentId: localStorage.getItem("studentId"),
+            subjectId: form.subject.value,
             level: form.grade.value,
             fee: parseFloat(form.fee.value) || 0,
             schedule: form.schedule ? form.schedule.value : "chưa xếp",
@@ -84,6 +85,8 @@ function renderCourseList(data) {
         const card = document.createElement("div");
         card.className = "class-card";
 
+        card.dataset.requestId = item.requestId;
+
         card.innerHTML = `
             <h3>${item.subject} lớp ${item.level}</h3>
             <p><strong>Khu vực:</strong> ${item.location}</p>
@@ -94,14 +97,17 @@ function renderCourseList(data) {
         `;
 
         card.querySelector(".apply-btn").addEventListener("click", () => {
-             const role = localStorage.getItem("role");
+            const role = localStorage.getItem("role");
+
+            const requestId = card.dataset.requestId;
+
             if (!role) {
                 alert("Vui lòng đăng nhập để ứng tuyển.");
                 return;
             }
 
             if (role === "tutor") {
-                window.location.href = "apply_tutor.html";
+                window.location.href = `apply_tutor.html?requestId=${requestId}`;
             } else {
                 alert("Chỉ gia sư mới có thể ứng tuyển lớp học.");
             }
@@ -161,41 +167,52 @@ if (window.location.pathname.endsWith("course.html")) {
     });
 }
 
+// Hàm lấy param từ URL
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+// Apply tutor
 if (window.location.pathname.endsWith("apply_tutor.html")) {
     document.querySelector("#applyForm button").addEventListener("click", async () => {
       // Lấy giá trị từ form
-            const fullName = document.getElementById("fullname").value.trim();
-            const email = document.getElementById("email").value.trim();
-            const phone = document.getElementById("phone").value.trim();
-            const specialization = document.getElementById("major").value.trim();
-            const qualification = document.getElementById("cer").value.trim();
-            const experience = document.getElementById("experience").value.trim();
-            const teachingArea = document.getElementById("location").value.trim();
+        const fullName = document.getElementById("fullname").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const specialization = document.getElementById("major").value.trim();
+        const qualification = document.getElementById("cer").value.trim();
+        const experience = document.getElementById("experience").value.trim();
+        const teachingArea = document.getElementById("location").value.trim();
+        const requestId = getQueryParam("requestId");
+        console.log(requestId)
 
-            // Mapping giá trị select sang đúng format mong muốn
-            const modeSelect = document.getElementById("mode").value;
-            let teachingFormat;
-            if(modeSelect === "online") teachingFormat = "Online";
-            else if(modeSelect === "offline") teachingFormat = "Offline";
-            else teachingFormat = "Cả hai";
+        // Mapping giá trị select sang đúng format mong muốn
+        const modeSelect = document.getElementById("mode").value;
+        let teachingFormat;
+        if(modeSelect === "online") teachingFormat = "Online";
+        else if(modeSelect === "offline") teachingFormat = "Offline";
+        else teachingFormat = "Cả hai";
 
-            const genderSelect = document.getElementById("gender").value;
-            // Ví dụ server bạn nhận gender kiểu boolean (true = nam, false = nữ), giả sử "other" là false
-            let gender;
-            if(genderSelect === "male") gender = true;
-            else gender = false;
+        const genderSelect = document.getElementById("gender").value;
+        // Ví dụ server bạn nhận gender kiểu boolean (true = nam, false = nữ), giả sử "other" là false
+        let gender;
+        if(genderSelect === "male") gender = true;
+        else gender = false;
 
             // Tạo object dữ liệu gửi lên
-            const data = {
-                FullName: fullName,
-                Email: email,
-                Phone: phone,
-                Specialization: specialization,
-                Qualification: qualification,
-                Experience: experience,
-                TeachingArea: teachingArea,
-                TeachingFormat: teachingFormat,
-                Gender: gender
+        const data = {
+            RequestId: requestId,
+            TutorId: localStorage.getItem("tutorId"),
+            FullName: fullName,
+            Email: email,
+            Phone: phone,
+            Specialization: specialization,
+            Qualification: qualification,
+            Experience: experience,
+            TeachingArea: teachingArea,
+            TeachingFormat: teachingFormat,
+            Gender: gender
       };
 
             try {
@@ -226,47 +243,58 @@ if (window.location.pathname.endsWith("apply_tutor.html")) {
 // Xem lịch sử lớp học
 if (window.location.pathname.endsWith("class_history.html")) {
     document.addEventListener('DOMContentLoaded', () => {
-        // Lấy studentId từ localStorage (hoặc chỗ bạn lưu)
+        const token = localStorage.getItem('token');
 
-
-        const studentId = localStorage.getItem('studentId');
-        if (!studentId) {
+        if (!token) {
             document.getElementById('class-history-list').innerHTML = '<p>Vui lòng đăng nhập để xem lịch sử lớp học.</p>';
             return;
         }
 
-        fetch(`/api/request/historyRequest/${studentId}`)  // gọi API backend C#
+        fetch('/api/request/historyRequest', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Lỗi mạng khi tải dữ liệu lớp học');
+                    throw new Error('Lỗi khi tải dữ liệu lớp học');
                 }
                 return response.json();
             })
             .then(data => {
                 const container = document.getElementById('class-history-list');
-                container.innerHTML = ''; // xóa dữ liệu cũ
+                container.innerHTML = '';
+
+                console.log(data);
 
                 if (!Array.isArray(data) || data.length === 0) {
                     container.innerHTML = '<p>Chưa có lớp học nào.</p>';
                     return;
                 }
-                console.log(data)
+
                 data.forEach(cls => {
                     const statusClass = cls.status === 'success' ? 'success'
                         : cls.status === 'pending' ? 'pending'
                             : 'waiting';
-                    const statusText = cls.status === 'success' ? '✅ Đã có gia sư'
-                        : cls.status === 'pending' ? '⏳ Đang xét duyệt'
-                            : '❌ Chưa có ứng viên';
+
+                    const statusText = cls.status === 'Applied'
+                        ? '✅ Đã có gia sư ứng tuyển'
+                        : cls.status === 'Pending'
+                            ? '⏳ Đang xét duyệt'
+                            : cls.status === 'Closed'
+                                ? '❌ Đã hủy'
+                                : '❌ Chưa có ứng viên';
+
 
                     const card = document.createElement('div');
                     card.className = 'class-card';
                     card.innerHTML = `
-                        <h3>${cls.subject.name}</h3>
-                        <p><strong>Khu vực:</strong> ${cls.location}</p>
-                        <p><strong>Học phí:</strong> ${cls.fee} VND/tháng</p>
-                        <p><strong>Trạng thái:</strong> <span class="status ${statusClass}">${statusText}</span></p>
-                    `;
+                    <h3>${cls.subjectName}</h3>
+                    <p><strong>Khu vực:</strong> ${cls.location}</p>
+                    <p><strong>Học phí:</strong> ${cls.fee} VND/tháng</p>
+                    <p><strong>Trạng thái:</strong> <span class="status ${statusClass}">${statusText}</span></p>
+                `;
                     container.appendChild(card);
                 });
             })

@@ -101,16 +101,26 @@ namespace BE_Tutor.Controllers
 
                 if (user == null)
                     return NotFound(new { message = "Không tìm thấy người dùng." });
+                               
+                if (!string.IsNullOrWhiteSpace(dto.Name))
+                    user.Name = dto.Name;
 
-                user.Name = dto.Name;
-                user.Gender = dto.Gender;
-                user.Email = dto.Email;
-                user.Workplace = dto.Workplace;
-                user.Age = dto.Age;
+                if (!string.IsNullOrWhiteSpace(dto.Workplace))
+                    user.Workplace = dto.Workplace;
+
+                if (dto.Age.HasValue && dto.Age.Value > 0)
+                    user.Age = dto.Age.Value;
+
+                if (!string.IsNullOrWhiteSpace(dto.Email))
+                    user.Email = dto.Email;
+
+                if (dto.Gender.HasValue)
+                    user.Gender = dto.Gender;
+
 
                 _context.Users.Update(user);
-                await _context.SaveChangesAsync();
-                return Ok(new { message = "Cập nhật thông tin thành công." });
+                    await _context.SaveChangesAsync();
+                    return Ok(new { message = "Cập nhật thông tin thành công." });
             }
             
         }

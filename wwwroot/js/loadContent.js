@@ -257,6 +257,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     loadContent("footer.html", "footer-container");
     loadContent("reg_log.html", "reg-log-container", () => {
+        attachEventHandlers();
         attachAuthHandlers(); // Chỉ cần xử lý form đăng ký/đăng nhập
     });
 

@@ -5,6 +5,12 @@ namespace BE_Tutor.DTO
     public class ApplicationViewModel
     {
         [Required]
+        public string RequestId { get; set; } = null!;
+
+        [Required]
+        public string TutorId { get; set; } = null!;
+
+        [Required]
         public string FullName { get; set; } = null!;
 
         [Required, EmailAddress]

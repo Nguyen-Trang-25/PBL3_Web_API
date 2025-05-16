@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BE_Tutor.Models;
 
@@ -35,5 +36,6 @@ public partial class Request
 
     public virtual Student? Student { get; set; }
 
+    [JsonIgnore]
     public virtual Subject? Subject { get; set; }
 }

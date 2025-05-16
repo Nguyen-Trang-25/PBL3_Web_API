@@ -1253,6 +1253,15 @@ section {
   flex-direction: column;
   gap: 16px;
 }
+.post-tutor-form form select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
 .post-tutor-form form label {
   font-weight: 600;
   font-size: 15px;
