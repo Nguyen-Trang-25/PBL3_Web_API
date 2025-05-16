@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace BE_Tutor.Models;
 
@@ -22,6 +23,10 @@ public partial class User
     public string? Role { get; set; }
 
     public bool? Gender { get; set; }
+
+    public string? Workplace { get; set; }
+
+    public int? Age { get; set; }
 
     public virtual ICollection<Message> MessageReceivers { get; set; } = new List<Message>();
 

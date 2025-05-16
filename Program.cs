@@ -44,6 +44,8 @@ builder.Services.AddScoped<ITutorRepository, TutorRepository>();
 builder.Services.AddScoped<ITutorService, TutorService>();
 
 builder.Services.AddControllersWithViews();
+    // dang ki OtpService
+builder.Services.AddScoped<IOtpService, OtpService>();
 
 var app = builder.Build();
 
