@@ -58,6 +58,19 @@ namespace BE_Tutor.Controllers
                 Gender = model.Gender
             };
 
+            var request = await _context.Requests
+                .FirstOrDefaultAsync(r => r.RequestId == model.RequestId);
+            if (request != null)
+            {
+                request.Status = "Applied";
+            }
+            else
+            {
+                // Nếu không tìm thấy request, bạn có thể trả về lỗi hoặc xử lý tuỳ ý
+                return NotFound(new { message = "Không tìm thấy Request tương ứng." });
+            }
+
+
             _context.Applications.Add(application);
             await _context.SaveChangesAsync();
 

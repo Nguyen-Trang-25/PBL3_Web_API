@@ -19,58 +19,28 @@
     <!-- Chat -->
 
     <main>
-      <div class="chat-layout">
-    
-        <div class="chat-sidebar">
-          <div class="sidebar-header">
-            <a href="index.html" class="logo">
-              <i class="fas fa-lightbulb"></i>
-            </a>
-            <h3>Gần đây</h3>
-          </div>
-      
-          <ul class="conversation-list">
-            <li class="conversation-item active">
-              <img src="images/avatar/tutor_m.png" class="avatar" />
-              <div class="conversation-preview">
-                <span class="name">Mr. John</span>
-                <span class="last-message">Got it! Let me help you.</span>
-              </div>
-            </li>
-            <li class="conversation-item">
-              <img src="images/avatar/tutor_fm.png" class="avatar" />
-              <div class="conversation-preview">
-                <span class="name">Ms. Linda</span>
-                <span class="last-message">Please send me the file.</span>
-              </div>
-            </li>
-          </ul>
-        </div>
-    
-        <div class="chat-container">
-          <div class="chat-header">
-            <h2 class="name">Mr. John</h2>
-          </div>
-    
-          <div class="chat-messages" id="chatMessages">
-            <div class="message-box receiver">
-              <img src="images/avatar/tutor_m.png" class="avatar" alt="Tutor" />
-              <div class="message">Hello! How can I help you today?</div>
+        <div class="chat-layout">
+
+            <div class="chat-sidebar">
+                ...
+                <ul class="conversation-list" id="conversationList"></ul>
             </div>
-    
-            <div class="message-box sender">
-              <img src="images/avatar/student_boy.png" class="avatar" alt="Student" />
-              <div class="message">I need help with algebra homework.</div>
+
+            <div class="chat-container">
+                <!-- ✅ đúng vị trí -->
+                <div class="chat-header">
+                    <h2 class="name" id="chatHeaderName">Chọn người để chat</h2>
+                </div>
+
+                <div class="chat-messages" id="chatMessages"></div>
+
+                <div class="chat-input">
+                    <input type="text" id="messageInput" placeholder="Type a message..." />
+                    <button id="sendBtn">Send</button>
+                </div>
             </div>
-          </div>
-    
-          <div class="chat-input">
-            <input type="text" id="messageInput" placeholder="Type a message..." />
-            <button id="sendBtn">Send</button>
-          </div>
+
         </div>
-    
-      </div>
     </main>
 
 
@@ -78,7 +48,7 @@
     <script src="/js/loadContent.js" defer></script>
     <script src="/js/script.js" defer></script>
 
-    <script>
+    <!--<script>
       const sendBtn = document.getElementById('sendBtn');
       const messageInput = document.getElementById('messageInput');
       const chatMessages = document.getElementById('chatMessages');
@@ -116,7 +86,7 @@
       } 
     });
 
-  </script>
+  </script>-->
     
 </body>
 </html>

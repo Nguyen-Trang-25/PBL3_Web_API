@@ -233,7 +233,8 @@ if (window.location.pathname.endsWith("apply_tutor.html")) {
             const result = await response.json();
                 alert(result.message || "Ứng tuyển thành công!");
 
-                window.location.href("index.html")
+                window.location.href = "home_tutor.html";
+
       } catch (error) {
                 alert("Có lỗi xảy ra khi gửi dữ liệu: " + error.message);
       }
@@ -303,4 +304,165 @@ if (window.location.pathname.endsWith("class_history.html")) {
                 document.getElementById('class-history-list').innerHTML = '<p>Không thể tải dữ liệu lớp học.</p>';
             });
     });
+}
+
+
+//Chat
+if (window.location.pathname.endsWith("chat.html")) {
+    const userId = localStorage.getItem('userId'); // id người dùng hiện tại
+    let currentChatPartnerId = null;
+
+    const conversationList = document.getElementById('conversationList');
+    const chatHeaderName = document.getElementById('chatHeaderName');
+    const chatMessages = document.getElementById('chatMessages');
+    const sendBtn = document.getElementById('sendBtn');
+    const messageInput = document.getElementById('messageInput');
+
+    
+
+    // Hàm load danh sách người đã chat
+    function loadConversations() {
+        fetch(`/api/message/conversations/${userId}`)
+            .then(res => res.json())
+            .then(users => {
+                conversationList.innerHTML = '';
+
+                if (users.length === 0) {
+                    // Nếu chưa có ai để chat, tạo 1 conversation với chính mình
+                    const li = document.createElement('li');
+                    li.classList.add('conversation-item', 'active');
+                    li.innerHTML = `
+          <img src="images/avatar/student_boy.png" class="avatar" />
+          <div class="conversation-preview">
+            <span class="name">Bạn</span>
+            <span class="last-message">Hãy bắt đầu nhắn tin với chính mình!</span>
+          </div>
+        `;
+                    li.addEventListener('click', () => {
+                        currentChatPartnerId = userId; // chat với chính mình
+                        chatHeaderName.textContent = "Bạn";
+                        loadMessageHistory();
+                        highlightActiveConversation(li);
+                    });
+                    conversationList.appendChild(li);
+
+                    // Mặc định chọn luôn cuộc trò chuyện này
+                    currentChatPartnerId = userId;
+                    chatHeaderName.textContent = "Bạn";
+                    loadMessageHistory();
+                    highlightActiveConversation(li);
+                } else {
+                    // Load danh sách user bình thường
+                    users.forEach(user => {
+                        const li = document.createElement('li');
+                        li.classList.add('conversation-item');
+                        li.innerHTML = `
+            <img src="${user.AvatarUrl || 'images/student_boy.png'}" class="avatar" />
+            <div class="conversation-preview">
+              <span class="name">${user.FullName}</span>
+              <span class="last-message">${user.LastMessage || ''}</span>
+            </div>
+          `;
+                        li.addEventListener('click', () => {
+                            currentChatPartnerId = user.UserId;
+                            chatHeaderName.textContent = user.FullName;
+                            loadMessageHistory();
+                            highlightActiveConversation(li);
+                        });
+                        conversationList.appendChild(li);
+                    });
+                }
+            })
+            .catch(err => console.error(err));
+    }
+
+
+    // Tô màu item đang chọn
+    function highlightActiveConversation(activeLi) {
+        document.querySelectorAll('.conversation-item').forEach(li => {
+            li.classList.remove('active');
+        });
+        activeLi.classList.add('active');
+    }
+
+    // Load lịch sử tin nhắn giữa user và người đang chat
+    function loadMessageHistory() {
+        if (!currentChatPartnerId) return;
+        fetch(`/api/message/history/${userId}/${currentChatPartnerId}`)
+            .then(res => res.json())
+            .then(messages => {
+                chatMessages.innerHTML = '';
+                messages.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.classList.add('message-box');
+                    if (msg.SenderId === userId) {
+                        div.classList.add('sender');
+                        div.innerHTML = `
+            <img src="images/avatar/student_boy.png" class="avatar" alt="Student" />
+            <div class="message">${msg.Content}</div>
+          `;
+                    } else {
+                        div.classList.add('receiver');
+                        div.innerHTML = `
+            <img src="images/avatar/tutor_m.png" class="avatar" alt="Tutor" />
+            <div class="message">${msg.Content}</div>
+          `;
+                    }
+                    chatMessages.appendChild(div);
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            })
+            .catch(console.error);
+    }
+
+    // Gửi tin nhắn mới
+    sendBtn.addEventListener('click', () => {
+        const text = messageInput.value.trim();
+        if (!text) return;
+        if (!currentChatPartnerId) return alert("Vui lòng chọn người để chat!");
+
+        const messageData = {
+            SenderId: userId,
+            ReceiverId: currentChatPartnerId,
+            Content: text
+        };
+
+        console.log("Đang gửi tin nhắn:", {
+            SenderId: userId,
+            ReceiverId: currentChatPartnerId,
+            Content: text
+        });
+
+        // Hiển thị tin nhắn mới
+        const userMsg = document.createElement("div");
+        userMsg.classList.add("message-box", "sender");
+        userMsg.innerHTML = `
+    <img src="images/avatar/student_boy.png" class="avatar" alt="Student" />
+    <div class="message">${text}</div>
+  `;
+        chatMessages.appendChild(userMsg);
+        messageInput.value = "";
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Gửi lên server
+        fetch('/api/message/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(messageData)
+        })
+            .then(res => res.json())
+            .then(data => console.log('Message sent:', data))
+            .catch(console.error);
+    });
+
+    messageInput.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            sendBtn.click();
+        }
+    });
+
+    // Load danh sách conversation khi trang tải xong
+    document.addEventListener('DOMContentLoaded', loadConversations);
+
 }
