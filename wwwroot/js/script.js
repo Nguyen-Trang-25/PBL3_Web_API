@@ -464,5 +464,64 @@ if (window.location.pathname.endsWith("chat.html")) {
 
     // Load danh sách conversation khi trang tải xong
     document.addEventListener('DOMContentLoaded', loadConversations);
-
+    
 }
+
+// Contact
+
+    if (window.location.pathname.endsWith("contact.html")) {
+        // lất các tp từ DOM
+        const contactForm = document.getElementById("contact-form");
+        const nameInput = document.getElementById("name");
+        const emailInput = document.getElementById("email");
+        const messageInput = document.getElementById("message");
+        const statusMessage = document.getElementById("contact-result");
+
+        // xử lí khi ng dùng submit form
+        contactForm.addEventListener("submit", function (e) {// truyền 1 hàm để xử lý sự kiện 
+            e.preventDefault();// ngăn reload trang
+
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const message = messageInput.value.trim();
+
+            // kiểm tra dữ liệu đầu vào
+            if (!name || !email || !message) {
+                showStatus("Vui lòng nhập đầy đủ thông tin.", "error");
+                return;
+            }
+            // tạo 1 json 
+            const contactData = {
+                Name: name,
+                Email: email,
+                Message: message
+            };
+            // gửi dữ liệu lên be
+            fetch('http://localhost:7128/api/Request/contact', {// ko cần phải chi tiết v
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(contactData)
+            })// fetch trả về 1 promise đại diện cho kết quả tương lai của yêu cầu http
+                .then(res => {
+                    if (!res.ok) return res.json().then(err => Promise.reject(err));
+                    return res.json();//parse ----> json-> data.
+                    // phản hồi http: status code: 200(ok),... headers,....
+                    // res: 1 đối tượng của reponse// trả về reponse sau khi ng dùng gửi yêu cầu lên (fetch trả về 1 reponse)
+                })
+                .then(data => {
+                    showStatus(data.message || "🎉Gửi mail thành công", "success");
+                    contactForm.reset();
+                })
+                .catch(err => {
+                    console.error(err);
+                    showStatus(err.message || "Đã xảy ra lỗi khi gửi!!!", "error");
+                });
+
+
+        });
+        function showStatus(message, type) {
+            statusMessage.style.display = "block";
+            statusMessage.textContent = message;
+            statusMessage.className = type;  // chỉ success hoặc error
+        }
+    }
