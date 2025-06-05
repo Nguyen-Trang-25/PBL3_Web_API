@@ -43,6 +43,7 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<OtpVerifications> OtpVerifications { get; set; }
 
+    public virtual DbSet<PendingRegistration> PendingRegistrations { get; set; }
     
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

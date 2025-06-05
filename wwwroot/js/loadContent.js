@@ -13,7 +13,7 @@ function parseJwt(token) {
 function attachEventHandlers() {
     console.log("Attaching event handlers...");
 
-    let navbar = document.querySelector('.header .navbar');
+    let navbar = document.querySelector('.header .navbar');// Tìm phần tử HTML đầu tiên có class là navbar, nằm bên trong phần tử có class là header, và lưu nó vào biến navbar.
     let menuBtn = document.querySelector('#menu-btn');
     let closeNavbar = document.querySelector('#close-navbar');
     let accountForm = document.querySelector('.account-form');
@@ -44,22 +44,28 @@ function attachEventHandlers() {
             document.querySelector('.account-form .login-form').classList.add('active');
         };
 
-        accountBtn.onclick = () => accountForm.classList.add('active');
+        if (accountBtn && accountForm) {
+            accountBtn.onclick = () => accountForm.classList.add('active');
+        }
+
         closeForm.onclick = () => accountForm.classList.remove('active');
     }
-}
+}// đóng mở menu, chuyển giữa register với login 
 
 
 function attachAuthHandlers() {
-    const acReg = document.querySelector('#ac_reg');
+   // const acReg = document.querySelector('#ac_reg');
     const acLog = document.querySelector('#ac_log');
+    const sendOtpBtn = document.getElementById('sendOtpBtn');
+    console.log("acReg: ",sendOtpBtn)
 
     console.log("acLog:", acLog); // để debug
-    console.log("acReg:", acReg);
+   // console.log("acReg:", acReg);
 
-    if (acReg) {
-        acReg.addEventListener('click', function (event) {
-            console.log("click reg")
+   /* if (acReg) {// xử lí gọi api backend
+        acReg.addEventListener('click', function (event) Không tìm thấy input đăng nhập.
+
+            console.log("click reg")//debug
             event.preventDefault();
 
             const phone = document.querySelector('#register-phone').value;
@@ -92,7 +98,7 @@ function attachAuthHandlers() {
                     alert("Đã xảy ra lỗi khi đăng ký.");
                 });
         });
-    }
+    }*/
 
     if (acLog) {
         acLog.addEventListener('click', function (event) {
@@ -161,8 +167,6 @@ function attachAuthHandlers() {
     }
 }
 
-
-
 function loadUserRoleAndShowUI() {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -201,7 +205,7 @@ function loadUserRoleAndShowUI() {
         console.error("Lỗi giải mã token:", error);
         logout();
     }
-}
+}// show UI của từng role
 
 document.addEventListener('DOMContentLoaded', function () {
     const btnLogoutList = document.querySelectorAll('.btn-logout');
@@ -213,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.removeItem("studentId");
             localStorage.removeItem("tutorId");
         });
-    });
+    });// xử lí đăng xuất
 });
 
 function loadContent(file, elementId, callback) {
@@ -228,15 +232,24 @@ function loadContent(file, elementId, callback) {
         .then(data => {
             targetElement.innerHTML = data;
             if (callback) callback();
+
+            // 🔗 Nếu file đang load là reg_log.html, gắn Register.js
+            //if (file === 'reg_log.html') {
+            //    const script = document.createElement('script');
+            //    script.src = '/js/register-handler.js'; // Đảm bảo đúng đường dẫn!
+            //    script.defer = true; // không cần thiết lắm nhưng tốt
+            //    document.body.appendChild(script);
+            //}
         })
+        
         .catch(error => console.error(`Lỗi khi tải ${file}:`, error));
 }
-
+// tìm file đó => load content file đó vào phần tử elementId, callback: 1 hàm tùy chọn sau khi thao tác xong cái kia
 
 document.addEventListener("DOMContentLoaded", function () {
     const role = localStorage.getItem("role");
 
-    console.log(role);
+    console.log(role);//debug
 
     if (role === "student") {
         loadContent("header_student.html", "header-container", () => {
@@ -259,6 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
     loadContent("reg_log.html", "reg-log-container", () => {
         attachEventHandlers();
         attachAuthHandlers(); // Chỉ cần xử lý form đăng ký/đăng nhập
+        setupRegisterOTPEvents();
     });
 
     document.addEventListener("click", function (e) {
