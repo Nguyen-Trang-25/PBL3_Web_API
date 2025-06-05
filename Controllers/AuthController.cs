@@ -30,8 +30,41 @@ namespace FindTutor_MVC.Controllers
             if (_context.Users.Any(u => u.Phone == dto.Phone))
                 return BadRequest(new { message = "Số điện thoại đã được đăng ký" });
 
-            if (_context.PendingRegistrations.Any(p => p.Phone == dto.Phone))
-                return BadRequest(new { message = "Bạn đã gửi yêu cầu đăng ký. Vui lòng xác nhận OTP." });
+
+            var existing = await _context.PendingRegistrations
+            .FirstOrDefaultAsync(p => p.Phone == dto.Phone);
+
+            if (existing != null)
+            {
+                // Nếu OTP cũ vẫn còn hiệu lực
+                if (existing.ExpiredAt > DateTime.UtcNow)
+                {
+                    TimeSpan remaining = existing.ExpiredAt - DateTime.UtcNow;
+
+                    // Nếu còn nhiều hơn 2 phút => yêu cầu người dùng chờ
+                    if (remaining > TimeSpan.FromMinutes(2))
+                    {
+                        return BadRequest(new { message = "Bạn đã gửi yêu cầu OTP gần đây. Vui lòng đợi thêm trước khi gửi lại." });
+                    }
+
+                    // Nếu gần hết hạn (dưới 2 phút) => tạo mã mới
+                    string refreshedOtp = OtpHelper.GenerateSecureOtp();
+                    existing.OtpCode = refreshedOtp;
+                    existing.ExpiredAt = DateTime.UtcNow.AddMinutes(3);
+                    await _context.SaveChangesAsync();
+
+                    // Gửi OTP mới (giả lập/sms)
+                    // await SmsService.SendOtpAsync(dto.Phone, refreshedOtp);
+
+                    return Ok(new { message = "Mã OTP mới đã được gửi." });
+                }
+                else
+                {
+                    // Nếu OTP đã hết hạn => xóa bản ghi cũ và tạo mới
+                    _context.PendingRegistrations.Remove(existing);
+                    await _context.SaveChangesAsync();
+                }
+            }
 
             string otp = OtpHelper.GenerateSecureOtp();
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
@@ -42,7 +75,7 @@ namespace FindTutor_MVC.Controllers
                 PasswordHash = hashedPassword,
                 Role = dto.Role,
                 OtpCode = otp,
-                ExpiredAt = DateTime.UtcNow.AddMinutes(5)
+                ExpiredAt = DateTime.UtcNow.AddMinutes(3)
             };
 
             _context.PendingRegistrations.Add(pending);

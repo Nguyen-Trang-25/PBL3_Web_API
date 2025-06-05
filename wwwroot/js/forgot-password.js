@@ -139,7 +139,7 @@ function showForgotPasswordForm() {
     // Clear và focus
     const phoneInput = document.getElementById('forgotPhoneInput');
     phoneInput.value = '';
-    phoneInput.focus();
+    phoneInput.focus();// đưa con trỏ ngay vào ô nhập sdt
     hideError('forgotPhoneError');
 }
 
@@ -176,32 +176,44 @@ async function sendForgotPasswordOTP() {
         return;
     }
 
+    const button = document.querySelector('.forgot-password-form .btn');
+
     try {
-        const button = document.querySelector('.forgot-password-form .btn');
         showLoading(button, 'Đang gửi...');
 
-        // Giả lập API call
-        await simulateAPI(1500);
+        const response = await fetch('/api/Verification/ForgotPassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ newphone: phone })  // Gửi đúng tên thuộc tính expected by backend
+        });
 
-        // Giả lập kiểm tra SĐT (demo: 1234567890 là lỗi)
-        if (phone === '1234567890') {
-            throw new Error('Phone not registered');
+        const result = await response.json();
+
+        if (!response.ok) {
+            if (result.message?.includes('Không tìm thấy')) {
+                showError('forgotPhoneError', 'Số điện thoại chưa được đăng ký!');
+            } else {
+                showError('forgotPhoneError', result.message || 'Có lỗi xảy ra khi gửi OTP!');
+            }
+            return;
         }
 
-        // Thành công - chuyển đến form reset
+        // Thành công
         currentPhone = phone;
-        correctOtp = '1234'; // Demo OTP
-        console.log(`Demo OTP: ${correctOtp}`);
-
-        showResetPasswordForm();
+        console.log("✅ OTP gửi thành công:", result.message);
         startOtpTimer();
+        showResetPasswordForm();
 
     } catch (error) {
-        showError('forgotPhoneError', 'Số điện thoại chưa được đăng ký!');
+        console.error('❌ Lỗi khi gửi OTP quên mật khẩu:', error);
+        showError('forgotPhoneError', 'Lỗi kết nối máy chủ!');
     } finally {
         hideLoading(button, '<i class="fas fa-paper-plane"></i> Gửi mã OTP');
     }
 }
+
 
 /**
  * Hiển thị form reset password
@@ -254,7 +266,7 @@ function moveOtpNext(current, index) {
 /**
  * Xác thực OTP
  */
-function verifyOTP() {
+async function verifyOTP() {
     const otpInputs = document.querySelectorAll('.otp-box');
     const enteredOtp = Array.from(otpInputs).map(input => input.value).join('');
 
@@ -263,19 +275,42 @@ function verifyOTP() {
         return;
     }
 
-    if (enteredOtp === correctOtp || enteredOtp === '1234') {
-        showSuccess('resetPasswordSuccess', 'OTP chính xác!');
+    try {
+        showLoading(document.querySelector('.otp-section .btn-verify'), 'Đang xác thực...');
 
-        // THAY ĐỔI: Ẩn phần OTP và hiện phần đặt mật khẩu
+        const response = await fetch('/api/Verification/VerifyOtpForgot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                phone: currentPhone,    // biến lưu số điện thoại khi gửi OTP
+                otpCode: enteredOtp
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            showError('resetPasswordError', result.message || 'Mã OTP không chính xác hoặc đã hết hạn!');
+            clearOtpInputs();
+            addErrorEffect();
+            return;
+        }
+
+        // OTP hợp lệ
+        showSuccess('resetPasswordSuccess', 'OTP chính xác!');
+        correctOtp = enteredOtp;  // Lưu lại OTP hợp lệ để dùng khi đổi pass
+
         hideOtpSection();
         showPasswordSection();
 
-    } else {
-        showError('resetPasswordError', 'Mã OTP không chính xác!');
-        clearOtpInputs();
-        addErrorEffect();
+    } catch (error) {
+        console.error('Lỗi khi xác thực OTP:', error);
+        showError('resetPasswordError', 'Lỗi kết nối máy chủ!');
+    } finally {
+        hideLoading(document.querySelector('.otp-section .btn-verify'), '<i class="fas fa-check"></i> Xác thực OTP');
     }
 }
+
 
 
 /**
@@ -285,10 +320,9 @@ function verifyOTP() {
  * Đặt lại mật khẩu
  */
 async function resetPassword() {
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
 
-    // Validate mật khẩu
     if (!isPasswordValid(newPassword)) {
         showError('passwordError', 'Mật khẩu chưa đáp ứng yêu cầu!');
         return;
@@ -303,21 +337,35 @@ async function resetPassword() {
         const button = document.querySelector('.password-section .btn-primary');
         showLoading(button, 'Đang cập nhật...');
 
-        // Giả lập API call
-        await simulateAPI(2000);
+        const response = await fetch('/api/Verification/ChangeForgot', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                phone: currentPhone,
+                newPass: newPassword,
+                confirmNew: confirmPassword
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            showError('passwordError', result.message || 'Có lỗi xảy ra khi đổi mật khẩu!');
+            return;
+        }
 
         clearOtpTimer();
-
-        // CHÍNH XÁC: Chỉ hiện modal sau khi hoàn thành
         showSuccessModal();
 
     } catch (error) {
+        console.error('Lỗi khi đổi mật khẩu:', error);
         showError('passwordError', 'Có lỗi xảy ra khi đổi mật khẩu!');
     } finally {
         const button = document.querySelector('.password-section .btn-primary');
         hideLoading(button, '<i class="fas fa-save"></i> Đổi mật khẩu');
     }
 }
+
 
 /**
  * Gửi lại OTP - KHÔNG CẦN KIỂM TRA THỜI GIAN
@@ -426,7 +474,7 @@ function clearOtpTimer() {
 
 /**
  * Toggle password visibility
- */
+ */// ẩn hiện mật khẩu 
 function togglePassword(inputId, toggleElement) {
     const input = document.getElementById(inputId);
     const icon = toggleElement.querySelector('i');

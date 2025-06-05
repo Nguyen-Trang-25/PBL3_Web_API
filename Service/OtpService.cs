@@ -22,7 +22,9 @@ namespace BE_Tutor.Service
                 x.ExpiredAt > DateTime.UtcNow);
 
                 if (existingOtp != null)
-                    return existingOtp.OtpCode;
+
+                throw new InvalidOperationException("Mã OTP hiện tại vẫn còn hiệu lực. Vui lòng thử lại sau.");
+                  
 
                 string otp = OtpHelper.GenerateSecureOtp();
 
@@ -32,7 +34,7 @@ namespace BE_Tutor.Service
                     Phone = phone,
                     OtpCode = otp,
                     Purpose = purpose,
-                    ExpiredAt = DateTime.UtcNow.AddMinutes(5)
+                    ExpiredAt = DateTime.UtcNow.AddMinutes(3)
                 };
 
                 _context.OtpVerifications.Add(verification);

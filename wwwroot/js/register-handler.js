@@ -283,14 +283,13 @@ async function resendRegisterOTP() {
     console.log('🔥 RESEND BUTTON CLICKED!');
 
     if (!currentRegisterData || !currentRegisterData.phone) {
-        console.log('Không có số điện thoại để gửi lại OTP.');
+        console.log('⚠️ No phone number or registration data found!');
         return;
     }
-
     const button = document.getElementById('registerResendBtn');
-
     try {
-        showLoadingBrief(button, 'Đang gửi...');
+    
+        showLoadingBrief(button, 'Đang gửi lại...');
 
         const response = await fetch('/api/Auth/RequestRegister', {
             method: 'POST',
@@ -301,23 +300,23 @@ async function resendRegisterOTP() {
         });
 
         const result = await response.json();
+        console.log("🔍 Full Response:", response);
+        console.log("📨 Parsed JSON:", result);
 
         if (!response.ok) {
-            console.error("❌ resend OTP fail response:", result);
-
-            if (result?.message?.includes("đăng ký")) {
+            if (result.message === "Số điện thoại đã được đăng ký") {
                 showError('registerOtpError', 'Số điện thoại đã được đăng ký!');
-            } else if (result?.message?.includes("gần đây")) {
+            } else if (result?.message?.includes("Vui lòng đợi")) {
                 showError('registerOtpError', result.message);
             } else {
-                showError('registerOtpError', result.message || 'Gửi lại OTP thất bại!');
+                showError('registerOtpError', result.message || 'Có lỗi xảy ra khi gửi lại OTP!');
             }
-
             return;
         }
 
         // Thành công
-        console.log(`✅ New OTP: ${result.message}`);
+        console.log("✅ OTP resend success:", result.message);
+
         clearRegisterOtpInputs();
         hideRegisterMessages();
         startRegisterOtpTimer();
@@ -327,12 +326,14 @@ async function resendRegisterOTP() {
 
     } catch (error) {
         console.error('Error resending OTP:', error);
-        showError('registerOtpError', 'Có lỗi xảy ra khi gửi lại OTP!');
+        showError('registerOtpError', 'Lỗi kết nối máy chủ!');
     } finally {
+        const button = document.getElementById('registerResendBtn');
         hideLoadingBrief(button, '<i class="fas fa-redo"></i> Gửi lại mã OTP');
         ensureResendButtonActive();
     }
 }
+
 
 /**
  * ===== TIMER KHÔNG ẢNH HƯỞNG ĐẾN RESEND BUTTON =====

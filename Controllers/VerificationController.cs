@@ -97,21 +97,33 @@ namespace BE_Tutor.Controllers
 
                 return Ok(new { message = "Cập nhật số điện thoại thành công." });
             }
-            // ng dùng quên pass
-            [AllowAnonymous]
-            [HttpPost("ForgotPassword")]
-            public async Task<IActionResult> RequestPass([FromBody] ChangePhone dto)
+        // ng dùng quên pass
+        [AllowAnonymous]
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> RequestPass([FromBody] ChangePhone dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u =>
+            u.Phone == dto.Newphone);
+            if (user == null)
+                return NotFound(new { message = "Không tìm thấy người dùng với số điện thoại này." });
+
+            try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u =>
-                u.Phone == dto.Newphone);
-                if (user == null)
-                    return NotFound(new { message = "Không tìm thấy người dùng với số điện thoại này." });
-
-                var otp = await _otpService.RequestOtpAsync(user.UserId, dto.Newphone, "Forgot Password");
-
+                await _otpService.RequestOtpAsync(user.UserId, dto.Newphone, "Forgot Password");
                 return Ok(new { message = "OTP đã được gửi." });
-
             }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message }); // Trả thông báo lỗi rõ ràng
+            }
+            catch (Exception ex)
+            {
+                // Đề phòng lỗi khác (ví dụ DB), không lộ thông tin nhạy cảm
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi gửi OTP." });
+            }
+        }
+
+
             //ng dùng muốn đổi pass chứ kh phải quên
             [Authorize]
             [HttpPost("ResetPassword")]
@@ -127,7 +139,23 @@ namespace BE_Tutor.Controllers
                 return Ok(new { message = "OTP đã được gửi." });
             }
 
-            //quên
+            [AllowAnonymous]
+            [HttpPost("VerifyOtpForgot")]
+            public async Task<IActionResult> VerifyOtpForgot([FromBody] VerifyOtpDto dto)
+            {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Phone == dto.Phone);
+            if (user == null)
+                return NotFound(new { message = "Không tìm thấy người dùng." });
+
+            var isValidOtp = await _otpService.VerifyOtpAsync(dto.Phone, dto.OtpCode, "Forgot Password");
+            if (!isValidOtp)
+                return BadRequest(new { message = "Mã OTP không hợp lệ hoặc đã hết hạn." });
+
+            return Ok(new { message = "OTP hợp lệ." });
+            }
+
+
+        //quên
             [AllowAnonymous]
             [HttpPut("ChangeForgot")]
             public async Task<IActionResult> ResetPassword([FromBody] PasswordDto dto)
@@ -139,10 +167,6 @@ namespace BE_Tutor.Controllers
                 u.Phone == dto.Phone);
                 if (user == null)
                     return NotFound(new { message = "Không tìm thấy người dùng." });
-
-                var isValidOtp = await _otpService.VerifyOtpAsync(dto.Phone, dto.OtpCode, "Forgot Password");
-                if (!isValidOtp)
-                    return BadRequest(new { message = "Mã OTP không hợp lệ hoặc đã hết hạn." });
 
                 user.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPass);
 
@@ -166,9 +190,9 @@ namespace BE_Tutor.Controllers
                 if (user == null)
                     return NotFound(new { message = "Không tìm thấy người dùng." });
 
-                var isValidOtp = await _otpService.VerifyOtpAsync(dto.Phone, dto.OtpCode, "Reset Password");
+                /*var isValidOtp = await _otpService.VerifyOtpAsync(dto.Phone, dto.OtpCode, "Reset Password");
                 if (!isValidOtp)
-                    return BadRequest(new { message = "Mã OTP không hợp lệ hoặc đã hết hạn." });
+                    return BadRequest(new { message = "Mã OTP không hợp lệ hoặc đã hết hạn." });*/
 
                 user.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPass);
 
