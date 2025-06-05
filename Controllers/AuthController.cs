@@ -25,113 +25,94 @@ namespace FindTutor_MVC.Controllers
         }
 
         [HttpPost("RequestRegister")]
-        public async Task<IActionResult> RequestRegister([FromBody] ChangePhone dto)
+     public async Task<IActionResult> RequestRegister([FromBody] RegisterRequestDto dto)
         {
-            if (_context.Users.Any(u => u.Phone == dto.Newphone))
+            if (_context.Users.Any(u => u.Phone == dto.Phone))
                 return BadRequest(new { message = "Số điện thoại đã được đăng ký" });
 
-            var existOtp = await _context.OtpVerifications
-        .FirstOrDefaultAsync(o =>
-            o.Phone == dto.Newphone &&
-            o.Purpose == "Register" &&
-            o.ExpiredAt > DateTime.UtcNow);
+            if (_context.PendingRegistrations.Any(p => p.Phone == dto.Phone))
+                return BadRequest(new { message = "Bạn đã gửi yêu cầu đăng ký. Vui lòng xác nhận OTP." });
 
-            string otp;
+            string otp = OtpHelper.GenerateSecureOtp();
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
-            if (existOtp != null)
+            var pending = new PendingRegistration
             {
-                otp = existOtp.OtpCode;
-            }
-            else
-            {
-                otp = OtpHelper.GenerateSecureOtp();
+                Phone = dto.Phone,
+                PasswordHash = hashedPassword,
+                Role = dto.Role,
+                OtpCode = otp,
+                ExpiredAt = DateTime.UtcNow.AddMinutes(5)
+            };
 
-                var verification = new OtpVerifications
-                {
-                    UserId = null,
-                    Phone = dto.Newphone,
-                    OtpCode = otp,
-                    Purpose = "Register",
-                    ExpiredAt = DateTime.UtcNow.AddMinutes(5)
-                };
-                _context.OtpVerifications.Add(verification);
-                await _context.SaveChangesAsync();
-            }
+            _context.PendingRegistrations.Add(pending);
+            await _context.SaveChangesAsync();
+
+            // Gửi OTP đến điện thoại (code gửi SMS, hoặc giả lập)
+            // await SmsService.SendOtpAsync(dto.Phone, otp);
+
             return Ok(new { message = "OTP đã được gửi đến số điện thoại." });
         }
 
 
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] Register model)
+        [HttpPost("ConfirmRegister")]
+        public async Task<IActionResult> ConfirmRegister([FromBody] ConfirmRegisterDto dto)
         {
-            // xac nhan co khop pass hay ko
-            if (model.Password != model.ConfirmPassword)
-                return BadRequest(new { message = "Mật khẩu xác nhận không khớp." });
+            var pending = await _context.PendingRegistrations
+                .FirstOrDefaultAsync(p => p.Phone == dto.Phone && p.OtpCode == dto.OtpCode && p.ExpiredAt > DateTime.UtcNow);
 
-            if (_context.Users.Any(u => u.Phone == model.Phone))
-                return BadRequest(new { message = "Số điện thoại đã được đăng ký" });
-
-            var otpRecord = await _context.OtpVerifications
-            .FirstOrDefaultAsync(o =>
-            o.Phone == model.Phone &&
-            o.OtpCode == model.OtpCode &&
-            o.Purpose == "Register" &&
-            o.ExpiredAt > DateTime.UtcNow);
-
-            if (otpRecord == null)
+            if (pending == null)
                 return BadRequest(new { message = "OTP không hợp lệ hoặc đã hết hạn." });
 
+            if (_context.Users.Any(u => u.Phone == dto.Phone))
+            {
+                _context.PendingRegistrations.Remove(pending);
+                await _context.SaveChangesAsync();
+                return BadRequest(new { message = "Số điện thoại đã được đăng ký" });
+            }
 
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
-            var lastUser = await _context.Users
-                   .OrderByDescending(u => u.UserId)
-                   .FirstOrDefaultAsync();
+            var lastUser = await _context.Users.OrderByDescending(u => u.UserId).FirstOrDefaultAsync();
 
             int nextId = 1;
             if (lastUser != null && int.TryParse(lastUser.UserId, out int lastId))
             {
-                nextId = lastId + 1;  // Tăng giá trị ID của người dùng cuối cùng
+                nextId = lastId + 1;
             }
+            string newUserId = nextId.ToString("D10");
 
-            // Tạo UserId đảm bảo có đủ 10 ký tự
-            string newUserId = nextId.ToString("D10");  // D10 đảm bảo ID có đủ 10 chữ số
-
-            // Tạo đối tượng người dùng
             var user = new User
             {
                 UserId = newUserId,
-                Phone = model.Phone,
-                Password = hashedPassword,
-                Role = model.Role
+                Phone = pending.Phone,
+                Password = pending.PasswordHash,
+                Role = pending.Role
             };
-
-
             _context.Users.Add(user);
 
-            if(model.Role == "student" )
+            if (pending.Role == "student")
             {
-                var student = new Student
+                _context.Students.Add(new Student
                 {
+                    StudentId = newUserId, // nếu bạn dùng newUserId làm khóa chính luôn
                     UserId = newUserId
-                };
-                _context.Students.Add(student);
+                });
             }
-
-            else if (model.Role == "tutor")
+            else if (pending.Role == "tutor")
             {
-                var tutor = new Tutor
-                { 
+                _context.Tutors.Add(new Tutor
+                {
+                    TutorId = newUserId,
                     UserId = newUserId
-                };
-                _context.Tutors.Add(tutor);
-            
+                });
 
             }
-            _context.OtpVerifications.Remove(otpRecord);
-            await _context.SaveChangesAsync();// chỉ lần lưu vào db, k cần chờ nó lưu xong mà vẫn làm việc khác dc
+
+            _context.PendingRegistrations.Remove(pending);
+            await _context.SaveChangesAsync();
 
             return Ok(new { message = "Đăng ký thành công" });
         }
+
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] Login model)

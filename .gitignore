@@ -10,6 +10,7 @@ obj/
 # ASP.NET secrets
 appsettings.Development.json
 appsettings.Local.json
+appsettings.json
 
 # Others
 *.log

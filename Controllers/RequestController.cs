@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BE_Tutor.DTO;
+using MailKit.Net.Smtp;
+using MimeKit;
+using MailKit.Security;
 
 namespace BE_Tutor.Controllers
 {
@@ -84,7 +87,7 @@ namespace BE_Tutor.Controllers
                         Status = "Pending",
                     };
 
-                    
+
 
                     _context.Requests.Add(request);
                     await _context.SaveChangesAsync();
@@ -103,7 +106,7 @@ namespace BE_Tutor.Controllers
                         requirement = request.Requirement,
                         learningFormat = request.LearningFormat,
                         createdAt = request.CreatedAt,
-                };
+                    };
 
                     return Ok(result);
                 }
@@ -364,5 +367,47 @@ namespace BE_Tutor.Controllers
             await _context.SaveChangesAsync();
         }
 
+
+        [HttpPost("Contact")]
+        public async Task<IActionResult> PostContact([FromBody] ContactRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Name) ||
+               string.IsNullOrWhiteSpace(request.Email) ||
+               string.IsNullOrWhiteSpace(request.Message))
+            {
+                return BadRequest(new { message = "Vui lòng nhập đầy đủ thông tin." });
+            }
+
+            try
+            {
+                var mail = new MimeMessage();
+
+                mail.From.Add(new MailboxAddress("Finder Web", "anhngocnguyen112005@gmail.com"));
+                mail.To.Add(new MailboxAddress("Admin", "anh422912@gmail.com"));
+
+
+                mail.Subject = $"[Liên hệ] từ {request.Name}";
+                mail.Body = new TextPart("plain")
+                {
+                    Text = $"Tên: {request.Name}\nEmail: {request.Email}\n\n Nội dung:\n{request.Message}"
+                };
+
+                using var smtp = new SmtpClient();//using auto giải phóng tài nguyên khi dùng xong
+
+                await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);// connet máy chủ gửi mail của Gmail
+
+                await smtp.AuthenticateAsync("anhngocnguyen112005@gmail.com", "cbym pyuf pvtg teqi"); // không có dấu cách
+
+                await smtp.SendAsync(mail);// gửi mail
+
+                await smtp.DisconnectAsync(true);// ngắt kết nối smtp
+
+                return Ok(new { message = "Gửi liên hệ thành công." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Gửi mail thất bại: {ex.Message}" });
+            }
+        }
     }
 }

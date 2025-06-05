@@ -48,13 +48,15 @@
               <img src="images/contact_tutor_student.jpg" alt="Contact Illustration">
             </div>
             <div class="contact-form">
-              <h2>Liên hệ với chúng tôi</h2>
-              <form action="">
-                <input type="text" placeholder="Họ và tên" required>
-                <input type="email" placeholder="Email" required>
-                <textarea placeholder="Nội dung" required></textarea>
-                <button type="submit">Gửi</button>
-              </form>
+                <h2>Liên hệ với chúng tôi</h2>
+                <form id="contact-form">
+                    <input type="text" id="name" placeholder="Họ và tên" required>
+                    <input type="email" id="email" placeholder="Email" required>
+                    <textarea id="message" placeholder="Nội dung" required></textarea>
+                    <button type="submit">Gửi</button>
+                </form>
+                <div id="contact-result" style="display: none;">
+                </div>
             </div>
         </div>
 
