@@ -58,17 +58,30 @@ namespace BE_Tutor.Controllers
                 Gender = model.Gender
             };
 
+            var tutor = await _context.Tutors
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.TutorId == model.TutorId);
+
+            if (tutor == null)
+            {
+                return NotFound(new { message = "Không tìm thấy gia sư tương ứng." });
+            }
+
             var request = await _context.Requests
+                .Include(r => r.Student)
+                    .ThenInclude(s => s.User)
+                .Include(r => r.Subject)  // Thêm phần này để lấy tên môn học
                 .FirstOrDefaultAsync(r => r.RequestId == model.RequestId);
             if (request != null)
             {
                 request.Status = "Applied";
+                await SendSystemMessage(request.StudentId, $"Gia sư {tutor.User.Name} đã ứng tuyển lớp \"{request.Subject.Name}\" {request.Level}.");
             }
             else
             {
-                // Nếu không tìm thấy request, bạn có thể trả về lỗi hoặc xử lý tuỳ ý
                 return NotFound(new { message = "Không tìm thấy Request tương ứng." });
             }
+
 
 
             _context.Applications.Add(application);
@@ -77,6 +90,33 @@ namespace BE_Tutor.Controllers
             // Optional: chuyển sang trang thông báo hoặc xác nhận
             return Ok(new { success = true, message = "Ứng tuyển thành công!" });
         }
+
+        private async Task SendSystemMessage(string receiverId, string content)
+        {
+            var latestMessage = await _context.Messages
+                .OrderByDescending(m => m.MessageId)
+                .FirstOrDefaultAsync();
+
+            string newId = "0000000001";
+            if (latestMessage != null)
+            {
+                long latestNumber = long.Parse(latestMessage.MessageId);
+                newId = (latestNumber + 1).ToString("D10");
+            }
+
+            var message = new Message
+            {
+                MessageId = newId,
+                SenderId = "system", // ID của hệ thống
+                ReceiverId = receiverId,
+                Content = content,
+                SentAt = DateTime.UtcNow
+            };
+
+            _context.Messages.Add(message);
+            await _context.SaveChangesAsync();
+        }
+
     }
 
 }

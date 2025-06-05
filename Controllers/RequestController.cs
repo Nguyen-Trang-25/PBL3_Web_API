@@ -264,6 +264,105 @@ namespace BE_Tutor.Controllers
             return BadRequest(new { message = "Role không hợp lệ" });
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
+        {
+            var request = await _context.Requests
+                .Include(r => r.Subject)
+                .FirstOrDefaultAsync(r => r.RequestId == id);
+
+            if (request == null)
+                return NotFound(new { message = "Không tìm thấy yêu cầu" });
+
+            return Ok(new
+            {
+                request.RequestId,
+                request.StudentId,
+                SubjectName = request.Subject?.Name,
+                request.Level,
+                request.Fee,
+                request.Schedule,
+                request.Status,
+                request.CreatedAt,
+                request.Location,
+                request.GenderTutor,
+                request.Requirement,
+                request.LearningFormat
+            });
+        }
+
+        //Cập nhật yêu cầu(chỉ student sở hữu yêu cầu)
+        [Authorize(Roles = "student")]
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateRequest(string id, [FromBody] Request model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId);
+            if (student == null) return Unauthorized();
+
+            var existing = await _context.Requests.FirstOrDefaultAsync(r => r.RequestId == id && r.StudentId == student.StudentId);
+            if (existing == null)
+                return NotFound(new { message = "Không tìm thấy yêu cầu của bạn" });
+
+            // Cho phép cập nhật các trường
+            existing.Fee = model.Fee;
+            existing.Schedule = model.Schedule;
+            existing.Level = model.Level;
+            existing.Location = model.Location;
+            existing.Requirement = model.Requirement;
+            existing.LearningFormat = model.LearningFormat;
+            existing.GenderTutor = model.GenderTutor;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Cập nhật thành công" });
+        }
+
+        //Xóa yêu cầu (chỉ student sở hữu yêu cầu)
+        [Authorize(Roles = "student")]
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteRequest(string id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId);
+            if (student == null) return Unauthorized();
+
+            var request = await _context.Requests
+                .FirstOrDefaultAsync(r => r.RequestId == id && r.StudentId == student.StudentId);
+
+            if (request == null)
+                return NotFound(new { message = "Không tìm thấy yêu cầu của bạn" });
+
+            _context.Requests.Remove(request);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã xoá yêu cầu thành công" });
+        }
+
+        private async Task SendSystemMessage(string receiverId, string content)
+        {
+            var latestMessage = await _context.Messages
+                .OrderByDescending(m => m.MessageId)
+                .FirstOrDefaultAsync();
+
+            string newId = "0000000001";
+            if (latestMessage != null)
+            {
+                long latestNumber = long.Parse(latestMessage.MessageId);
+                newId = (latestNumber + 1).ToString("D10");
+            }
+
+            var message = new Message
+            {
+                MessageId = newId,
+                SenderId = "system", // ID của hệ thống
+                ReceiverId = receiverId,
+                Content = content,
+                SentAt = DateTime.UtcNow
+            };
+
+            _context.Messages.Add(message);
+            await _context.SaveChangesAsync();
+        }
 
     }
 }

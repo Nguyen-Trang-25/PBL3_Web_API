@@ -26,6 +26,7 @@ namespace BE_Tutor.Controllers
                 .Distinct()
                 .ToListAsync();
 
+            // Nếu user chưa từng chat, nhưng có tin nhắn với chính mình
             if (!conversations.Contains(userId))
             {
                 var hasSelfMessage = await _context.Messages.AnyAsync(m => m.SenderId == userId && m.ReceiverId == userId);
@@ -35,17 +36,23 @@ namespace BE_Tutor.Controllers
                 }
             }
 
+            // Truy vấn thông tin người dùng từ danh sách cuộc hội thoại
             var users = await _context.Users
                 .Where(u => conversations.Contains(u.UserId))
                 .Select(u => new
                 {
-                    u.UserId,
-                    u.Name,
+                    userId = u.UserId,
+                    name = u.Name ?? "(Không có tên)",
+                    role = u.Role ?? "student", // Mặc định student
+                    avatarUrl = u.Role == "tutor"
+                        ? "images/avatar/tutor_m.png"
+                        : "images/avatar/student_boy.png"
                 })
                 .ToListAsync();
 
             return Ok(users);
         }
+
 
 
         [HttpPost("send")]
