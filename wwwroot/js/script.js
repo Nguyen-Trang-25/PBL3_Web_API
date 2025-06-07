@@ -524,4 +524,20 @@ if (window.location.pathname.endsWith("chat.html")) {
             statusMessage.textContent = message;
             statusMessage.className = type;  // chỉ success hoặc error
         }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const role = localStorage.getItem("role");
+
+    if (role === "tutor") {
+        loadContent("header_tutor.html", "header-container", attachLogoutHandlers);
+    } else if (role === "student") {
+        loadContent("header_student.html", "header-container", attachLogoutHandlers);
+    } else if (role === "admin") {
+        loadContent("header_admin.html", "header-container", attachLogoutHandlers);
     }
+    else {
+        console.warn("Không xác định được role:", role);
+    }
+});
+

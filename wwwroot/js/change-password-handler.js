@@ -5,7 +5,7 @@
 
 let changePasswordOtpTimer = null;
 let changePasswordTimeLeft = 180; // 3 phút
-let currentUserPhone = '0935130945'; // Demo phone - thực tế sẽ lấy từ session/API
+//let currentUserPhone = null; // Demo phone - thực tế sẽ lấy từ session/API
 let correctChangePasswordOtp = null;
 let isChangePasswordVerifying = false;
 let currentPasswordData = null;
@@ -126,34 +126,53 @@ function togglePasswordVisibility(inputId, toggleIcon) {
 }
 
 /**
- * Submit change password request
+ * Submit change password request// hàm này đã gửi OTP
  */
 async function submitChangePassword() {
+    const token = localStorage.getItem('token'); // <-- Lấy token ở đây
+    if (!token) {
+        console.error('Không tìm thấy token, vui lòng đăng nhập lại.');
+        return;
+    }
+    console.log('Token:', token);
+
     const currentPassword = document.getElementById('currentPassword').value;
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmNewPassword').value;
-
+   
+    console.log("hihi")
     // Validate inputs
     if (!validateChangePasswordForm(currentPassword, newPassword, confirmPassword)) {
         return;
     }
 
-    // Store password data for later use
     currentPasswordData = {
         currentPassword: currentPassword,
         newPassword: newPassword
     };
 
+    const submitButton = document.querySelector('#passwordStep .btn-primary');
+    showChangePasswordLoading(submitButton, 'Đang xử lý...');
     try {
-        const submitButton = document.querySelector('#passwordStep .btn-primary');
-        showChangePasswordLoading(submitButton, 'Đang xử lý...');
-
-        // Simulate API call to verify current password
-        await simulateAPI(1500);
-
-        // Demo: reject if current password is "wrong"
-        if (currentPassword === 'wrong') {
-            throw new Error('Current password incorrect');
+      
+        const response = await fetch('/api/Verification/RequestChangePassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                currentPassword: currentPassword,
+                newPassword: newPassword
+            })
+        });
+        console.log('Fetch response received');
+        const result = await response.json();
+        console.log("có chạy k")
+    
+        if (!response.ok) {
+            // Đây là chỗ ném lỗi ra ngoài để catch xử lý
+            throw new Error(result.message || 'Đã xảy ra lỗi');
         }
 
         // Success - show OTP step
@@ -161,7 +180,7 @@ async function submitChangePassword() {
         await sendChangePasswordOTP();
 
     } catch (error) {
-        if (error.message === 'Current password incorrect') {
+        if (error.message === 'Mật khẩu hiện tại không chính xác.') {
             showChangePasswordError('passwordError', 'Mật khẩu hiện tại không chính xác!');
         } else {
             showChangePasswordError('passwordError', 'Có lỗi xảy ra khi xử lý yêu cầu!');
@@ -244,23 +263,37 @@ function showOtpVerificationStep() {
 /**
  * Send OTP for change password
  */
-async function sendChangePasswordOTP() {
+/*async function sendChangePasswordOTP() {
     try {
-        // Simulate API call
-        await simulateAPI(1000);
+        const response = await fetch('/api/Verification/RequestChangePassword', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({
+                currentPassword: currentPasswordData.currentPassword,
+                newPassword: currentPasswordData.newPassword
+            })
+        });
 
-        // Generate demo OTP
-        correctChangePasswordOtp = '1234';
-        console.log(`Demo Change Password OTP: ${correctChangePasswordOtp}`);
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.message || 'Lỗi khi gửi OTP');
+        }
 
-        // Start timer
+        const data = await response.json();
+        console.log('OTP sent:', data.message);
+
         startChangePasswordOtpTimer();
-
     } catch (error) {
         console.error('Error sending change password OTP:', error);
-        showChangePasswordError('changePasswordOtpError', 'Có lỗi xảy ra khi gửi OTP!');
+        showChangePasswordError('changePasswordOtpError', error.message);
     }
+}*/
+
+function sendChangePasswordOTP() {
+    // Nếu backend đã gửi OTP rồi thì chỉ cần khởi động timer ở đây thôi
+    startChangePasswordOtpTimer();
 }
+
 
 /**
  * Move to next OTP input
@@ -316,31 +349,43 @@ async function verifyChangePasswordOTP() {
 
     try {
         showChangePasswordLoading(verifyBtn, 'Đang xác thực...');
-        await simulateAPI(1500);
 
-        if (enteredOtp === correctChangePasswordOtp) {
-            showChangePasswordSuccess('changePasswordOtpSuccess', 'OTP chính xác!');
-
-            // Complete password change
-            setTimeout(() => {
-                completePasswordChange();
-            }, 1500);
-
-        } else {
-            showChangePasswordError('changePasswordOtpError', 'Mã OTP không chính xác!');
-            addChangePasswordErrorEffect();
-            clearChangePasswordOtpInputs();
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('Không tìm thấy token, vui lòng đăng nhập lại.');
         }
 
+        const response = await fetch('/api/Verification/VerifyChangePasswordOtp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                otpCode: enteredOtp,
+                purpose: 'Change Password' // nếu cần, bạn có thể bỏ dòng này nếu backend không dùng
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Mã OTP không hợp lệ hoặc đã hết hạn.');
+        }
+
+        showChangePasswordSuccess('changePasswordOtpSuccess', 'OTP chính xác!');
+        setTimeout(() => {
+            showChangePasswordSuccessModal();
+        }, 1500);
+
     } catch (error) {
-        showChangePasswordError('changePasswordOtpError', 'Có lỗi xảy ra khi xác thực OTP!');
+        showChangePasswordError('changePasswordOtpError', error.message || 'Có lỗi xảy ra khi xác thực OTP!');
         addChangePasswordErrorEffect();
+        clearChangePasswordOtpInputs();
     } finally {
         hideChangePasswordLoading(verifyBtn, '<i class="fas fa-key"></i> Xác thực & Đổi mật khẩu');
         isChangePasswordVerifying = false;
 
-        // Disable button again if failed
-        const otpInputs = document.querySelectorAll('.change-password-otp');
         const allFilled = Array.from(otpInputs).every(input => input.value.length === 1);
         if (verifyBtn) {
             verifyBtn.disabled = !allFilled;
@@ -348,10 +393,11 @@ async function verifyChangePasswordOTP() {
     }
 }
 
+
 /**
  * Complete password change
  */
-async function completePasswordChange() {
+/*async function completePasswordChange() {
     try {
         console.log('Completing password change...');
 
@@ -383,7 +429,7 @@ async function completePasswordChange() {
 /**
  * Resend change password OTP
  */
-async function resendChangePasswordOTP() {
+/*async function resendChangePasswordOTP() {
     if (!currentUserPhone) {
         console.log('No phone number found');
         return;
@@ -414,7 +460,60 @@ async function resendChangePasswordOTP() {
         const button = document.getElementById('changePasswordResendBtn');
         hideChangePasswordLoadingBrief(button, '<i class="fas fa-redo"></i> Gửi lại mã OTP');
     }
+}*/
+async function resendChangePasswordOTP() {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.error('Không tìm thấy token, vui lòng đăng nhập lại.');
+        return;
+    }
+
+
+    const button = document.getElementById('changePasswordResendBtn');
+    // Lấy lại mật khẩu hiện tại + mật khẩu mới đã lưu (từ lần submitChangePassword trước)
+    if (!currentPasswordData || !currentPasswordData.currentPassword || !currentPasswordData.newPassword) {
+        console.log('Không có dữ liệu mật khẩu để gửi lại OTP');
+        return;
+    }
+    showChangePasswordLoadingBrief(button, 'Đang gửi...');
+    try {
+     
+        const response = await fetch('/api/Verification/RequestChangePassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                currentPassword: currentPasswordData.currentPassword,// dùng currentPassworđata
+                newPassword: currentPasswordData.newPassword
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Lỗi khi gửi lại OTP');
+        }
+
+
+        clearChangePasswordOtpInputs();
+        hideChangePasswordMessages();
+        startChangePasswordOtpTimer();
+
+        showChangePasswordSuccess('changePasswordOtpSuccess', 'Đã gửi lại mã OTP thành công!');
+        setTimeout(() => hideChangePasswordMessages(), 3000);
+
+    } catch (error) {
+        console.error('Error resending change password OTP:', error);
+        showChangePasswordError('changePasswordOtpError', 'Có lỗi xảy ra khi gửi lại OTP!');
+    } finally {
+        const button = document.getElementById('changePasswordResendBtn');
+        hideChangePasswordLoadingBrief(button, '<i class="fas fa-redo"></i> Gửi lại mã OTP');
+    }
 }
+
 
 /**
  * Start OTP timer
@@ -541,7 +640,7 @@ function redirectToLogin() {
     // Small delay before redirect for better UX
     setTimeout(() => {
         // Redirect to home page (which should show login)
-        window.location.href = '/home.html';
+        window.location.href = '/index.html';
     }, 300);
 }
 

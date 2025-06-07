@@ -98,14 +98,14 @@
             </p>
 
             <!-- Nhập OTP -->
-            <div class="otp-container">
-                <label class="otp-label">Nhập mã OTP (4 chữ số):</label>
-                <div class="otp-input-group">
-                    <input type="text" class="otp-box" maxlength="1" oninput="moveOtpNext(this, 0)">
-                    <input type="text" class="otp-box" maxlength="1" oninput="moveOtpNext(this, 1)">
-                    <input type="text" class="otp-box" maxlength="1" oninput="moveOtpNext(this, 2)">
-                    <input type="text" class="otp-box" maxlength="1" oninput="moveOtpNext(this, 3)">
-                </div>
+                <div class="otp-container">
+                    <label class="otp-label">Nhập mã OTP (4 chữ số):</label>
+                    <div class="otp-input-group">
+                        <input type="text" class="otp-box reset-otp" maxlength="1" oninput="moveResetOtpNext(this, 0)">
+                        <input type="text" class="otp-box reset-otp" maxlength="1" oninput="moveResetOtpNext(this, 1)">
+                        <input type="text" class="otp-box reset-otp" maxlength="1" oninput="moveResetOtpNext(this, 2)">
+                        <input type="text" class="otp-box reset-otp" maxlength="1" oninput="moveResetOtpNext(this, 3)">
+                    </div>
 
                 <!-- Timer OTP -->
                 <div class="otp-timer" id="otpTimer">
@@ -114,7 +114,7 @@
 
                 <!-- Gửi lại OTP -->
                 <div class="resend-section">
-                    <button type="button" class="btn-link" id="forgotResendBtn" onclick="resendForgotPasswordOTP(); return false;">
+                    <button type="button" class="btn-link" id="resendBtn" onclick="resendOTP(); return false;">
                         <i class="fas fa-redo"></i> Gửi lại mã OTP
                     </button>
                 </div>
@@ -130,6 +130,11 @@
                     <span>OTP chính xác!</span>
                 </div>
             </div>
+
+            <!-- ✅ NÚT XÁC THỰC OTP CHO RESET PASSWORD -->
+            <button type="button" class="btn btn-primary" id="verifyOtpBtn" onclick="verifyOTP(); return false;" disabled style="opacity: 0.6; background-color: #ccc; cursor: not-allowed;">
+                <i class="fas fa-check-circle"></i> Xác thực OTP
+            </button>
 
             <div class="back-to-login">
                 <a href="#" onclick="showForgotPasswordForm(); return false;">

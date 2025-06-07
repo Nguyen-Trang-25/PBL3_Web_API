@@ -191,11 +191,9 @@ function loadUserRoleAndShowUI() {
                 window.location.href = '/Admin/Dashboard';
                 break;
             case 'tutor':
-                loadContent("header_tutor.html", "header-container", attachLogoutHandlers);
                 window.location.href = '/home_tutor.html';
                 break;
             case 'student':
-                loadContent("header_student.html", "header-container", attachLogoutHandlers);
                 window.location.href = '/home_student.html';
                 break;
             default:
@@ -272,7 +270,16 @@ document.addEventListener("DOMContentLoaded", function () {
     loadContent("reg_log.html", "reg-log-container", () => {
         attachEventHandlers();
         attachAuthHandlers(); // Chỉ cần xử lý form đăng ký/đăng nhập
-        setupRegisterOTPEvents();
+        const script = document.createElement('script');
+        script.src = '/js/register-handler.js'; // Đường dẫn đúng tới file
+        script.onload = () => {
+            if (typeof setupRegisterOTPEvents === 'function') {
+                setupRegisterOTPEvents();
+            } else {
+                console.warn("setupRegisterOTPEvents không được định nghĩa trong file register-handler.js");
+            }
+        };
+        document.body.appendChild(script);
     });
 
     document.addEventListener("click", function (e) {

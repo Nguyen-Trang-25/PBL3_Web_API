@@ -10,5 +10,6 @@
         public string OtpCode { get; set; }
         public string Purpose { get; set; }
         public DateTime ExpiredAt { get; set; }
+        public string? ExtraData { get; set; }// lưu tạm mật khẩu
     }
 }

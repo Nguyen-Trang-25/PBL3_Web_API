@@ -1,13 +1,14 @@
 ﻿/**
  * OTP Handler - Xử lý xác thực OTP cho việc đổi số điện thoại
  * File: js/otp-handler.js
+ * Updated with test OTP functionality like register form
  */
 
 class OTPHandler {
     constructor() {
         this.otpTimer = null;
         this.timeLeft = 180; // 3 phút
-        this.correctOtp = null;
+        this.correctOtp = null; // Sẽ được set thành '1234' cho test
         this.newPhoneNumber = null;
         this.isVerifying = false;
 
@@ -91,40 +92,50 @@ class OTPHandler {
     }
 
     /**
-     * Gửi OTP tới server
+     * Gửi OTP tới server (Demo mode với OTP test 1234)
      */
     async sendOtpToServer(phoneNumber) {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('Không tìm thấy token, vui lòng đăng nhập lại.');
+            alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+            return;
+        }
+
+        console.log('Token:', token);
+
         try {
             this.showLoading(true);
 
-            const response = await fetch('/api/send-otp', {
+            const response = await fetch('/api/Verification/RequestChangePhone', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': this.getCsrfToken()
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    phone: phoneNumber,
-                    type: 'change_phone'
-                })
+                body: JSON.stringify({ newphone: phoneNumber })
             });
 
             const data = await response.json();
 
-            if (data.success) {
+            if (response.ok) {
                 this.showOtpModal(phoneNumber);
                 this.startOtpTimer();
-                console.log('OTP sent successfully');
+                console.log('✅ OTP sent successfully');
             } else {
-                throw new Error(data.message || 'Failed to send OTP');
+                const errorMessage = data.message || '❌ Gửi OTP thất bại. Vui lòng thử lại!';
+                this.showError(errorMessage);  // Hiển thị lỗi lên UI
+                console.warn('⚠️ Server error:', errorMessage);
             }
+
         } catch (error) {
-            console.error('Error sending OTP:', error);
-            alert('Có lỗi xảy ra khi gửi OTP. Vui lòng thử lại!');
+            console.error('❌ Error sending OTP:', error);
+            this.showError('Có lỗi xảy ra khi gửi OTP. Vui lòng thử lại!');
         } finally {
             this.showLoading(false);
         }
     }
+
 
     /**
      * Hiển thị modal OTP
@@ -134,9 +145,10 @@ class OTPHandler {
             phoneNumber.replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3');
         document.getElementById('otpOverlay').classList.add('active');
 
-        // Focus vào ô đầu tiên
+        // Focus vào ô đầu tiên và đảm bảo resend button active
         setTimeout(() => {
             document.querySelector('.otp-input').focus();
+            this.ensureResendButtonActive();
         }, 300);
     }
 
@@ -148,6 +160,7 @@ class OTPHandler {
         this.clearOtpTimer();
         this.resetOtpForm();
         this.newPhoneNumber = null;
+        this.correctOtp = null;
     }
 
     /**
@@ -156,7 +169,9 @@ class OTPHandler {
     startOtpTimer() {
         this.timeLeft = 180; // Reset về 3 phút
         const resendBtn = document.getElementById('resendBtn');
-        resendBtn.disabled = true;
+
+        // Đảm bảo resend button luôn active như register form
+        this.ensureResendButtonActive();
 
         this.otpTimer = setInterval(() => {
             this.timeLeft--;
@@ -164,10 +179,25 @@ class OTPHandler {
 
             if (this.timeLeft <= 0) {
                 this.clearOtpTimer();
-                resendBtn.disabled = false;
-                this.showTimerExpired();
+                // Vẫn đảm bảo resend button active
+                this.ensureResendButtonActive();
             }
         }, 1000);
+    }
+
+    /**
+     * Đảm bảo resend button luôn active như register form
+     */
+    ensureResendButtonActive() {
+        const resendBtn = document.getElementById('resendBtn');
+        if (resendBtn) {
+            resendBtn.disabled = false;
+            resendBtn.style.opacity = '1';
+            resendBtn.style.cursor = 'pointer';
+            resendBtn.style.pointerEvents = 'auto';
+            resendBtn.removeAttribute('disabled');
+            console.log('✅ OTP Resend button is ALWAYS active');
+        }
     }
 
     /**
@@ -231,7 +261,7 @@ class OTPHandler {
             current.classList.remove('filled');
         }
 
-        // Auto verify khi đủ 4 số
+        // Auto verify khi đủ 4 số như register form
         const otpInputs = document.querySelectorAll('.otp-input');
         const allFilled = Array.from(otpInputs).every(input => input.value.length === 1);
         if (allFilled && !this.isVerifying) {
@@ -243,7 +273,7 @@ class OTPHandler {
     }
 
     /**
-     * Xác thực OTP với server
+     * Xác thực OTP với test code 1234
      */
     async verifyOtp() {
         if (this.isVerifying) return;
@@ -256,26 +286,31 @@ class OTPHandler {
             return;
         }
 
+        const token = localStorage.getItem('token');
+        if (!token) {
+            this.showError('Bạn cần đăng nhập lại!');
+            return;
+        }
+
         this.isVerifying = true;
         this.hideMessages();
 
         try {
-            const response = await fetch('/api/verify-otp', {
-                method: 'POST',
+            const response = await fetch('/api/Verification/ConfirmChangePhone', {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': this.getCsrfToken()
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    phone: this.newPhoneNumber,
-                    otp: enteredOtp,
-                    type: 'change_phone'
+                    newPhone: this.newPhoneNumber,
+                    otpCode: enteredOtp
                 })
             });
 
             const data = await response.json();
 
-            if (data.success) {
+            if (response.ok) {
                 this.showSuccess();
                 this.clearOtpTimer();
 
@@ -285,10 +320,10 @@ class OTPHandler {
                     this.showProfileUpdateSuccess();
                 }, 1500);
             } else {
-                throw new Error(data.message || 'Invalid OTP');
+                throw new Error(data.message || 'Mã OTP không hợp lệ!');
             }
         } catch (error) {
-            console.error('Error verifying OTP:', error);
+            console.error('❌ Error verifying OTP:', error);
             this.showError('Mã OTP không chính xác!');
             this.clearOtpInputs();
             this.addErrorShakeEffect();
@@ -298,20 +333,56 @@ class OTPHandler {
     }
 
     /**
-     * Gửi lại OTP
+     * Gửi lại OTP - luôn active như register form
      */
     async resendOtp() {
-        if (!this.newPhoneNumber) return;
+        console.log('🔥 OTP RESEND BUTTON CLICKED!');
+
+        if (!this.newPhoneNumber) {
+            console.log('No phone number found');
+            return;
+        }
+
+        const button = document.getElementById('resendBtn');
+        this.showLoadingBrief(button, 'Đang gửi...');
 
         try {
-            await this.sendOtpToServer(this.newPhoneNumber);
-            this.resetOtpForm();
-            alert('Đã gửi lại mã OTP!');
+            const response = await fetch('/RequestChangePhone', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    newphone: this.newPhoneNumber
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('❌ Gửi OTP thất bại');
+            }
+
+            const result = await response.json();
+            console.log('✅ OTP resend response:', result);
+
+            // Reset OTP test (chỉ dùng cho debug)
+            // this.correctOtp = '1234'; // Có thể bỏ nếu dùng OTP thật
+
+            this.clearOtpInputs();
+            this.hideMessages();
+            this.startOtpTimer();
+
+            this.showResendSuccess(result.message || 'OTP đã được gửi');
+            setTimeout(() => this.hideMessages(), 3000);
+
         } catch (error) {
             console.error('Error resending OTP:', error);
-            alert('Có lỗi xảy ra khi gửi lại OTP. Vui lòng thử lại!');
+            this.showError('Có lỗi xảy ra khi gửi lại OTP!');
+        } finally {
+            this.hideLoadingBrief(button, '<i class="fas fa-redo"></i> Gửi lại');
+            this.ensureResendButtonActive();
         }
     }
+
 
     /**
      * Reset form OTP
@@ -332,7 +403,12 @@ class OTPHandler {
             input.classList.remove('filled', 'error');
         });
         // Focus về ô đầu tiên
-        otpInputs[0].focus();
+        if (otpInputs.length > 0) {
+            otpInputs[0].focus();
+        }
+
+        // Đảm bảo resend button vẫn active
+        this.ensureResendButtonActive();
     }
 
     /**
@@ -354,24 +430,45 @@ class OTPHandler {
     /**
      * Hiển thị thông báo lỗi
      */
-    showError(message = 'Mã OTP không chính xác!') {
+    showError(message) {
         const errorElement = document.getElementById('otpError');
         const errorText = document.getElementById('errorText');
 
-        errorText.textContent = message;
-        errorElement.className = 'error-message show';
+        if (errorElement && errorText) {
+            errorText.textContent = message || 'Đã xảy ra lỗi. Vui lòng thử lại!';
+            errorElement.classList.add('show');
 
-        setTimeout(() => {
-            errorElement.classList.remove('show');
-        }, 3000);
+            setTimeout(() => {
+                errorElement.classList.remove('show');
+            }, 3000);
+        } else {
+            console.error('Không tìm thấy phần tử hiển thị lỗi.');
+        }
+    }
+
+
+    /**
+     * Hiển thị thông báo gửi lại OTP thành công
+     */
+    showResendSuccess() {
+        const successElement = document.getElementById('otpSuccess');
+        if (successElement) {
+            // Cập nhật nội dung trực tiếp
+            successElement.innerHTML = '<i class="fas fa-check-circle"></i> Đã gửi lại mã OTP thành công!';
+            successElement.className = 'success-message show';
+        }
     }
 
     /**
      * Hiển thị thông báo thành công
      */
-    showSuccess() {
+    showSuccess(message = 'Xác thực thành công!') {
         const successElement = document.getElementById('otpSuccess');
-        successElement.className = 'success-message show';
+        if (successElement) {
+            // Cập nhật nội dung trực tiếp với icon
+            successElement.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            successElement.className = 'success-message show';
+        }
     }
 
     /**
@@ -404,7 +501,6 @@ class OTPHandler {
      * Hiển thị/ẩn loading
      */
     showLoading(show) {
-        // Có thể thêm spinner loading ở đây
         const changeBtn = document.querySelector('.change-phone-btn');
         if (show) {
             changeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
@@ -413,6 +509,33 @@ class OTPHandler {
             changeBtn.innerHTML = '<i class="fas fa-edit"></i> Đổi';
             changeBtn.disabled = false;
         }
+    }
+
+    /**
+     * Loading functions cho resend button
+     */
+    showLoadingBrief(button, text) {
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${text}`;
+        }
+    }
+
+    hideLoadingBrief(button, originalText) {
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = originalText;
+            button.style.opacity = '1';
+            button.style.cursor = 'pointer';
+            button.removeAttribute('disabled');
+        }
+    }
+
+    /**
+     * Simulate API call
+     */
+    simulateAPI(delay = 1000) {
+        return new Promise(resolve => setTimeout(resolve, delay));
     }
 
     /**
@@ -449,7 +572,7 @@ class OTPHandler {
                 }
             });
 
-            // Xử lý paste
+            // Xử lý paste như register form
             input.addEventListener('paste', (e) => {
                 e.preventDefault();
                 const paste = (e.clipboardData || window.clipboardData).getData('text');
@@ -505,6 +628,15 @@ let otpHandler;
 // Khởi tạo khi DOM loaded
 document.addEventListener('DOMContentLoaded', function () {
     otpHandler = new OTPHandler();
+
+    // Đảm bảo resend button luôn active như register form
+    setTimeout(() => {
+        if (otpHandler) {
+            setInterval(() => {
+                otpHandler.ensureResendButtonActive();
+            }, 2000);
+        }
+    }, 1000);
 });
 
 // Global functions
