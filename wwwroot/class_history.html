@@ -1,63 +1,291 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lịch sử lớp học</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
-  <link rel="stylesheet" href="/css/styles.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Sử Lớp Học - Hệ thống gia sư</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
-  <!-- Header -->
-  <div id="header-container"></div>
+<body class="class-history-page">
+    <!-- Header -->
+    <div id="header-container"></div>
 
-  <!-- Class History Section -->
-  <section class="class-history">
-    <h2>Lịch sử lớp học</h2>
-    <div id="class-history-list">
-      <!-- Các lớp học sẽ được JS render tại đây -->
+    <!-- Account Form -->
+    <div id="reg-log-container"></div>
+
+    <!-- Main Content -->
+    <main class="class-history-main">
+        <div class="class-history-container">
+            <!-- Page Header -->
+            <div class="class-history-header">
+                <h1 class="class-history-title">
+                    <i class="fas fa-history"></i>
+                    Lịch Sử Lớp Học
+                </h1>
+                <p class="class-history-subtitle" id="userRoleSubtitle">
+                    Quản lý và theo dõi các lớp học của bạn
+                </p>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="class-history-filters">
+                <div class="class-history-filter-group">
+                    <label for="statusFilter">Trạng thái</label>
+                    <select id="statusFilter">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="no_applications">Chưa có gia sư ứng tuyển</option>
+                        <option value="reviewing">Đang xem xét ứng viên</option>
+                        <option value="completed">Đã hoàn thành</option>
+                        <option value="cancelled">Đã hủy</option>
+                    </select>
+                </div>
+
+                <div class="class-history-filter-group">
+                    <label for="subjectFilter">Môn học</label>
+                    <select id="subjectFilter">
+                        <option value="">Tất cả môn học</option>
+                        <option value="math">Toán học</option>
+                        <option value="physics">Vật lý</option>
+                        <option value="chemistry">Hóa học</option>
+                        <option value="english">Tiếng Anh</option>
+                        <option value="literature">Ngữ văn</option>
+                        <option value="biology">Sinh học</option>
+                        <option value="history">Lịch sử</option>
+                        <option value="geography">Địa lý</option>
+                    </select>
+                </div>
+
+                <div class="class-history-filter-group">
+                    <label for="dateFilter">Thời gian</label>
+                    <select id="dateFilter">
+                        <option value="">Tất cả thời gian</option>
+                        <option value="this_week">Tuần này</option>
+                        <option value="this_month">Tháng này</option>
+                        <option value="last_month">Tháng trước</option>
+                        <option value="this_year">Năm này</option>
+                    </select>
+                </div>
+
+                <button class="class-history-refresh-btn" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                    Làm mới
+                </button>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="class-history-stats" id="statsContainer">
+                <!-- Stats will be loaded here -->
+            </div>
+
+            <!-- Classes Grid -->
+            <div class="class-history-grid" id="classesGrid">
+                <!-- Classes will be loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="class-history-empty" id="emptyState" style="display: none;">
+                <i class="fas fa-inbox"></i>
+                <h3>Chưa có lớp học nào</h3>
+                <p>Bạn chưa có lớp học nào. Hãy đăng yêu cầu tìm gia sư hoặc ứng tuyển các lớp học phù hợp.</p>
+                <a href="post_tutor.html" class="class-history-cta-btn">
+                    <i class="fas fa-plus"></i>
+                    Đăng yêu cầu tìm gia sư
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Class Detail Modal -->
+    <div class="class-history-modal-overlay" id="classDetailModal">
+        <div class="class-history-modal">
+            <div class="class-history-modal-header">
+                <h2 id="modalTitle">Chi tiết lớp học</h2>
+                <button class="class-history-modal-close" id="closeDetailModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="class-history-modal-body" id="modalBody">
+                <!-- Modal content will be loaded here -->
+            </div>
+        </div>
     </div>
-  </section>
 
-  <!-- Footer -->
-  <div id="footer-container"></div>
+    <!-- Applications Modal (for students) -->
+    <div class="class-history-modal-overlay" id="applicationsModal">
+        <div class="class-history-modal large">
+            <div class="class-history-modal-header">
+                <h2>Danh sách gia sư ứng tuyển</h2>
+                <button class="class-history-modal-close" id="closeApplicationsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="class-history-modal-body" id="applicationsBody">
+                <!-- Applications will be loaded here -->
+            </div>
+        </div>
+    </div>
 
-  <!-- JS -->
-  <script src="/js/loadContent.js" defer></script>
-  <script src="/js/script.js" defer></script>
+    <!-- Confirm Select Tutor Modal -->
+    <div class="class-history-modal-overlay" id="confirmSelectTutorModal">
+        <div class="class-history-modal">
+            <div class="class-history-modal-header">
+                <h2>Xác nhận chọn gia sư</h2>
+                <button class="class-history-modal-close" id="closeConfirmSelectModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="class-history-modal-body">
+                <div class="confirm-select-content">
+                    <div class="tutor-selection-summary">
+                        <h3><i class="fas fa-user-check"></i> Thông tin gia sư được chọn</h3>
+                        <div class="tutor-info-card" id="selectedTutorInfo">
+                            <!-- Tutor info will be populated here -->
+                        </div>
+                    </div>
 
-  <!-- Dữ liệu động từ backend -->
-  <!--<script>
-    document.addEventListener('DOMContentLoaded', () => {
-      fetch('get_classes.php')
-        .then(response => response.json())
-        .then(data => {
-          const container = document.getElementById('class-history-list');
-          container.innerHTML = '';
+                    <div class="class-info-summary">
+                        <h3><i class="fas fa-book"></i> Thông tin lớp học</h3>
+                        <div class="class-summary-content" id="classSummaryContent">
+                            <!-- Class info will be populated here -->
+                        </div>
+                    </div>
 
-          data.forEach(cls => {
-            const statusClass = cls.status === 'success' ? 'success'
-                              : cls.status === 'pending' ? 'pending'
-                              : 'waiting';
-            const statusText = cls.status === 'success' ? '✅ Đã có gia sư'
-                              : cls.status === 'pending' ? '⏳ Đang xét duyệt'
-                              : '❌ Chưa có ứng viên';
+                    <div class="start-date-section">
+                        <label for="startDate"><i class="fas fa-calendar-alt"></i> Ngày bắt đầu học:</label>
+                        <input type="date" id="startDate" name="startDate" required>
+                    </div>
 
-            const card = document.createElement('div');
-            card.className = 'class-card';
-            card.innerHTML = `
-              <h3>${cls.subject}</h3>
-              <p><strong>Khu vực:</strong> ${cls.location}</p>
-              <p><strong>Học phí:</strong> ${cls.fee} VND/tháng</p>
-              <p><strong>Trạng thái:</strong> <span class="status ${statusClass}">${statusText}</span></p>
-            `;
-            container.appendChild(card);
-          });
-        })
-        .catch(error => {
-          console.error('Lỗi khi tải dữ liệu lớp học:', error);
-        });
-    });
-  </script>-->
+                    <div class="agreement-section">
+                        <div class="agreement-checkbox">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="confirmAgreement" required>
+                                Tôi xác nhận đã đọc và đồng ý với các điều khoản, đồng ý chọn gia sư này cho lớp học.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="class-history-modal-footer">
+                <button type="button" class="class-history-btn secondary" id="cancelSelectTutor">
+                    <i class="fas fa-times"></i>
+                    Hủy
+                </button>
+                <button type="button" class="class-history-btn primary" id="confirmSelectTutor">
+                    <i class="fas fa-check"></i>
+                    Xác nhận chọn gia sư
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Class Modal -->
+    <div class="class-history-modal-overlay" id="cancelClassModal">
+        <div class="class-history-modal">
+            <div class="class-history-modal-header">
+                <h2>Hủy lớp học</h2>
+                <button class="class-history-modal-close" id="closeCancelClassModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="class-history-modal-body">
+                <div class="cancel-class-content">
+                    <div class="warning-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Bạn có chắc chắn muốn hủy lớp học này?</h3>
+                        <p>Hành động này không thể hoàn tác. Lớp học sẽ bị hủy và không thể khôi phục.</p>
+                    </div>
+
+                    <div class="cancel-form">
+                        <div class="form-group">
+                            <label for="cancelReason">Lý do hủy lớp <span class="required">*</span></label>
+                            <select id="cancelReason" required>
+                                <option value="">Chọn lý do hủy</option>
+                                <option value="found_other_tutor">Đã tìm được gia sư khác</option>
+                                <option value="no_longer_need">Không còn nhu cầu học</option>
+                                <option value="financial_issue">Vấn đề tài chính</option>
+                                <option value="schedule_conflict">Xung đột lịch học</option>
+                                <option value="other">Lý do khác</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cancelNote">Ghi chú thêm</label>
+                            <textarea id="cancelNote" placeholder="Nhập ghi chú thêm (tùy chọn)" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="class-history-modal-footer">
+                <button type="button" class="class-history-btn secondary" id="cancelCancelClass">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại
+                </button>
+                <button type="button" class="class-history-btn danger" id="confirmCancelClass">
+                    <i class="fas fa-trash"></i>
+                    Xác nhận hủy lớp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="class-history-modal-overlay" id="reviewModal">
+        <div class="class-history-modal">
+            <div class="class-history-modal-header">
+                <h2>Đánh giá gia sư</h2>
+                <button class="class-history-modal-close" id="closeReviewModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="class-history-modal-body">
+                <form id="reviewForm" class="class-history-review-form">
+                    <div class="class-history-tutor-info" id="reviewTutorInfo">
+                        <!-- Tutor info will be loaded here -->
+                    </div>
+
+                    <div class="class-history-form-group">
+                        <label>Đánh giá sao</label>
+                        <div class="class-history-star-rating" id="starRating">
+                            <i class="fas fa-star" data-rating="1"></i>
+                            <i class="fas fa-star" data-rating="2"></i>
+                            <i class="fas fa-star" data-rating="3"></i>
+                            <i class="fas fa-star" data-rating="4"></i>
+                            <i class="fas fa-star" data-rating="5"></i>
+                        </div>
+                        <span class="class-history-rating-text" id="ratingText">Chọn số sao</span>
+                    </div>
+
+                    <div class="class-history-form-group">
+                        <label for="reviewComment">Nhận xét</label>
+                        <textarea id="reviewComment"
+                                  placeholder="Chia sẻ trải nghiệm của bạn về gia sư này..."
+                                  rows="4"
+                                  required></textarea>
+                    </div>
+
+                    <div class="class-history-form-actions">
+                        <button type="button" class="class-history-btn secondary" id="cancelReview">
+                            Hủy
+                        </button>
+                        <button type="submit" class="class-history-btn primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Gửi đánh giá
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/loadContent.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/class_history.js"></script>
+    <script src="js/forgot-password.js"></script>
+
 </body>
 </html>

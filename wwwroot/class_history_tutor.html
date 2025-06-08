@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Sử Ứng Tuyển - Gia Sư</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/class_history_tutor.css">
+</head>
+<body class="tutor-class-history-page">
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Account Form -->
+    <div id="reg-log-container"></div>
+
+    <!-- Main Content -->
+    <main class="tutor-class-history-main">
+        <div class="tutor-class-history-container">
+            <!-- Page Header -->
+            <div class="tutor-class-history-header">
+                <h1 class="tutor-class-history-title">
+                    <i class="fas fa-clipboard-list"></i>
+                    Lịch Sử Ứng Tuyển
+                </h1>
+                <p class="tutor-class-history-subtitle">
+                    Theo dõi các lớp học bạn đã ứng tuyển và trạng thái xét duyệt
+                </p>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="tutor-class-history-filters">
+                <div class="tutor-filter-group">
+                    <label for="tutorStatusFilter">Trạng thái</label>
+                    <select id="tutorStatusFilter">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="pending">Đang chờ xét duyệt</option>
+                        <option value="accepted">Đã được chấp nhận</option>
+                        <!--<option value="rejected">Đã bị từ chối</option>-->
+                        <option value="others_selected">Đã chọn gia sư khác</option>
+                        <option value="class_cancelled">Lớp đã bị hủy</option>
+                    </select>
+                </div>
+
+                <div class="tutor-filter-group">
+                    <label for="tutorSubjectFilter">Môn học</label>
+                    <select id="tutorSubjectFilter">
+                        <option value="">Tất cả môn học</option>
+                        <option value="math">Toán học</option>
+                        <option value="physics">Vật lý</option>
+                        <option value="chemistry">Hóa học</option>
+                        <option value="english">Tiếng Anh</option>
+                        <option value="literature">Ngữ văn</option>
+                        <option value="biology">Sinh học</option>
+                        <option value="history">Lịch sử</option>
+                        <option value="geography">Địa lý</option>
+                    </select>
+                </div>
+
+                <div class="tutor-filter-group">
+                    <label for="tutorDateFilter">Thời gian ứng tuyển</label>
+                    <select id="tutorDateFilter">
+                        <option value="">Tất cả thời gian</option>
+                        <option value="this_week">Tuần này</option>
+                        <option value="this_month">Tháng này</option>
+                        <option value="last_month">Tháng trước</option>
+                        <option value="this_year">Năm này</option>
+                    </select>
+                </div>
+
+                <button class="tutor-refresh-btn" id="tutorRefreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                    Làm mới
+                </button>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="tutor-class-history-stats" id="tutorStatsContainer">
+                <!-- Stats will be loaded here -->
+            </div>
+
+            <!-- Applications Grid -->
+            <div class="tutor-applications-grid" id="tutorApplicationsGrid">
+                <!-- Applications will be loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="tutor-empty-state" id="tutorEmptyState" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>Chưa có ứng tuyển nào</h3>
+                <p>Bạn chưa ứng tuyển lớp học nào. Hãy tìm kiếm và ứng tuyển các lớp học phù hợp với khả năng của bạn.</p>
+                <a href="course.html" class="tutor-cta-btn">
+                    <i class="fas fa-search"></i>
+                    Tìm lớp học
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Application Detail Modal -->
+    <div class="tutor-modal-overlay" id="tutorApplicationDetailModal">
+        <div class="tutor-modal">
+            <div class="tutor-modal-header">
+                <h2 id="tutorModalTitle">Chi tiết ứng tuyển</h2>
+                <button class="tutor-modal-close" id="closeTutorDetailModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tutor-modal-body" id="tutorModalBody">
+                <!-- Modal content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Info Modal -->
+    <div class="tutor-modal-overlay" id="tutorStudentInfoModal">
+        <div class="tutor-modal">
+            <div class="tutor-modal-header">
+                <h2>Thông tin học viên</h2>
+                <button class="tutor-modal-close" id="closeStudentInfoModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tutor-modal-body" id="studentInfoBody">
+                <!-- Student info will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Application Modal -->
+    <div class="tutor-modal-overlay" id="tutorWithdrawModal">
+        <div class="tutor-modal">
+            <div class="tutor-modal-header">
+                <h2>Rút ứng tuyển</h2>
+                <button class="tutor-modal-close" id="closeWithdrawModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tutor-modal-body">
+                <div class="tutor-withdraw-content">
+                    <div class="tutor-warning-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Bạn có chắc chắn muốn rút ứng tuyển?</h3>
+                        <p>Hành động này không thể hoàn tác. Bạn sẽ không thể ứng tuyển lại lớp học này.</p>
+                    </div>
+
+                    <div class="tutor-withdraw-form">
+                        <div class="tutor-form-group">
+                            <label for="withdrawReason">Lý do rút ứng tuyển <span class="required">*</span></label>
+                            <select id="withdrawReason" required>
+                                <option value="">Chọn lý do</option>
+                                <option value="schedule_conflict">Xung đột lịch dạy</option>
+                                <option value="distance_too_far">Khoảng cách quá xa</option>
+                                <option value="fee_not_suitable">Học phí không phù hợp</option>
+                                <option value="found_other_class">Đã nhận lớp khác</option>
+                                <option value="personal_reason">Lý do cá nhân</option>
+                                <option value="other">Lý do khác</option>
+                            </select>
+                        </div>
+
+                        <div class="tutor-form-group">
+                            <label for="withdrawNote">Ghi chú thêm</label>
+                            <textarea id="withdrawNote" placeholder="Nhập ghi chú thêm (tùy chọn)" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tutor-modal-footer">
+                <button type="button" class="tutor-btn secondary" id="cancelWithdraw">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại
+                </button>
+                <button type="button" class="tutor-btn danger" id="confirmWithdraw">
+                    <i class="fas fa-times"></i>
+                    Xác nhận rút ứng tuyển
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Student Modal -->
+    <div class="tutor-modal-overlay" id="tutorContactModal">
+        <div class="tutor-modal">
+            <div class="tutor-modal-header">
+                <h2>Liên hệ học viên</h2>
+                <button class="tutor-modal-close" id="closeContactModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tutor-modal-body">
+                <div class="tutor-contact-content">
+                    <div class="tutor-contact-note">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Thông tin liên hệ sẽ chỉ hiển thị sau khi ứng tuyển của bạn được chấp nhận.</p>
+                    </div>
+
+                    <div class="tutor-contact-info" id="tutorContactInfo">
+                        <!-- Contact info will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/loadContent.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/class_history_tutor.js"></script>
+    <script src="js/forgot-password.js"></script>
+
+</body>
+</html>

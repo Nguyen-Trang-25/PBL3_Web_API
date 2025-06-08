@@ -84,7 +84,7 @@ namespace BE_Tutor.Controllers
                         Requirement = model.Requirement,
                         LearningFormat = model.LearningFormat,
                         CreatedAt = DateTime.Now,
-                        Status = "Pending",
+                        Status = "pending",
                     };
 
 
@@ -206,66 +206,91 @@ namespace BE_Tutor.Controllers
 
                 var studentHistory = await _context.Requests
                     .Include(r => r.Subject)
+                    .Include(r => r.Student)
+                    .Include(r => r.Applications).ThenInclude(a => a.Tutor)
+                    .Include(r => r.Contracts)
                     .Where(r => r.StudentId == student.StudentId)
                     .Select(r => new RequestHistoryDto
                     {
                         RequestId = r.RequestId,
-                        StudentId = r.StudentId,
+                        Subject = r.SubjectId,
                         SubjectName = r.Subject != null ? r.Subject.Name : null,
                         Level = r.Level,
                         Fee = r.Fee,
                         Schedule = r.Schedule,
+                        Location = r.Location,
                         Status = r.Status,
                         CreatedAt = r.CreatedAt,
-                        Location = r.Location,
-                        GenderTutor = r.GenderTutor,
-                        Requirement = r.Requirement,
-                        LearningFormat = r.LearningFormat
+                        ApplicationsCount = r.Applications.Count,
+                        SelectedTutor = r.Applications.FirstOrDefault(a => a.Status == "accepted") != null
+                            ? r.Applications.FirstOrDefault(a => a.Status == "accepted").Tutor.User.Name
+                            : null,
+                        StartDate = r.Contracts.FirstOrDefault() != null
+                            ? r.Contracts.FirstOrDefault().StartDate.ToDateTime(TimeOnly.MinValue)
+                            : (DateTime?)null,
+                        HasReviewed = _context.Reviews.Any(rev =>
+                            rev.StudentId == student.StudentId &&
+                            rev.TutorId == r.Applications.FirstOrDefault(a => a.Status == "accepted").TutorId
+                        ),
+                        StudentName = r.Student != null ? r.Student.User.Name : null
                     })
                     .ToListAsync();
 
                 return Ok(studentHistory);
-
             }
+
             else if (role == "tutor")
             {
                 var tutor = await _context.Tutors.FirstOrDefaultAsync(t => t.UserId == userId);
                 if (tutor == null)
                     return NotFound(new { message = "Không tìm thấy gia sư" });
 
-                // Lấy danh sách các lớp mà tutor đã ứng tuyển
                 var appliedRequestIds = await _context.Applications
                     .Where(a => a.TutorId == tutor.TutorId)
                     .Select(a => a.RequestId)
                     .Distinct()
                     .ToListAsync();
 
-                var history = await _context.Requests
+                var tutorHistory = await _context.Requests
                     .Include(r => r.Subject)
+                    .Include(r => r.Student)
+                    .Include(r => r.Applications).ThenInclude(a => a.Tutor)
+                    .Include(r => r.Contracts)
                     .Where(r => appliedRequestIds.Contains(r.RequestId))
                     .Select(r => new RequestHistoryDto
                     {
                         RequestId = r.RequestId,
-                        StudentId = r.StudentId,
+                        Subject = r.SubjectId,
                         SubjectName = r.Subject != null ? r.Subject.Name : null,
                         Level = r.Level,
                         Fee = r.Fee,
                         Schedule = r.Schedule,
+                        Location = r.Location,
                         Status = r.Status,
                         CreatedAt = r.CreatedAt,
-                        Location = r.Location,
-                        GenderTutor = r.GenderTutor,
-                        Requirement = r.Requirement,
-                        LearningFormat = r.LearningFormat
+                        ApplicationsCount = r.Applications.Count,
+                        SelectedTutor = r.Applications.FirstOrDefault(a => a.Status == "accepted") != null
+                            ? r.Applications.FirstOrDefault(a => a.Status == "accepted").Tutor.User.Name
+                            : null,
+                        StartDate = r.Contracts.FirstOrDefault() != null
+                            ? r.Contracts.FirstOrDefault().StartDate.ToDateTime(TimeOnly.MinValue)
+                            : (DateTime?)null,
+                        HasReviewed = _context.Reviews.Any(rev =>
+                            rev.StudentId == r.StudentId &&
+                            rev.TutorId == tutor.TutorId
+                        ),
+                        StudentName = r.Student != null ? r.Student.User.Name : null
                     })
                     .ToListAsync();
 
-
-                return Ok(history);
+                return Ok(tutorHistory);
             }
 
             return BadRequest(new { message = "Role không hợp lệ" });
         }
+
+
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
@@ -409,5 +434,69 @@ namespace BE_Tutor.Controllers
                 return StatusCode(500, new { message = $"Gửi mail thất bại: {ex.Message}" });
             }
         }
+
+        [Authorize]
+        [HttpPut("update-status/{id}")]
+        public async Task<IActionResult> UpdateStatus(string id, [FromBody] UpdateStatusDto dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var role = User.FindFirstValue(ClaimTypes.Role);
+
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(role))
+                return Unauthorized(new { message = "Không xác thực được người dùng." });
+
+            var request = await _context.Requests.Include(r => r.Subject).FirstOrDefaultAsync(r => r.RequestId == id);
+            if (request == null)
+                return NotFound(new { message = "Không tìm thấy yêu cầu." });
+
+            // Chỉ cho phép student cập nhật yêu cầu của mình
+            if (role == "student")
+            {
+                var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId);
+                if (student == null || request.StudentId != student.StudentId)
+                    return Forbid("Bạn không có quyền cập nhật yêu cầu này.");
+            }
+
+            // Nếu chuyển sang active thì tạo contract
+            if (dto.Status == "active")
+            {
+                // Kiểm tra xem đã có contract chưa
+                bool hasContract = await _context.Contracts.AnyAsync(c => c.RequestId == request.RequestId);
+                if (hasContract)
+                    return BadRequest(new { message = "Yêu cầu này đã có hợp đồng." });
+
+                var latestContract = await _context.Contracts
+                    .OrderByDescending(c => c.ContractId)
+                    .FirstOrDefaultAsync();
+
+                string newContractId = "0000000001";
+                if (latestContract != null)
+                {
+                    long latestNumber = long.Parse(latestContract.ContractId);
+                    newContractId = (latestNumber + 1).ToString("D10");
+                }
+
+                var contract = new Contract
+                {
+                    ContractId = newContractId,
+                    RequestId = request.RequestId,
+                    Fee = request.Fee ?? 0,
+                    Location = request.Location ?? "",
+                    Schedule = request.Schedule ?? "",
+                    StartDate = DateOnly.FromDateTime(DateTime.Today),
+                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddMonths(1)), // Giả sử hợp đồng 1 tháng
+                    Status = "active",
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.Contracts.Add(contract);
+            }
+
+            request.Status = dto.Status;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Cập nhật trạng thái thành công." });
+        }
+
     }
 }

@@ -74,7 +74,7 @@ namespace BE_Tutor.Controllers
                 .FirstOrDefaultAsync(r => r.RequestId == model.RequestId);
             if (request != null)
             {
-                request.Status = "Applied";
+                request.Status = "applied";
                 await SendSystemMessage(request.StudentId, $"Gia sư {tutor.User.Name} đã ứng tuyển lớp \"{request.Subject.Name}\" {request.Level}.");
             }
             else
@@ -90,6 +90,36 @@ namespace BE_Tutor.Controllers
             // Optional: chuyển sang trang thông báo hoặc xác nhận
             return Ok(new { success = true, message = "Ứng tuyển thành công!" });
         }
+
+        [HttpGet("by-request/{requestId}")]
+        public async Task<IActionResult> GetApplicationsByRequestId(string requestId)
+        {
+            var applications = await _context.Applications
+                .Include(a => a.Tutor).ThenInclude(t => t.User)
+                .Where(a => a.RequestId == requestId)
+                .Select(a => new ApplicationDetailDto
+                {
+                    ApplicationId = a.ApplicationId,
+                    TutorId = a.TutorId,
+                    Name = a.Tutor.User.Name,
+                    Rating = _context.Reviews
+                                .Where(r => r.TutorId == a.TutorId && r.Rating != null)
+                                .Average(r => (double?)r.Rating) ?? 0,
+                    TotalReviews = _context.Reviews.Count(r => r.TutorId == a.TutorId),
+                    Experience = a.Experience,
+                    Specialization = a.Specialization,
+                    Qualification = a.Qualification,
+                    TeachingArea = a.TeachingArea,
+                    Status = a.Status ?? "pending",
+                    AppliedAt = a.AppliedAt,
+                    Message = a.Experience, // giả định Experience là "message" trong dữ liệu mock của bạn
+                    Phone = a.Phone
+                })
+                .ToListAsync();
+
+            return Ok(applications);
+        }
+
 
         private async Task SendSystemMessage(string receiverId, string content)
         {

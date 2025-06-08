@@ -18,44 +18,34 @@ namespace BE_Tutor.Controllers
         }
 
         // 1. Tạo hợp đồng từ học sinh hoặc gia sư
-        [Authorize(Roles = "student,tutor")]
         [HttpPost("create")]
-        public async Task<IActionResult> CreateContract([FromBody] Contract model)
+        public async Task<IActionResult> CreateContract([FromBody] ContractDto model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var role = User.FindFirstValue(ClaimTypes.Role);
 
             if (model == null || string.IsNullOrEmpty(model.RequestId))
                 return BadRequest("Dữ liệu không hợp lệ.");
 
+            // Parse ngày từ string sang DateOnly
+            if (!DateOnly.TryParse(model.StartDate, out var startDate))
+                return BadRequest("Ngày bắt đầu không hợp lệ.");
+
+            DateOnly? endDate = null;
+            if (!string.IsNullOrEmpty(model.EndDate))
+            {
+                if (DateOnly.TryParse(model.EndDate, out var parsedEndDate))
+                    endDate = parsedEndDate;
+                else
+                    return BadRequest("Ngày kết thúc không hợp lệ.");
+            }
+
             var request = await _context.Requests.FirstOrDefaultAsync(r => r.RequestId == model.RequestId);
             if (request == null) return NotFound("Không tìm thấy yêu cầu.");
 
-            // Gửi tin nhắn đến học sinh hoặc gia sư
-            if (role == "student")
-            {
-                var tutorId = await _context.Applications
-                    .Where(a => a.RequestId == model.RequestId)
-                    .Select(a => a.TutorId)
-                    .FirstOrDefaultAsync();
-
-                var tutorUserId = await _context.Tutors
-                    .Where(t => t.TutorId == tutorId)
-                    .Select(t => t.UserId)
-                    .FirstOrDefaultAsync();
-
-                await SendSystemMessage(tutorUserId, $"Học sinh đã tạo hợp đồng cho lớp học bạn đã ứng tuyển.");
-            }
-            else if (role == "tutor")
-            {
-                var studentUserId = await _context.Students
-                    .Where(s => s.StudentId == request.StudentId)
-                    .Select(s => s.UserId)
-                    .FirstOrDefaultAsync();
-
-                await SendSystemMessage(studentUserId, $"Gia sư đã tạo hợp đồng cho lớp học của bạn.");
-            }
-
+            // Kiểm tra quyền tạo hợp đồng...
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId);
+            if (student == null || student.StudentId != request.StudentId)
+                return Forbid("Bạn không có quyền tạo hợp đồng cho yêu cầu này.");
 
             if (await _context.Contracts.AnyAsync(c => c.RequestId == model.RequestId))
                 return BadRequest("Request này đã có hợp đồng.");
@@ -67,58 +57,86 @@ namespace BE_Tutor.Controllers
             {
                 ContractId = newId,
                 RequestId = model.RequestId,
-                StartDate = model.StartDate,
-                EndDate = model.EndDate,
+                StartDate = startDate,
+                EndDate = endDate,
                 Fee = model.Fee,
                 Schedule = model.Schedule,
                 Location = model.Location,
-                Status = "pending",
+                Status = "active",
                 CreatedAt = DateTime.Now
             };
+
+            request.Status = "active"; 
+            _context.Requests.Update(request);
+
+            // Cập nhật trạng thái Application của tutor được chọn
+            var tutorUserId = await _context.Applications
+                .Where(a => a.RequestId == model.RequestId)
+                .Select(a => a.Tutor.UserId)
+                .FirstOrDefaultAsync();
+
+            var application = await _context.Applications
+                .FirstOrDefaultAsync(a => a.RequestId == model.RequestId && a.Tutor.UserId == tutorUserId);
+
+            if (application != null)
+            {
+                application.Status = "accepted"; 
+                _context.Applications.Update(application);
+            }
 
             _context.Contracts.Add(contract);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Tạo hợp đồng thành công", contractId = newId });
-        }
+            // Gửi thông báo đến gia sư ứng tuyển nếu cần...
+            
 
-        // 2. Học sinh hoặc gia sư xác nhận hợp đồng
-        [Authorize(Roles = "student,tutor")]
-        [HttpPut("confirm/{contractId}")]
-        public async Task<IActionResult> ConfirmContract(string contractId)
-        {
-            var contract = await _context.Contracts.FirstOrDefaultAsync(c => c.ContractId == contractId);
-            if (contract == null) return NotFound("Không tìm thấy hợp đồng.");
-
-            contract.Status = "active";
-            var request = await _context.Requests
-            .Include(r => r.Student)
-            .FirstOrDefaultAsync(r => r.RequestId == contract.RequestId);
-
-            if (request != null)
+            if (!string.IsNullOrEmpty(tutorUserId))
             {
-                var studentUserId = await _context.Students
-                    .Where(s => s.StudentId == request.StudentId)
-                    .Select(s => s.UserId)
-                    .FirstOrDefaultAsync();
-
-                var tutorUserId = await _context.Applications
-                    .Where(a => a.RequestId == contract.RequestId)
-                    .Select(a => a.Tutor.TutorId)
-                    .Distinct()
-                    .Join(_context.Tutors, aTutorId => aTutorId, t => t.TutorId, (aTutorId, t) => t.UserId)
-                    .FirstOrDefaultAsync();
-
-                var senderName = User.FindFirstValue(ClaimTypes.Role) == "student" ? "Học sinh" : "Gia sư";
-                var receiverId = User.FindFirstValue(ClaimTypes.Role) == "student" ? tutorUserId : studentUserId;
-
-                await SendSystemMessage(receiverId, $"{senderName} đã xác nhận hợp đồng. Hợp đồng hiện đã có hiệu lực.");
+                await SendSystemMessage(tutorUserId, $"The student has created and confirmed a contract for the class you applied for.");
             }
 
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Hợp đồng đã được xác nhận và kích hoạt." });
+            return Ok(new { message = "Tạo hợp đồng và xác nhận thành công", contractId = newId });
         }
+
+
+
+        // 2. Học sinh hoặc gia sư xác nhận hợp đồng
+        //[Authorize(Roles = "student,tutor")]
+        //[HttpPut("confirm/{contractId}")]
+        //public async Task<IActionResult> ConfirmContract(string contractId)
+        //{
+        //    var contract = await _context.Contracts.FirstOrDefaultAsync(c => c.ContractId == contractId);
+        //    if (contract == null) return NotFound("Không tìm thấy hợp đồng.");
+
+        //    contract.Status = "active";
+        //    var request = await _context.Requests
+        //    .Include(r => r.Student)
+        //    .FirstOrDefaultAsync(r => r.RequestId == contract.RequestId);
+
+        //    if (request != null)
+        //    {
+        //        var studentUserId = await _context.Students
+        //            .Where(s => s.StudentId == request.StudentId)
+        //            .Select(s => s.UserId)
+        //            .FirstOrDefaultAsync();
+
+        //        var tutorUserId = await _context.Applications
+        //            .Where(a => a.RequestId == contract.RequestId)
+        //            .Select(a => a.Tutor.TutorId)
+        //            .Distinct()
+        //            .Join(_context.Tutors, aTutorId => aTutorId, t => t.TutorId, (aTutorId, t) => t.UserId)
+        //            .FirstOrDefaultAsync();
+
+        //        var senderName = User.FindFirstValue(ClaimTypes.Role) == "student" ? "Học sinh" : "Gia sư";
+        //        var receiverId = User.FindFirstValue(ClaimTypes.Role) == "student" ? tutorUserId : studentUserId;
+
+        //        await SendSystemMessage(receiverId, $"{senderName} đã xác nhận hợp đồng. Hợp đồng hiện đã có hiệu lực.");
+        //    }
+
+        //    await _context.SaveChangesAsync();
+
+        //    return Ok(new { message = "Hợp đồng đã được xác nhận và kích hoạt." });
+        //}
 
         // 3. Admin lấy tất cả hợp đồng
         [Authorize(Roles = "admin")]
@@ -240,7 +258,7 @@ namespace BE_Tutor.Controllers
             var message = new Message
             {
                 MessageId = newId,
-                SenderId = "system", // ID của hệ thống
+                SenderId = "0000000004", // ID của hệ thống
                 ReceiverId = receiverId,
                 Content = content,
                 SentAt = DateTime.UtcNow

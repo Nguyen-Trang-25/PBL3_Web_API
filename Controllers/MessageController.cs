@@ -20,38 +20,83 @@ namespace BE_Tutor.Controllers
         [HttpGet("conversations/{userId}")]
         public async Task<IActionResult> GetUserConversations(string userId)
         {
-            var conversations = await _context.Messages
+            // Lấy danh sách partner đã chat cùng userId
+            var partnerIds = await _context.Messages
                 .Where(m => m.SenderId == userId || m.ReceiverId == userId)
                 .Select(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
                 .Distinct()
                 .ToListAsync();
 
-            // Nếu user chưa từng chat, nhưng có tin nhắn với chính mình
-            if (!conversations.Contains(userId))
+            // Nếu chưa có partner nhưng user chat với chính mình
+            if (!partnerIds.Contains(userId))
             {
                 var hasSelfMessage = await _context.Messages.AnyAsync(m => m.SenderId == userId && m.ReceiverId == userId);
                 if (hasSelfMessage)
                 {
-                    conversations.Add(userId);
+                    partnerIds.Add(userId);
                 }
             }
 
-            // Truy vấn thông tin người dùng từ danh sách cuộc hội thoại
-            var users = await _context.Users
-                .Where(u => conversations.Contains(u.UserId))
-                .Select(u => new
+            // Lấy thông tin partner (user khác)
+            var partners = await _context.Users
+                .Where(u => partnerIds.Contains(u.UserId))
+                .Select(u => new PartnerDto
                 {
-                    userId = u.UserId,
-                    name = u.Name ?? "(Không có tên)",
-                    role = u.Role ?? "student", // Mặc định student
-                    avatarUrl = u.Role == "tutor"
+                    Id = u.UserId,
+                    Name = u.Name ?? "(Không có tên)",
+                    Role = u.Role ?? "student",
+                    AvatarUrl = u.Role == "tutor"
                         ? "images/avatar/tutor_m.png"
-                        : "images/avatar/student_boy.png"
+                        : "images/avatar/student_boy.png",
+                    Status = "offline",
+                    lastSeen = null
                 })
                 .ToListAsync();
 
-            return Ok(users);
-        }
+
+            // Với mỗi partner, lấy tin nhắn cuối và số tin nhắn chưa đọc của userId
+            var conversations = new List<ConversationDto>();
+
+            foreach (var partner in partners)
+            {
+                var lastMessage = await _context.Messages
+                    .Where(m =>
+                        (m.SenderId == userId && m.ReceiverId == partner.Id) ||
+                        (m.SenderId == partner.Id && m.ReceiverId == userId))
+                    .OrderByDescending(m => m.SentAt)
+                    .FirstOrDefaultAsync();
+
+                var unreadCount = await _context.Messages
+                    .Where(m => m.SenderId == partner.Id && m.ReceiverId == userId)
+                    .CountAsync();
+
+                conversations.Add(new ConversationDto
+                {
+                    partner = new PartnerDto
+                    {
+                        Id = partner.Id,
+                        Name = partner.Name,
+                        Role = partner.Role,
+                        AvatarUrl = partner.AvatarUrl,
+                        Status = "offline",
+                        lastSeen = null
+                    },
+                    lastMessage = lastMessage?.Content ?? "",
+                    lastTime = lastMessage?.SentAt,
+                    unreadCount = unreadCount
+                });
+            }
+
+            var sorted = conversations
+                .OrderByDescending(c => c.lastTime ?? DateTime.MinValue)
+                .ToList();
+
+
+
+            return Ok(sorted);
+        
+    }
+
 
 
 
