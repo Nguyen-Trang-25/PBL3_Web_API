@@ -1,0 +1,330 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Finder Admin - Thông tin hệ thống</title>
+
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Inline CSS Backup -->
+    <style>
+        .admin-system-info h1,
+        .admin-system-info h2,
+        .admin-system-info h3,
+        .admin-system-info .info-value,
+        .admin-system-info .status-text {
+            color: #333333 !important;
+        }
+
+        .admin-system-info .info-label,
+        .admin-system-info .page-subtitle {
+            color: #666666 !important;
+        }
+
+        .admin-system-info i {
+            display: inline-block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .admin-system-info .status.online .status-dot {
+            background: #28a745 !important;
+        }
+
+        .admin-system-info .status.warning .status-dot {
+            background: #ffc107 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Admin System Info Section -->
+    <section class="admin-system-info">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-server" style="color: #0eb582 !important; font-size: 3rem;"></i>
+                    Thông tin hệ thống
+                </h1>
+                <p class="page-subtitle">Theo dõi trạng thái và thông số hệ thống</p>
+            </div>
+
+            <!-- System Status Overview -->
+            <div class="status-overview">
+                <div class="status-card online">
+                    <div class="status-icon">
+                        <i class="fas fa-check-circle" style="color: #28a745 !important;"></i>
+                    </div>
+                    <div class="status-content">
+                        <h3>Hệ thống hoạt động</h3>
+                        <p>Tất cả dịch vụ đang chạy ổn định</p>
+                    </div>
+                    <div class="status-dot online"></div>
+                </div>
+            </div>
+
+            <!-- System Information Grid -->
+            <div class="system-grid">
+                <!-- Server Information -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-server" style="color: #0eb582 !important;"></i>
+                            Thông tin máy chủ
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label">Hệ điều hành:</span>
+                            <span class="info-value">Ubuntu 22.04 LTS</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">CPU:</span>
+                            <span class="info-value">Intel Xeon E5-2680 v4</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">RAM:</span>
+                            <span class="info-value">32 GB</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Ổ cứng:</span>
+                            <span class="info-value">1 TB SSD</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">IP Address:</span>
+                            <span class="info-value">192.168.1.100</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Information -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-code" style="color: #0eb582 !important;"></i>
+                            Thông tin ứng dụng
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label">Phiên bản:</span>
+                            <span class="info-value">TutorFinder v2.1.0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Framework:</span>
+                            <span class="info-value">Laravel 10.x</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">PHP Version:</span>
+                            <span class="info-value">PHP 8.2.15</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Database:</span>
+                            <span class="info-value">MySQL 8.0.35</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Cập nhật lần cuối:</span>
+                            <span class="info-value">15/12/2024</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Resources -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-chart-pie" style="color: #0eb582 !important;"></i>
+                            Tài nguyên hệ thống
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="resource-item">
+                            <div class="resource-info">
+                                <span class="resource-label">CPU sử dụng:</span>
+                                <span class="resource-value">15%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 15%; background: #28a745;"></div>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <div class="resource-info">
+                                <span class="resource-label">RAM sử dụng:</span>
+                                <span class="resource-value">8.2 GB / 32 GB (26%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 26%; background: #0eb582;"></div>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <div class="resource-info">
+                                <span class="resource-label">Ổ cứng sử dụng:</span>
+                                <span class="resource-value">650 GB / 1 TB (65%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%; background: #ffc107;"></div>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <div class="resource-info">
+                                <span class="resource-label">Băng thông:</span>
+                                <span class="resource-value">1.2 Mbps</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 12%; background: #17a2b8;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Database Information -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-database" style="color: #0eb582 !important;"></i>
+                            Cơ sở dữ liệu
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label">Trạng thái:</span>
+                            <span class="info-value status online">
+                                <span class="status-dot"></span>
+                                Đang hoạt động
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Kích thước DB:</span>
+                            <span class="info-value">2.8 GB</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Số bảng:</span>
+                            <span class="info-value">45 bảng</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Backup lần cuối:</span>
+                            <span class="info-value">Hôm nay - 03:00</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Kết nối active:</span>
+                            <span class="info-value">8 connections</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security & Maintenance -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-shield-alt" style="color: #0eb582 !important;"></i>
+                            Bảo mật & Bảo trì
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label">SSL Certificate:</span>
+                            <span class="info-value status online">
+                                <span class="status-dot"></span>
+                                Hợp lệ đến 15/06/2025
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Firewall:</span>
+                            <span class="info-value status online">
+                                <span class="status-dot"></span>
+                                Đang hoạt động
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Antivirus:</span>
+                            <span class="info-value status online">
+                                <span class="status-dot"></span>
+                                Cập nhật mới nhất
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Bảo trì tiếp theo:</span>
+                            <span class="info-value">Chủ nhật - 02:00</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Uptime:</span>
+                            <span class="info-value">25 ngày 14 giờ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact & Support -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-headset" style="color: #0eb582 !important;"></i>
+                            Liên hệ & Hỗ trợ
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label">Nhà phát triển:</span>
+                            <span class="info-value">TutorFinder Team</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email hỗ trợ:</span>
+                            <span class="info-value">support@tutorfinder.com</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Hotline:</span>
+                            <span class="info-value">1900 1234</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Website:</span>
+                            <span class="info-value">tutorfinder.com</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Giờ hỗ trợ:</span>
+                            <span class="info-value">24/7</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="system-actions">
+                <button class="btn btn-primary" id="refreshSystemInfo">
+                    <i class="fas fa-sync-alt" style="color: white !important;"></i>
+                    Làm mới thông tin
+                </button>
+                <button class="btn btn-secondary" id="downloadSystemReport">
+                    <i class="fas fa-download" style="color: #0eb582 !important;"></i>
+                    Tải báo cáo hệ thống
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/loadContent.js" defer></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/admin-system-info.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Finder Admin - Thông tin cá nhân</title>
+
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Inline CSS Backup to prevent white text -->
+    <style>
+        .admin-profile-simple h1,
+        .admin-profile-simple h2,
+        .admin-profile-simple h3,
+        .admin-profile-simple .admin-name,
+        .admin-profile-simple .info-item span {
+            color: #333333 !important;
+        }
+
+        .admin-profile-simple .info-item label,
+        .admin-profile-simple .page-subtitle {
+            color: #666666 !important;
+        }
+
+        .admin-profile-simple .admin-role {
+            color: #0eb582 !important;
+        }
+
+            .admin-profile-simple .admin-role i {
+                color: #FFD700 !important;
+            }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="header_admin-container"></div>
+
+    <!-- Admin Profile Section -->
+    <section class="admin-profile-simple">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-user-shield"></i>
+                    Thông tin cá nhân
+                </h1>
+                <p class="page-subtitle">Quản lý thông tin tài khoản và bảo mật</p>
+            </div>
+
+            <!-- Main Content -->
+            <div class="profile-content">
+                <!-- Profile Info Card -->
+                <div class="profile-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-id-card"></i>
+                            Thông tin cá nhân
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="profile-layout">
+                            <!-- Avatar Section -->
+                            <div class="avatar-section">
+                                <div class="avatar-wrapper">
+                                    <img src="images/avatar/tutor_m2.png" alt="Admin Avatar" class="admin-avatar">
+                                    <div class="avatar-badge">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                </div>
+                                <h3 class="admin-name">Huỳnh Bảo Quyền</h3>
+                                <span class="admin-role">
+                                    <i class="fas fa-crown"></i>
+                                    Super Administrator
+                                </span>
+                            </div>
+
+                            <!-- Info Section -->
+                            <div class="info-section">
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <label>
+                                            <i class="fas fa-user"></i>
+                                            Họ và tên
+                                        </label>
+                                        <span id="displayName">Huỳnh Bảo Quyền</span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>
+                                            <i class="fas fa-envelope"></i>
+                                            Email
+                                        </label>
+                                        <span id="displayEmail">admin@tutorfinder.com</span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>
+                                            <i class="fas fa-phone"></i>
+                                            Số điện thoại
+                                        </label>
+                                        <span id="displayPhone">0935 130 945</span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>
+                                            <i class="fas fa-calendar-alt"></i>
+                                            Ngày tạo tài khoản
+                                        </label>
+                                        <span>15/01/2024</span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>
+                                            <i class="fas fa-clock"></i>
+                                            Đăng nhập lần cuối
+                                        </label>
+                                        <span>Hôm nay - 14:30</span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <label>
+                                            <i class="fas fa-check-circle"></i>
+                                            Trạng thái tài khoản
+                                        </label>
+                                        <span class="status active">
+
+                                            Đang hoạt động
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="action-buttons">
+                                    <button class="btn btn-primary" id="editProfileBtn">
+                                        <i class="fas fa-edit"></i>
+                                        Chỉnh sửa thông tin
+                                    </button>
+                                    <button class="btn btn-secondary" id="changePasswordBtn">
+                                        <i class="fas fa-key"></i>
+                                        Đổi mật khẩu
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>
+                    <i class="fas fa-edit"></i>
+                    Chỉnh sửa thông tin cá nhân
+                </h2>
+                <button class="modal-close" id="closeEditModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="edit-profile-form" id="editProfileForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">
+                                Họ và tên
+                                <span class="required">*</span>
+                            </label>
+                            <input type="text" id="fullName" name="fullName" value="Huỳnh Bảo Quyền" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">
+                                Email
+                                <span class="required">*</span>
+                            </label>
+                            <input type="email" id="email" name="email" value="admin@tutorfinder.com" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">
+                                Số điện thoại
+                                <span class="required">*</span>
+                            </label>
+                            <input type="tel" id="phone" name="phone" value="0935 130 945" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="role">
+                                Vai trò
+                            </label>
+                            <input type="text" id="role" name="role" value="Super Administrator" readonly>
+                        </div>
+                    </div>
+                    <div class="error-message" id="editErrorMessage" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelEditBtn">
+                    <i class="fas fa-times"></i>
+                    Hủy
+                </button>
+                <button class="btn btn-primary" id="saveProfileBtn">
+                    <i class="fas fa-save"></i>
+                    Lưu thay đổi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" id="changePasswordModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>
+                    <i class="fas fa-key"></i>
+                    Đổi mật khẩu
+                </h2>
+                <button class="modal-close" id="closePasswordModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="change-password-form" id="changePasswordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">
+                            Mật khẩu hiện tại
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-with-icon">
+                            <input type="password" id="currentPassword" name="currentPassword" required>
+                            <button type="button" class="password-toggle" data-target="currentPassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newPassword">
+                            Mật khẩu mới
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-with-icon">
+                            <input type="password" id="newPassword" name="newPassword" required>
+                            <button type="button" class="password-toggle" data-target="newPassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            Xác nhận mật khẩu mới
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-with-icon">
+                            <input type="password" id="confirmPassword" name="confirmPassword" required>
+                            <button type="button" class="password-toggle" data-target="confirmPassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Password Requirements -->
+                    <div class="password-requirements">
+                        <p>Mật khẩu mới phải đáp ứng các yêu cầu sau:</p>
+                        <ul>
+                            <li id="length-req">
+                                <i class="fas fa-times"></i>
+                                Ít nhất 8 ký tự
+                            </li>
+                            <li id="uppercase-req">
+                                <i class="fas fa-times"></i>
+                                Có ít nhất 1 chữ hoa
+                            </li>
+                            <li id="lowercase-req">
+                                <i class="fas fa-times"></i>
+                                Có ít nhất 1 chữ thường
+                            </li>
+                            <li id="number-req">
+                                <i class="fas fa-times"></i>
+                                Có ít nhất 1 số
+                            </li>
+                            <li id="special-req">
+                                <i class="fas fa-times"></i>
+                                Có ít nhất 1 ký tự đặc biệt
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="error-message" id="passwordErrorMessage" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelPasswordBtn">
+                    <i class="fas fa-times"></i>
+                    Hủy
+                </button>
+                <button class="btn btn-primary" id="changePasswordSubmitBtn">
+                    <i class="fas fa-key"></i>
+                    Đổi mật khẩu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal small">
+            <div class="modal-body">
+                <div class="success-content">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 id="successTitle">Thành công!</h3>
+                    <p id="successMessage">Thao tác đã được thực hiện thành công.</p>
+                    <button class="btn btn-primary" id="successOkBtn">
+                        <i class="fas fa-check"></i>
+                        Đồng ý
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/loadContent.js" defer></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/admin-profile.js" defer></script>
+</body>
+</html>

@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Chỉnh sửa thông tin cá nhân</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="/css/styles.css">
-
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <!-- Header -->
@@ -17,24 +16,29 @@
 
         <form id="profileForm">
             <label for="fullName">Họ và tên:</label>
-            <input type="text" id="fullName" name="fullName">
+            <input type="text" id="fullName" name="fullName" value="Nguyễn Văn A">
 
             <label for="workplace">Nơi học tập / Làm việc:</label>
-            <input type="text" id="workplace" name="workplace">
+            <input type="text" id="workplace" name="workplace" value="Đại học Bách Khoa">
 
             <label for="age">Độ tuổi:</label>
-            <input type="number" id="age" name="age" min="10" max="100">
+            <input type="number" id="age" name="age" min="10" max="100" value="25">
 
             <label for="phone">Số điện thoại:</label>
-            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}">
+            <div class="phone-input-container">
+                <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" value="0123456789" readonly>
+                <button type="button" class="change-phone-btn" onclick="openPhoneChangeModal()">
+                    <i class="fas fa-edit"></i> Đổi
+                </button>
+            </div>
 
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email">
+            <input type="email" id="email" name="email" value="user@example.com">
 
             <label for="gender">Giới tính:</label>
             <select id="gender" name="gender">
                 <option value="">-- Chọn giới tính --</option>
-                <option value="Nam">Nam</option>
+                <option value="Nam" selected>Nam</option>
                 <option value="Nữ">Nữ</option>
                 <option value="Khác">Khác</option>
             </select>
@@ -45,76 +49,147 @@
         <div id="updateResult" class="message-box" style="display: none;">
             <h4>🎉 Cập nhật thành công!</h4>
         </div>
-
     </section>
 
+    <!-- Modal nhập số điện thoại mới -->
+    <div id="phoneInputOverlay" class="modal-overlay">
+        <div class="phone-input-modal">
+            <span class="modal-close" onclick="closePhoneInputModal()">&times;</span>
 
+            <div class="modal-header">
+                <i class="fas fa-phone"></i>
+                <h3>Đổi số điện thoại</h3>
+            </div>
+
+            <p class="modal-description">
+                Nhập số điện thoại mới<br>
+                để nhận mã OTP xác thực
+            </p>
+
+            <div class="phone-input-form">
+                <label for="newPhoneInput">Số điện thoại mới:</label>
+                <input type="tel" id="newPhoneInput" placeholder="0xxxxxxxxx" maxlength="10">
+                <div class="input-error" id="phoneInputError"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closePhoneInputModal()">Hủy</button>
+                <button class="btn-confirm" onclick="confirmPhoneChange()">
+                    <i class="fas fa-paper-plane"></i> Gửi OTP
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Modal - Giao diện nhỏ gọn -->
+    <div id="otpOverlay" class="otp-overlay">
+        <div class="otp-modal">
+            <span class="otp-close" onclick="closeOtpModal()">&times;</span>
+
+            <div class="otp-header">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Xác thực OTP</h3>
+            </div>
+
+            <p class="otp-description">
+                Mã OTP đã được gửi đến:<br>
+                <span class="phone-display" id="newPhoneDisplay"></span>
+            </p>
+
+            <div class="otp-input-container">
+                <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 0)">
+                <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 1)">
+                <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 2)">
+                <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 3)">
+            </div>
+
+            <div class="otp-timer" id="otpTimer">
+                <i class="fas fa-clock"></i> <span id="countdown">03:00</span>
+            </div>
+
+            <div class="error-message" id="otpError">
+                <i class="fas fa-exclamation-triangle"></i> <span id="errorText">Mã OTP không chính xác!</span>
+            </div>
+
+            <div class="success-message" id="otpSuccess">
+                <i class="fas fa-check-circle"></i> Xác thực thành công!
+            </div>
+
+            <div class="otp-actions">
+                <button class="otp-verify-btn" onclick="verifyOtp()">
+                    <i class="fas fa-check"></i> Xác thực
+                </button>
+                <button class="otp-resend-btn" id="resendBtn" onclick="resendOtp()" disabled>
+                    <i class="fas fa-redo"></i> Gửi lại
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <div id="footer-container"></div>
 
-
-    <!-- custom js file link -->
-    <script src="/js/loadContent.js" defer></script>
-    <script src="/js/script.js" defer></script>
-    <script src="js/register-handler.js" defer></script>
-    <script src="js/forgot-password.js" defer></script>
-
-    <script>
-        document.getElementById("profileForm").addEventListener("submit", async function (e) {
-            e.preventDefault();
-            // laytoken
-            const token = localStorage.getItem("token"); // Lấy token từ localStorage
-            if (!token) {
-                alert("Bạn chưa đăng nhập!");
-                return;
-            }
-            // bool? gender
-            let genderValue = null;
-            const gender = document.getElementById("gender").value;
-            if (gender === "Nam") genderValue = true;
-            else if (gender === "Nữ") genderValue = false;
-
-            // lay va gui du  lieu len backend
-            const data = {
-                Name: document.getElementById("fullName").value,
-                workplace: document.getElementById("workplace").value,
-                Age: parseInt(document.getElementById("age").value),
-                Phone: document.getElementById("phone").value,
-                Email: document.getElementById("email").value,
-                Gender: genderValue
-            };
-
-            try {
-                const response = await fetch("http://localhost:7128/api/Profile/UpdateMyUser", {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(data)
-
-                });
-                if (response.ok) {
-                    const resultDiv = document.getElementById("updateResult");
-                    resultDiv.style.display = 'block';
-                    this.reset();
-
-                    setTimeout(function () {
-                        resultDiv.style.display = 'none';
-                    }, 3000);
-                }
-                else {
-                    const errorData = await response.json();
-                    alert("Cập nhật thất bại: " + (errorData.message || "Lỗi không xác định"));
-                }
-            }
-            catch (error) {
-                alert("Lỗi kết nối: " + error.message);
-            }
-
-        });
-    </script>
+    <!-- Scripts -->
+    <script src="js/loadContent.js" defer></script>
+    <script src="js/script.js" defer></script>s
+    <script src="js/otp-handler.js" defer></script>
 </body>
 </html>
+
+<script>
+    document.getElementById("profileForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        // laytoken
+        const token = localStorage.getItem("token"); // Lấy token từ localStorage
+        if (!token) {
+            alert("Bạn chưa đăng nhập!");
+            return;
+        }
+        // bool? gender
+        let genderValue = null;
+        const gender = document.getElementById("gender").value;
+        if (gender === "Nam") genderValue = true;
+        else if (gender === "Nữ") genderValue = false;
+
+        // lay va gui du  lieu len backend
+        const data = {
+            Name: document.getElementById("fullName").value,
+            workplace: document.getElementById("workplace").value,
+            Age: parseInt(document.getElementById("age").value),
+            Phone: document.getElementById("phone").value,
+            Email: document.getElementById("email").value,
+            Gender: genderValue
+        };
+
+        try {
+            const response = await fetch("http://localhost:7128/api/Profile/UpdateMyUser", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+
+            });
+            if (response.ok) {
+                const resultDiv = document.getElementById("updateResult");
+                resultDiv.style.display = 'block';
+                this.reset();
+
+                setTimeout(function () {
+                    resultDiv.style.display = 'none';
+                }, 3000);
+            }
+            else {
+                const errorData = await response.json();
+                alert("Cập nhật thất bại: " + (errorData.message || "Lỗi không xác định"));
+            }
+        }
+        catch (error) {
+            alert("Lỗi kết nối: " + error.message);
+        }
+
+    });
+</script>
+
 

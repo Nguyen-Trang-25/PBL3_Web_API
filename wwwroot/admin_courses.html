@@ -16,7 +16,7 @@
 </head>
 <body>
     <!-- Header -->
-    <div id="header_admin-container"></div>
+    <div id="header-container"></div>
 
     <!-- Courses Management Section -->
     <section class="admin-courses-management">
@@ -46,17 +46,25 @@
                     </div>
                     <div class="stat-content">
                         <h3>Tổng lớp học</h3>
-                        <div class="stat-number">0</div>
+                        <div class="stat-number">2,847</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +156 tháng này
+                        </div>
                     </div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-icon pending-courses">
-                        <i class="fas fa-search"></i>
+                        <i class="fas fa-clock"></i>
                     </div>
                     <div class="stat-content">
-                        <h3>Đang tìm gia sư</h3>
-                        <div class="stat-number urgent">0</div>
+                        <h3>Chờ duyệt</h3>
+                        <div class="stat-number urgent">23</div>
+                        <div class="stat-change urgent">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Cần xử lý
+                        </div>
                     </div>
                 </div>
 
@@ -65,8 +73,12 @@
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="stat-content">
-                        <h3>Đang chọn gia sư</h3>
-                        <div class="stat-number">0</div>
+                        <h3>Đang kết nối</h3>
+                        <div class="stat-number">1,256</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +89 tuần này
+                        </div>
                     </div>
                 </div>
 
@@ -76,7 +88,11 @@
                     </div>
                     <div class="stat-content">
                         <h3>Đã hoàn thành</h3>
-                        <div class="stat-number">0</div>
+                        <div class="stat-number">1,432</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +67 tuần này
+                        </div>
                     </div>
                 </div>
             </div>
@@ -98,10 +114,12 @@
                         <label>Trạng thái:</label>
                         <select id="statusFilter">
                             <option value="all">Tất cả</option>
-                            <option value="pending">Chưa có gia sư</option>
-                            <option value="active">Đang chọn gia sư</option>
+                            <option value="pending">Chờ duyệt</option>
+                            <option value="approved">Đã duyệt</option>
+                            <option value="active">Đang diễn ra</option>
                             <option value="completed">Đã hoàn thành</option>
                             <option value="cancelled">Đã hủy</option>
+                            <option value="paused">Tạm dừng</option>
                         </select>
                     </div>
 
@@ -117,6 +135,17 @@
                             <option value="biology">Sinh học</option>
                             <option value="history">Lịch sử</option>
                             <option value="geography">Địa lý</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Cấp độ:</label>
+                        <select id="levelFilter">
+                            <option value="all">Tất cả</option>
+                            <option value="elementary">Tiểu học</option>
+                            <option value="junior">THCS</option>
+                            <option value="senior">THPT</option>
+                            <option value="university">Đại học</option>
                         </select>
                     </div>
 
@@ -142,6 +171,10 @@
                     <button class="btn btn-success" id="batchApprove">
                         <i class="fas fa-check"></i>
                         Duyệt hàng loạt
+                    </button>
+                    <button class="btn btn-warning" id="batchPause">
+                        <i class="fas fa-pause"></i>
+                        Tạm dừng
                     </button>
                     <button class="btn btn-danger" id="batchCancel">
                         <i class="fas fa-times"></i>
@@ -180,7 +213,216 @@
                             </tr>
                         </thead>
                         <tbody id="coursesTableBody">
-                            <!-- Data will be populated by JavaScript -->
+                            <!-- Sample Data -->
+                            <tr data-course-id="1">
+                                <td>
+                                    <input type="checkbox" class="course-checkbox" value="1">
+                                </td>
+                                <td>
+                                    <div class="course-info">
+                                        <div class="course-details">
+                                            <div class="course-name">Toán 12 - Ôn thi THPT</div>
+                                            <div class="course-id">#C001</div>
+                                            <div class="course-schedule">T2, T4, T6 - 19:00-21:00</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="subject-badge math">
+                                        <i class="fas fa-calculator"></i>
+                                        Toán
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="tutor-info">
+                                        <div class="tutor-name">Nguyễn Văn An</div>
+                                        <div class="tutor-rating">
+                                            <span class="stars">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </span>
+                                            <span class="rating-text">5.0</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="student-info">
+                                        <div class="student-name">Trần Thị Thảo</div>
+                                        <div class="student-grade">Lớp 12</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status active">
+                                        <i class="fas fa-play-circle"></i>
+                                        Đang diễn ra
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fee-info">
+                                        <div class="fee-amount">350,000 VNĐ</div>
+                                        <div class="fee-period">/tháng</div>
+                                    </div>
+                                </td>
+                                <td>15/11/2024</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn view" title="Xem chi tiết" data-course-id="1">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Chỉnh sửa" data-course-id="1">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn pause" title="Tạm dừng" data-course-id="1">
+                                            <i class="fas fa-pause"></i>
+                                        </button>
+                                        <button class="action-btn cancel" title="Hủy lớp" data-course-id="1">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr data-course-id="2">
+                                <td>
+                                    <input type="checkbox" class="course-checkbox" value="2">
+                                </td>
+                                <td>
+                                    <div class="course-info">
+                                        <div class="course-details">
+                                            <div class="course-name">Tiếng Anh giao tiếp</div>
+                                            <div class="course-id">#C002</div>
+                                            <div class="course-schedule">Thứ 7 - 14:00-16:00</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="subject-badge english">
+                                        <i class="fas fa-language"></i>
+                                        Tiếng Anh
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="tutor-info">
+                                        <div class="tutor-name">Sarah Johnson</div>
+                                        <div class="tutor-rating">
+                                            <span class="stars">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                            </span>
+                                            <span class="rating-text">4.8</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="student-info">
+                                        <div class="student-name">Lê Văn Cẩn</div>
+                                        <div class="student-grade">Sinh viên</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status pending">
+                                        <i class="fas fa-clock"></i>
+                                        Chờ duyệt
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fee-info">
+                                        <div class="fee-amount">500,000 VNĐ</div>
+                                        <div class="fee-period">/tháng</div>
+                                    </div>
+                                </td>
+                                <td>14/11/2024</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn view" title="Xem chi tiết" data-course-id="2">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn approve" title="Duyệt lớp" data-course-id="2">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Chỉnh sửa" data-course-id="2">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn cancel" title="Hủy lớp" data-course-id="2">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr data-course-id="3">
+                                <td>
+                                    <input type="checkbox" class="course-checkbox" value="3">
+                                </td>
+                                <td>
+                                    <div class="course-info">
+                                        <div class="course-details">
+                                            <div class="course-name">Vật lý 11 nâng cao</div>
+                                            <div class="course-id">#C003</div>
+                                            <div class="course-schedule">CN - 08:00-10:00</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="subject-badge physics">
+                                        <i class="fas fa-atom"></i>
+                                        Vật lý
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="tutor-info">
+                                        <div class="tutor-name">Phạm Thị Bôi</div>
+                                        <div class="tutor-rating">
+                                            <span class="stars">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </span>
+                                            <span class="rating-text">4.9</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="student-info">
+                                        <div class="student-name">Hoàng Văn Sơn</div>
+                                        <div class="student-grade">Lớp 11</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status completed">
+                                        <i class="fas fa-check-circle"></i>
+                                        Đã hoàn thành
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fee-info">
+                                        <div class="fee-amount">400,000 VNĐ</div>
+                                        <div class="fee-period">/tháng</div>
+                                    </div>
+                                </td>
+                                <td>01/10/2024</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn view" title="Xem chi tiết" data-course-id="3">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Chỉnh sửa" data-course-id="3">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn archive" title="Lưu trữ" data-course-id="3">
+                                            <i class="fas fa-archive"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -188,14 +430,18 @@
                 <!-- Pagination -->
                 <div class="table-pagination">
                     <div class="pagination-info">
-                        Hiển thị <span id="showingStart">1</span> - <span id="showingEnd">0</span>
-                        trong tổng số <span id="totalCourses">0</span> lớp học
+                        Hiển thị <span id="showingStart">1</span> - <span id="showingEnd">3</span>
+                        trong tổng số <span id="totalCourses">2,847</span> lớp học
                     </div>
                     <div class="pagination-controls">
                         <button class="page-btn" id="prevPage" disabled>
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <span class="page-dots">...</span>
+                        <button class="page-btn">285</button>
                         <button class="page-btn" id="nextPage">
                             <i class="fas fa-chevron-right"></i>
                         </button>
@@ -236,7 +482,7 @@
 
                         <div class="course-financial">
                             <div class="fee-display">
-                                <span class="fee-amount" id="modalCourseFee">1,800,000 VNĐ</span>
+                                <span class="fee-amount" id="modalCourseFee">350,000 VNĐ</span>
                                 <span class="fee-period">/tháng</span>
                             </div>
                         </div>
@@ -249,18 +495,8 @@
                         </div>
 
                         <div class="detail-item">
-                            <label>Lớp học:</label>
-                            <span id="modalCourseClass">Lớp 12A1</span>
-                        </div>
-
-                        <div class="detail-item">
-                            <label>Lịch học:</label>
-                            <span id="modalCourseSchedule">T2, T4, T6 - 19:00-21:00</span>
-                        </div>
-
-                        <div class="detail-item">
                             <label>Ngày bắt đầu:</label>
-                            <span id="modalCourseStartDate">20/03/2025</span>
+                            <span id="modalCourseStartDate">20/11/2024</span>
                         </div>
                     </div>
 
@@ -269,7 +505,7 @@
                             <h4>Gia sư</h4>
                             <div class="participant-card tutor">
                                 <div class="participant-info">
-                                    <div class="participant-name" id="modalTutorName">Phạm Minh Thu</div>
+                                    <div class="participant-name" id="modalTutorName">Nguyễn Văn An</div>
                                     <div class="participant-role" id="modalTutorRole">Gia sư Toán</div>
                                 </div>
                             </div>
@@ -279,12 +515,14 @@
                             <h4>Học viên</h4>
                             <div class="participant-card student">
                                 <div class="participant-info">
-                                    <div class="participant-name" id="modalStudentName">Nguyễn Hoàng Minh</div>
-                                    <div class="participant-role" id="modalStudentRole">Lớp 12A1</div>
+                                    <div class="participant-name" id="modalStudentName">Tên học viên</div>
+                                    <div class="participant-role" id="modalStudentRole">Lớp học</div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
+
                 </div>
             </div>
 
@@ -293,9 +531,17 @@
                     <i class="fas fa-edit"></i>
                     Chỉnh sửa
                 </button>
+                <button class="btn btn-success" id="approveCourseFromModal">
+                    <i class="fas fa-check"></i>
+                    Duyệt lớp
+                </button>
+                <button class="btn btn-warning" id="pauseCourseFromModal">
+                    <i class="fas fa-pause"></i>
+                    Tạm dừng
+                </button>
                 <button class="btn btn-danger" id="cancelCourseFromModal">
                     <i class="fas fa-times"></i>
-                    Xóa lớp
+                    Hủy lớp
                 </button>
             </div>
         </div>
@@ -351,9 +597,16 @@
 
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="editCourseClass">Lớp học</label>
-                                        <input type="text" id="editCourseClass" name="classLevel"
-                                               placeholder="VD: Lớp 12A1">
+                                        <label for="editCourseLevel">
+                                            Cấp độ <span class="required">*</span>
+                                        </label>
+                                        <select id="editCourseLevel" name="level" required>
+                                            <option value="">Chọn cấp độ</option>
+                                            <option value="elementary">Tiểu học</option>
+                                            <option value="junior">THCS</option>
+                                            <option value="senior">THPT</option>
+                                            <option value="university">Đại học</option>
+                                        </select>
                                     </div>
 
                                     <div class="form-group">
@@ -389,6 +642,13 @@
                                         <input type="date" id="editCourseStartDate" name="startDate">
                                     </div>
 
+                                    <div class="form-group">
+                                        <label for="editCourseEndDate">Ngày kết thúc</label>
+                                        <input type="date" id="editCourseEndDate" name="endDate">
+                                    </div>
+                                </div>
+
+                                <div class="form-row single-column">
                                     <div class="form-group">
                                         <label for="editCourseSchedule">Lịch học cụ thể</label>
                                         <input type="text" id="editCourseSchedule" name="schedule"
@@ -441,10 +701,11 @@
                                             Trạng thái <span class="required">*</span>
                                         </label>
                                         <select id="editCourseStatus" name="status" required>
-                                            <option value="pending">Chưa có gia sư </option>
-                                            <option value="applied">Đang chọn gia sư</option>
-                                            <option value="active">Đang giảng dạy</option>
+                                            <option value="pending">Chờ duyệt</option>
+                                            <option value="approved">Đã duyệt</option>
+                                            <option value="active">Đang diễn ra</option>
                                             <option value="completed">Đã hoàn thành</option>
+                                            <option value="paused">Tạm dừng</option>
                                             <option value="cancelled">Đã hủy</option>
                                         </select>
                                     </div>
@@ -488,7 +749,7 @@
     <div class="modal-overlay" id="cancelCourseModal">
         <div class="modal small">
             <div class="modal-header">
-                <h2>Xóa lớp học</h2>
+                <h2>Hủy lớp học</h2>
                 <button class="modal-close" id="closeCancelCourse">
                     <i class="fas fa-times"></i>
                 </button>
@@ -496,7 +757,7 @@
             <div class="modal-body">
                 <form id="cancelCourseForm">
                     <div class="form-group">
-                        <label for="cancelReason">Lý do xóa lớp <span class="required">*</span></label>
+                        <label for="cancelReason">Lý do hủy lớp <span class="required">*</span></label>
                         <select id="cancelReason" name="reason" required>
                             <option value="">Chọn lý do</option>
                             <option value="violation">Vi phạm quy định</option>
@@ -511,7 +772,7 @@
                     <div class="form-group">
                         <label for="cancelNote">Ghi chú chi tiết</label>
                         <textarea id="cancelNote" name="note" rows="4"
-                                  placeholder="Mô tả chi tiết lý do xóa lớp..."></textarea>
+                                  placeholder="Mô tả chi tiết lý do hủy lớp..."></textarea>
                     </div>
                 </form>
             </div>
@@ -519,7 +780,7 @@
                 <button class="btn btn-outline" id="cancelCancelCourse">Hủy</button>
                 <button class="btn btn-danger" id="confirmCancelCourse">
                     <i class="fas fa-times"></i>
-                    Xác nhận xóa lớp
+                    Xác nhận hủy lớp
                 </button>
             </div>
         </div>

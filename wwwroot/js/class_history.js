@@ -1,8 +1,12 @@
+<<<<<<< HEAD
 ﻿ 
 // ===== CLASS HISTORY PAGE JAVASCRIPT - UPDATED =====
 // File: js/class_history.js
 
 // ===== CLASS HISTORY PAGE JAVASCRIPT - UPDATED =====
+=======
+﻿// ===== CLASS HISTORY PAGE JAVASCRIPT - UPDATED =====
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
 // File: js/class_history.js
 
 class ClassHistoryManager {
@@ -219,6 +223,7 @@ class ClassHistoryManager {
     }
 
     // ===== DATA LOADING =====
+<<<<<<< HEAD
     async loadClassData() {
         this.showLoading();
 
@@ -264,6 +269,154 @@ class ClassHistoryManager {
     }
 
 
+=======
+    loadClassData() {
+        // Simulate API call - replace with actual API endpoint
+        this.showLoading();
+
+        setTimeout(() => {
+            this.classes = this.generateSampleData();
+            this.filteredClasses = [...this.classes];
+            this.renderStats();
+            this.renderClasses();
+            this.hideLoading();
+        }, 1000);
+    }
+
+    generateSampleData() {
+        const baseData = {
+            student: [
+                {
+                    id: 'req_1',
+                    subject: 'math',
+                    subjectName: 'Toán học',
+                    level: 'Lớp 12',
+                    fee: '2,200,000 VNĐ/Tháng',
+                    schedule: 'Thứ 2, 4, 6 - 19:00-21:00',
+                    location: 'Quận Ngũ Hành Sơn',
+                    status: 'reviewing',
+                    statusText: 'Đang xét duyệt',
+                    createdAt: new Date('2025-03-15'),
+                    applicationsCount: 5,
+                    selectedTutor: null,
+                    hasReviewed: false,
+                    studentName: 'Nguyễn Minh An',
+                    startDate: null
+                },
+                {
+                    id: 'req_2',
+                    subject: 'english',
+                    subjectName: 'Tiếng Anh',
+                    level: 'Lớp 11',
+                    fee: '2,500,000 VNĐ/Tháng',
+                    schedule: 'T3, T5, T7',
+                    location: 'Quận Liên Chiểu',
+                    status: 'reviewing',
+                    statusText: 'Đang xét duyệt',
+                    createdAt: new Date('2025-04-22'),
+                    applicationsCount: 3,
+                    selectedTutor: {
+                        id: 'tutor_1',
+                        name: 'Thầy Nguyễn Văn Hùng',
+                        rating: 4.8,
+                        experience: '5 năm kinh nghiệm',
+                        qualification: 'Thạc sĩ Toán học - ĐH Bách Khoa',
+                        phone: '0123456789'
+                    },
+                    hasReviewed: false,
+                    studentName: 'Nguyễn Minh An',
+                    startDate: new Date('2025-03-20')
+                },
+                {
+                    id: 'req_3',
+                    subject: 'physics',
+                    subjectName: 'Vật lý',
+                    level: 'Lớp 10',
+                    fee: '1,800,000 VNĐ/Tháng',
+                    schedule: 'Thứ 3, 5 - 18:00-20:00',
+                    location: 'Quận Sơn Trà',
+                    status: 'no_applications',
+                    statusText: 'Chưa có gia sư ứng tuyển',
+                    createdAt: new Date('2024-01-20'),
+                    applicationsCount: 0,
+                    selectedTutor: null,
+                    hasReviewed: false,
+                    studentName: 'Nguyễn Minh An',
+                    startDate: null
+                },
+                {
+                    id: 'req_4',
+                    subject: 'chemistry',
+                    subjectName: 'Hóa học',
+                    level: 'Lớp 12',
+                    fee: '190,000 VNĐ/buổi',
+                    schedule: 'Thứ 7 - 08:00-10:00',
+                    location: 'Quận 5, TP.HCM',
+                    status: 'completed',
+                    statusText: 'Đã hoàn thành',
+                    createdAt: new Date('2023-12-01'),
+                    applicationsCount: 2,
+                    selectedTutor: {
+                        id: 'tutor_2',
+                        name: 'Cô Trần Thị Lan',
+                        rating: 4.6,
+                        experience: '3 năm kinh nghiệm',
+                        qualification: 'Cử nhân Hóa học - ĐH Khoa học Tự nhiên',
+                        phone: '0987654321'
+                    },
+                    hasReviewed: true,
+                    studentName: 'Nguyễn Minh An',
+                    startDate: new Date('2023-12-05'),
+                    completedAt: new Date('2024-01-25')
+                },
+                {
+                    id: 'req_5',
+                    subject: 'literature',
+                    subjectName: 'Ngữ văn',
+                    level: 'Lớp 11',
+                    fee: '170,000 VNĐ/buổi',
+                    schedule: 'Thứ 4, 6 - 17:00-19:00',
+                    location: 'Quận 2, TP.HCM',
+                    status: 'cancelled',
+                    statusText: 'Đã hủy',
+                    createdAt: new Date('2024-01-05'),
+                    applicationsCount: 1,
+                    selectedTutor: null,
+                    hasReviewed: false,
+                    studentName: 'Nguyễn Minh An',
+                    startDate: null,
+                    cancelledAt: new Date('2024-01-12'),
+                    cancelReason: 'no_longer_need',
+                    cancelNote: 'Học sinh không còn nhu cầu học thêm môn này'
+                }
+            ],
+            tutor: [
+                {
+                    id: 'app_1',
+                    requestId: 'req_101',
+                    subject: 'math',
+                    subjectName: 'Toán học',
+                    level: 'Lớp 12',
+                    fee: '200,000 VNĐ/buổi',
+                    schedule: 'Thứ 2, 4, 6 - 19:00-21:00',
+                    location: 'Quận 1, TP.HCM',
+                    status: 'reviewing',
+                    statusText: 'Đang xét duyệt',
+                    appliedAt: new Date('2024-01-16'),
+                    student: {
+                        id: 'student_1',
+                        name: 'Nguyễn Minh An',
+                        phone: '0123456789'
+                    },
+                    startDate: new Date('2024-01-20')
+                }
+            ]
+        };
+
+        return baseData[this.currentUserRole] || baseData.student;
+    }
+
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
     // ===== FILTERING =====
     applyFilters() {
         this.currentFilters = {
@@ -420,7 +573,11 @@ class ClassHistoryManager {
         const actionButtons = this.getStudentActionButtons(classItem);
 
         return `
+<<<<<<< HEAD
             <div class="class-history-card" data-class-id="${classItem.requestId}">
+=======
+            <div class="class-history-card" data-class-id="${classItem.id}">
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
                 <div class="class-history-card-header">
                     <div class="class-history-status-badge ${statusConfig.class}">
                         ${statusConfig.text}
@@ -480,7 +637,11 @@ class ClassHistoryManager {
         const actionButtons = this.getTutorActionButtons(classItem);
 
         return `
+<<<<<<< HEAD
             <div class="class-history-card" data-class-id="${classItem.requestId}">
+=======
+            <div class="class-history-card" data-class-id="${classItem.id}">
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
                 <div class="class-history-card-header">
                     <div class="class-history-status-badge ${statusConfig.class}">
                         ${statusConfig.text}
@@ -530,7 +691,11 @@ class ClassHistoryManager {
 
         // Always show detail button
         buttons.push(`
+<<<<<<< HEAD
             <button class="class-history-btn secondary" onclick="classHistoryManager.showClassDetail('${classItem.requestId}')">
+=======
+            <button class="class-history-btn secondary" onclick="classHistoryManager.showClassDetail('${classItem.id}')">
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
                 <i class="fas fa-eye"></i>
                 Xem chi tiết
             </button>
@@ -539,7 +704,11 @@ class ClassHistoryManager {
         // Show applications if any
         if (classItem.applicationsCount > 0) {
             buttons.push(`
+<<<<<<< HEAD
                 <button class="class-history-btn primary" onclick="classHistoryManager.showApplications('${classItem.requestId}')">
+=======
+                <button class="class-history-btn primary" onclick="classHistoryManager.showApplications('${classItem.id}')">
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
                     <i class="fas fa-users"></i>
                     Xem ứng viên (${classItem.applicationsCount})
                 </button>
@@ -549,7 +718,11 @@ class ClassHistoryManager {
         // Show review if not reviewed yet and completed
         if (!classItem.hasReviewed && classItem.status === 'completed' && classItem.selectedTutor) {
             buttons.push(`
+<<<<<<< HEAD
                 <button class="class-history-btn warning" onclick="classHistoryManager.showReviewForm('${classItem.requestId}')">
+=======
+                <button class="class-history-btn warning" onclick="classHistoryManager.showReviewForm('${classItem.id}')">
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
                     <i class="fas fa-star"></i>
                     Đánh giá
                 </button>
@@ -559,7 +732,11 @@ class ClassHistoryManager {
         // Always show cancel button (except for completed and cancelled classes)
         if (classItem.status !== 'completed' && classItem.status !== 'cancelled') {
             buttons.push(`
+<<<<<<< HEAD
                 <button class="class-history-btn danger" onclick="classHistoryManager.showCancelClassModal('${classItem.requestId}')">
+=======
+                <button class="class-history-btn danger" onclick="classHistoryManager.showCancelClassModal('${classItem.id}')">
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
                     <i class="fas fa-times"></i>
                     Hủy lớp
                 </button>
@@ -574,7 +751,11 @@ class ClassHistoryManager {
 
         // Always show detail button
         buttons.push(`
+<<<<<<< HEAD
             <button class="class-history-btn secondary" onclick="classHistoryManager.showClassDetail('${classItem.requestId}')">
+=======
+            <button class="class-history-btn secondary" onclick="classHistoryManager.showClassDetail('${classItem.id}')">
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
                 <i class="fas fa-eye"></i>
                 Xem chi tiết
             </button>
@@ -583,7 +764,11 @@ class ClassHistoryManager {
         // Always show cancel button for tutors too (except completed and cancelled)
         if (classItem.status !== 'completed' && classItem.status !== 'cancelled') {
             buttons.push(`
+<<<<<<< HEAD
                 <button class="class-history-btn danger" onclick="classHistoryManager.showCancelClassModal('${classItem.requestId}')">
+=======
+                <button class="class-history-btn danger" onclick="classHistoryManager.showCancelClassModal('${classItem.id}')">
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
                     <i class="fas fa-times"></i>
                     Hủy lớp
                 </button>
@@ -596,9 +781,14 @@ class ClassHistoryManager {
     // ===== UTILITY FUNCTIONS =====
     getStatusConfig(status) {
         const configs = {
+<<<<<<< HEAD
             pending: { class: 'secondary', text: 'Chưa có gia sư ứng tuyển' },
             applied: { class: 'info', text: 'Đã có gia sư ứng tuyển' },
             active: { class: 'teaching', text: 'Đang giảng dạy'},
+=======
+            no_applications: { class: 'secondary', text: 'Chưa có gia sư ứng tuyển' },
+            reviewing: { class: 'info', text: 'Đang xét duyệt' },
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
             completed: { class: 'success', text: 'Đã hoàn thành' },
             cancelled: { class: 'danger', text: 'Đã hủy' }
         };
@@ -631,8 +821,12 @@ class ClassHistoryManager {
 
     // ===== MODAL FUNCTIONS =====
     showClassDetail(classId) {
+<<<<<<< HEAD
         const classItem = this.classes.find(c => c.requestId === classId);
         console.log("xem chi tiết")
+=======
+        const classItem = this.classes.find(c => c.id === classId);
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         if (!classItem) return;
 
         this.elements.modalTitle.textContent = `Chi tiết lớp học - ${classItem.subjectName}`;
@@ -640,12 +834,21 @@ class ClassHistoryManager {
         this.showModal('classDetailModal');
     }
 
+<<<<<<< HEAD
     async showApplications(classId) {
         const classItem = this.classes.find(c => c.requestId === classId);
         if (!classItem) return;
 
         // Generate sample applications
         const applications = await this.fetchApplicationsByRequestId(classId);
+=======
+    showApplications(classId) {
+        const classItem = this.classes.find(c => c.id === classId);
+        if (!classItem) return;
+
+        // Generate sample applications
+        const applications = this.generateSampleApplications(classId);
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
 
         this.elements.applicationsBody.innerHTML = applications
             .map(app => this.createApplicationCard(app, classId))
@@ -654,6 +857,7 @@ class ClassHistoryManager {
         this.showModal('applicationsModal');
     }
 
+<<<<<<< HEAD
     async showConfirmSelectTutorModal(tutorId, classId) {
         try {
             console.log("Đang ký hợp đồng ", tutorId);
@@ -673,6 +877,19 @@ class ClassHistoryManager {
             this.rebindModalElements?.(); 
 
             this.elements.selectedTutorInfo.innerHTML = `
+=======
+    showConfirmSelectTutorModal(tutorId, classId) {
+        const tutor = this.findTutorById(tutorId);
+        const classItem = this.classes.find(c => c.id === classId);
+
+        if (!tutor || !classItem) return;
+
+        this.selectedTutorForConfirm = tutor;
+        this.selectedClassForConfirm = classItem;
+
+        // Populate tutor info
+        this.elements.selectedTutorInfo.innerHTML = `
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
             <div class="tutor-card-compact">
                 <div class="tutor-avatar-small">
                     ${tutor.name.charAt(0)}
@@ -689,8 +906,13 @@ class ClassHistoryManager {
             </div>
         `;
 
+<<<<<<< HEAD
             // Populate class info
             this.elements.classSummaryContent.innerHTML = `
+=======
+        // Populate class info
+        this.elements.classSummaryContent.innerHTML = `
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
             <div class="class-info-grid">
                 <div class="info-row">
                     <span class="label">Môn học:</span>
@@ -715,6 +937,7 @@ class ClassHistoryManager {
             </div>
         `;
 
+<<<<<<< HEAD
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             this.elements.startDate.min = tomorrow.toISOString().split('T')[0];
@@ -732,6 +955,21 @@ class ClassHistoryManager {
 
     showCancelClassModal(classId) {
         const classItem = this.classes.find(c => c.requestId === classId);
+=======
+        // Set minimum start date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        this.elements.startDate.min = tomorrow.toISOString().split('T')[0];
+        this.elements.startDate.value = '';
+        this.elements.confirmAgreement.checked = false;
+
+        this.closeModal('applicationsModal');
+        this.showModal('confirmSelectTutorModal');
+    }
+
+    showCancelClassModal(classId) {
+        const classItem = this.classes.find(c => c.id === classId);
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         if (!classItem) return;
 
         this.classToCancel = classItem;
@@ -742,7 +980,11 @@ class ClassHistoryManager {
     }
 
     showReviewForm(classId) {
+<<<<<<< HEAD
         const classItem = this.classes.find(c => c.requestId === classId);
+=======
+        const classItem = this.classes.find(c => c.id === classId);
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         if (!classItem || !classItem.selectedTutor) return;
 
         // Populate tutor info
@@ -799,7 +1041,11 @@ class ClassHistoryManager {
     }
 
     // ===== HANDLE CONFIRM SELECT TUTOR =====
+<<<<<<< HEAD
     async handleConfirmSelectTutor() {
+=======
+    handleConfirmSelectTutor() {
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         if (!this.selectedTutorForConfirm || !this.selectedClassForConfirm) return;
 
         // Validate form
@@ -817,6 +1063,7 @@ class ClassHistoryManager {
         this.elements.confirmSelectTutor.disabled = true;
         this.elements.confirmSelectTutor.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
 
+<<<<<<< HEAD
         try {
             // Chuẩn bị dữ liệu hợp đồng theo backend
             const contractData = {
@@ -854,12 +1101,25 @@ class ClassHistoryManager {
             if (classItem) {
                 classItem.status = 'active';
                 classItem.statusText = 'Đã tạo hợp đồng';
+=======
+        // Simulate API call
+        setTimeout(() => {
+            // Update class data
+            const classItem = this.classes.find(c => c.id === this.selectedClassForConfirm.id);
+            if (classItem) {
+                classItem.status = 'reviewing';
+                classItem.statusText = 'Đang xét duyệt';
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
                 classItem.selectedTutor = this.selectedTutorForConfirm;
                 classItem.startDate = this.elements.startDate.value;
             }
 
             this.closeModal('confirmSelectTutorModal');
+<<<<<<< HEAD
             this.showNotification('Đã tạo hợp đồng và xác nhận chọn gia sư thành công!', 'success');
+=======
+            this.showNotification('Đã chọn gia sư thành công! Lớp học đang được xét duyệt.', 'success');
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
             this.renderClasses();
             this.renderStats();
 
@@ -870,6 +1130,7 @@ class ClassHistoryManager {
             // Clear selections
             this.selectedTutorForConfirm = null;
             this.selectedClassForConfirm = null;
+<<<<<<< HEAD
 
         } catch (error) {
             this.showNotification(error.message, 'error');
@@ -880,6 +1141,11 @@ class ClassHistoryManager {
 
 
 
+=======
+        }, 2000);
+    }
+
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
     // ===== HANDLE CANCEL CLASS =====
     handleConfirmCancelClass() {
         if (!this.classToCancel) return;
@@ -897,7 +1163,11 @@ class ClassHistoryManager {
         // Simulate API call
         setTimeout(() => {
             // Update class data
+<<<<<<< HEAD
             const classItem = this.classes.find(c => c.requestId === this.classToCancel.requestId);
+=======
+            const classItem = this.classes.find(c => c.id === this.classToCancel.id);
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
             if (classItem) {
                 classItem.status = 'cancelled';
                 classItem.statusText = 'Đã hủy';
@@ -983,7 +1253,11 @@ class ClassHistoryManager {
 
         setTimeout(() => {
             // Update class data
+<<<<<<< HEAD
             const classItem = this.classes.find(c => c.requestId === classId);
+=======
+            const classItem = this.classes.find(c => c.id === classId);
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
             if (classItem) {
                 classItem.hasReviewed = true;
             }
@@ -1068,6 +1342,7 @@ class ClassHistoryManager {
         // Re-bind any dynamic events if needed
     }
 
+<<<<<<< HEAD
     async fetchApplicationsByRequestId(requestId) {
         try {
             const response = await fetch(`http://localhost:7128/api/application/by-request/${requestId}`);
@@ -1167,6 +1442,69 @@ class ClassHistoryManager {
         }
     }
 
+=======
+    // ===== SAMPLE DATA GENERATORS =====
+    generateSampleApplications(classId) {
+        return [
+            {
+                id: 'app_1',
+                tutorId: 'tutor_1',
+                name: 'Thầy Nguyễn Văn Hùng',
+                rating: 4.8,
+                totalReviews: 25,
+                experience: '5 năm kinh nghiệm giảng dạy',
+                specialization: 'Toán học THPT, luyện thi đại học',
+                qualification: 'Thạc sĩ Toán học - ĐH Bách Khoa',
+                teachingArea: 'Quận Thanh Khê',
+                status: 'pending',
+                appliedAt: new Date('2025-04-16'),
+                message: 'Em có 5 năm kinh nghiệm giảng dạy Toán THPT và đã giúp nhiều học sinh đạt điểm cao trong kỳ thi đại học. Em tự tin có thể giúp em học sinh này cải thiện kết quả học tập.',
+                phone: '0936741254'
+            },
+            {
+                id: 'app_2',
+                tutorId: 'tutor_2',
+                name: 'Cô Trần Thị Lan',
+                rating: 4.6,
+                totalReviews: 18,
+                experience: '3 năm kinh nghiệm',
+                specialization: 'Toán học cơ bản, nâng cao',
+                qualification: 'Cử nhân Sư phạm Toán - ĐH Sư phạm',
+                teachingArea: 'Huyện Hòa Vang',
+                status: 'pending',
+                appliedAt: new Date('2025-05-17'),
+                message: 'Em có phương pháp giảng dạy sinh động, dễ hiểu và luôn theo sát tiến độ học tập của học sinh.',
+                phone: '0973247811'
+            }
+        ];
+    }
+
+    findTutorById(tutorId) {
+        // This would be replaced with actual API call
+        const sampleTutors = {
+            'tutor_1': {
+                id: 'tutor_1',
+                name: 'Thầy Nguyễn Văn Hùng',
+                rating: 4.8,
+                totalReviews: 25,
+                experience: '5 năm kinh nghiệm giảng dạy',
+                qualification: 'Thạc sĩ Toán học - ĐH Bách Khoa',
+                phone: '0123456789'
+            },
+            'tutor_2': {
+                id: 'tutor_2',
+                name: 'Cô Trần Thị Lan',
+                rating: 4.6,
+                totalReviews: 18,
+                experience: '3 năm kinh nghiệm',
+                qualification: 'Cử nhân Sư phạm Toán - ĐH Sư phạm',
+                phone: '0987654321'
+            }
+        };
+
+        return sampleTutors[tutorId];
+    }
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
 
     createApplicationCard(application, classId) {
         return `
@@ -1224,14 +1562,21 @@ class ClassHistoryManager {
     }
 
     createClassDetailContent(classItem) {
+<<<<<<< HEAD
         console.log("tạo chi tiết")
+=======
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         return `
             <div class="class-history-detail-content">
                 <div class="detail-header">
                     <div class="detail-title">
                         <h3><i class="fas fa-book"></i> ${classItem.subjectName} - ${classItem.level}</h3>
                         <div class="status-badge ${this.getStatusConfig(classItem.status).class}">
+<<<<<<< HEAD
                             ${this.getStatusConfig(classItem.status).text}
+=======
+                            ${classItem.statusText}
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
                         </div>
                     </div>
                 </div>

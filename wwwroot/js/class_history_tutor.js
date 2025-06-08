@@ -17,6 +17,7 @@ class TutorClassHistory {
         this.loadApplications();
     }
 
+<<<<<<< HEAD
     //async fetchHistoryData() {
     //    try {
     //        const response = await fetch('/api/historyRequest', {
@@ -40,6 +41,8 @@ class TutorClassHistory {
     //    }
     //}
 
+=======
+>>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
     // ===== SAMPLE DATA GENERATION =====
     generateSampleData() {
         const subjects = [

@@ -1,0 +1,9 @@
+﻿namespace BE_Tutor.DTO
+{
+    public class VerifyOtpDto
+    {
+        public string Phone { get; set; }
+        public string OtpCode { get; set; }
+        public string Purpose { get; set; }
+    }
+}
