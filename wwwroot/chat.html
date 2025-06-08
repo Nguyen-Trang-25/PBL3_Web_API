@@ -1,93 +1,132 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lớp mới</title>
+    <title>Chat - Hệ thống gia sư</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="/css/styles.css">
-
-
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="chat-page">
-    <!-- Header
-    <div id="header-container"></div> -->
-    
+    <!-- Header -->
+    <div id="header-container"></div>
+
     <!-- Account Form -->
     <div id="reg-log-container"></div>
 
-    <!-- Chat -->
-
-    <main>
-        <div class="chat-layout">
-
-            <div class="chat-sidebar">
-                ...
-                <ul class="conversation-list" id="conversationList"></ul>
+    <!-- Chat Application -->
+    <section class="chat-application">
+        <!-- Chat Header Bar -->
+        <div class="chat-header-bar">
+            <div class="chat-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Chat - Tutor Finder</span>
             </div>
 
-            <div class="chat-container">
-                <!-- ✅ đúng vị trí -->
-                <div class="chat-header">
-                    <h2 class="name" id="chatHeaderName">Chọn người để chat</h2>
-                </div>
-
-                <div class="chat-messages" id="chatMessages"></div>
-
-                <div class="chat-input">
-                    <input type="text" id="messageInput" placeholder="Type a message..." />
-                    <button id="sendBtn">Send</button>
-                </div>
+            <div class="header-actions">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="home.html" class="back-home-btn">
+                    <i class="fas fa-home"></i>
+                    <span>Trang chủ</span>
+                </a>
             </div>
-
         </div>
-    </main>
 
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <!-- Sidebar -->
+            <aside class="chat-sidebar" id="chatSidebar">
+                <div class="sidebar-header">
+                    <h2 class="sidebar-title">
+                        <i class="fas fa-comments"></i>
+                        Tin nhắn
+                    </h2>
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Tìm kiếm cuộc trò chuyện..." id="searchInput">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
 
-    <!-- custom js file link -->
-    <script src="/js/loadContent.js" defer></script>
-    <script src="/js/script.js" defer></script>
+                <div class="conversations-container" id="conversationsList">
+                    <!-- Conversations will be loaded here -->
+                </div>
+            </aside>
 
-    <!--<script>
-      const sendBtn = document.getElementById('sendBtn');
-      const messageInput = document.getElementById('messageInput');
-      const chatMessages = document.getElementById('chatMessages');
+            <!-- Main Chat Area -->
+            <main class="chat-main">
+                <!-- Chat Header -->
+                <div class="chat-header" id="chatHeader">
+                    <div class="chat-participant">
+                        <img src="https://via.placeholder.com/45/0eb582/ffffff?text=U" alt="Avatar" class="participant-avatar" id="participantAvatar">
+                        <div class="participant-info">
+                            <h3 id="participantName">Chọn cuộc trò chuyện</h3>
+                            <div class="participant-status" id="participantStatus">
+                                <i class="fas fa-circle"></i>
+                                <span>Offline</span>
+                            </div>
+                        </div>
+                    </div>
 
-      sendBtn.addEventListener('click',()=>{
-        const text = messageInput.value.trim();
-        if (text !== "") {
-          const userMsg = document.createElement("div");
-          userMsg.classList.add("message-box", "sender");
-          userMsg.innerHTML = `
-            <img src="images/avatar/student_boy.png" class="avatar" alt="Student" />
-            <div class="message">${text}</div>
-          `;
-          chatMessages.appendChild(userMsg);
-          messageInput.value = "";
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-          
-          setTimeout(() => {
-            const botMsg = document.createElement("div");
-            botMsg.classList.add("message-box", "receiver");
-            botMsg.innerHTML = `
-              <img src="images/avatar/tutor_m.png" class="avatar" alt="Tutor" />
-              <div class="message">Got it! Let me help you.</div>
-            `;
-            chatMessages.appendChild(botMsg);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-          }, 1000);
-        }
-    });
+                    <div class="chat-actions">
+                        <button class="action-btn" title="Gọi video">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="action-btn" title="Gọi thoại">
+                            <i class="fas fa-phone"></i>
+                        </button>
+                        <button class="action-btn" title="Thông tin">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    </div>
+                </div>
 
-    messageInput.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        event.preventDefault(); // Ngăn xuống dòng
-        sendBtn.click();
-      } 
-    });
+                <!-- Messages Container -->
+                <div class="messages-container" id="messagesContainer">
+                    <div class="empty-chat" id="emptyChat">
+                        <i class="fas fa-comments empty-icon"></i>
+                        <h3 class="empty-title">Chọn một cuộc trò chuyện</h3>
+                        <p class="empty-subtitle">Bắt đầu nhắn tin với gia sư hoặc học viên của bạn</p>
+                    </div>
+                </div>
 
-  </script>-->
-    
+                <!-- Message Input -->
+                <div class="message-input-container">
+                    <div class="input-wrapper">
+                        <div class="input-actions">
+                            <button class="attachment-btn" title="Đính kèm file">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <button class="attachment-btn" title="Gửi hình ảnh">
+                                <i class="fas fa-image"></i>
+                            </button>
+                        </div>
+
+                        <textarea class="message-input"
+                                  id="messageInput"
+                                  placeholder="Nhập tin nhắn..."
+                                  rows="1"
+                                  disabled></textarea>
+
+                        <button class="send-btn" id="sendBtn" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </section>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Custom JS files -->
+    <script src="js/loadContent.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/chat-app.js"></script>
 </body>
 </html>
-

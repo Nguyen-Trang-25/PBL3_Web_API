@@ -188,7 +188,7 @@ function loadUserRoleAndShowUI() {
         // Chuyển trang theo vai trò
         switch (role) {
             case 'admin':
-                window.location.href = '/Admin/Dashboard';
+                window.location.href = '/home_admin.html';
                 break;
             case 'tutor':
                 window.location.href = '/home_tutor.html';
@@ -247,41 +247,41 @@ function loadContent(file, elementId, callback) {
 document.addEventListener("DOMContentLoaded", function () {
     const role = localStorage.getItem("role");
 
-    console.log(role);//debug
+    let headerFile = "header.html";
+    if (role === "student") headerFile = "header_student.html";
+    else if (role === "tutor") headerFile = "header_tutor.html";
+    else if (role === "admin") headerFile = "header_admin.html";
 
-    if (role === "student") {
-        loadContent("header_student.html", "header-container", () => {
-            attachLogoutHandlers();
-            attachEventHandlers(); // Gọi sau khi header được load
-        });
-    } else if (role === "tutor") {
-        loadContent("header_tutor.html", "header-container", () => {
-            attachLogoutHandlers();
-            attachEventHandlers();
-        });
-    } else {
-        loadContent("header.html", "header-container", () => {
-            attachLogoutHandlers();
-            attachEventHandlers();
-        });
-    }
-
-    loadContent("footer.html", "footer-container");
-    loadContent("reg_log.html", "reg-log-container", () => {
+    // Load header trước
+    loadContent(headerFile, "header-container", () => {
+        attachLogoutHandlers();
         attachEventHandlers();
-        attachAuthHandlers(); // Chỉ cần xử lý form đăng ký/đăng nhập
-        const script = document.createElement('script');
-        script.src = '/js/register-handler.js'; // Đường dẫn đúng tới file
-        script.onload = () => {
-            if (typeof setupRegisterOTPEvents === 'function') {
-                setupRegisterOTPEvents();
-            } else {
-                console.warn("setupRegisterOTPEvents không được định nghĩa trong file register-handler.js");
-            }
-        };
-        document.body.appendChild(script);
+
+        // ❗ Sau khi chắc chắn header đã load xong, kiểm tra reg-log-container
+        const regLog = document.getElementById("reg-log-container");
+        if (regLog) {
+            loadContent("reg_log.html", "reg-log-container", () => {
+                attachEventHandlers();
+                attachAuthHandlers();
+
+                const script = document.createElement('script');
+                script.src = '/js/register-handler.js';
+                script.onload = () => {
+                    if (typeof setupRegisterOTPEvents === 'function') {
+                        setupRegisterOTPEvents();
+                    } else {
+                        console.warn("setupRegisterOTPEvents không được định nghĩa trong register-handler.js");
+                    }
+                };
+                document.body.appendChild(script);
+            });
+        }
     });
 
+    // Load footer
+    loadContent("footer.html", "footer-container");
+
+    // Toggle dropdown
     document.addEventListener("click", function (e) {
         const userIcon = document.getElementById("user-icon");
         const dropdown = document.getElementById("user-dropdown");
@@ -294,6 +294,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
 
 function attachLogoutHandlers() {
     const btnLogoutList = document.querySelectorAll('.btn-logout');

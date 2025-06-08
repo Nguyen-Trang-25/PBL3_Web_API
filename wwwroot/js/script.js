@@ -526,6 +526,8 @@ if (window.location.pathname.endsWith("chat.html")) {
         }
 }
 
+
+
 document.addEventListener("DOMContentLoaded", () => {
     const role = localStorage.getItem("role");
 

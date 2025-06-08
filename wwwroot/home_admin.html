@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Finder Admin - Trang chủ</title>
+
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Admin Home Section -->
+    <section class="admin-home">
+        <div class="container">
+            <!-- Welcome Header -->
+            <div class="welcome-header">
+                <h1>
+                    <i class="fas fa-tachometer-alt"></i>
+                    Chào mừng đến với Bảng điều khiển Admin
+                </h1>
+                <p>Quản lý hệ thống Tutor Finder một cách dễ dàng</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-overview">
+                <div class="stat-item">
+                    <div class="stat-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Người dùng</h3>
+                        <span class="stat-number">1,245</span>
+                        <p>Tổng số người dùng</p>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-icon courses">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Lớp học</h3>
+                        <span class="stat-number">78</span>
+                        <p>Lớp đang hoạt động</p>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-icon reviews">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Đánh giá</h3>
+                        <span class="stat-number">324</span>
+                        <p>Tổng đánh giá</p>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-icon system">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Hệ thống</h3>
+                        <span class="stat-status online">
+                            <i class="fas fa-check-circle"></i>
+                            Hoạt động
+                        </span>
+                        <p>Trạng thái ổn định</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Actions -->
+            <div class="main-actions">
+                <h2>
+                    <i class="fas fa-tasks"></i>
+                    Các chức năng chính
+                </h2>
+
+                <div class="actions-grid">
+                    <a href="admin_users.html" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Quản lý người dùng</h3>
+                        <p>Xem và quản lý thông tin người dùng</p>
+                    </a>
+
+                    <a href="admin_courses.html" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h3>Quản lý lớp học</h3>
+                        <p>Theo dõi và quản lý các lớp học</p>
+                    </a>
+
+                    <a href="admin_reviews.html" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3>Quản lý đánh giá</h3>
+                        <p>Xem và kiểm duyệt đánh giá</p>
+                    </a>
+
+                    <a href="admin_profile.html" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <h3>Hồ sơ Admin</h3>
+                        <p>Quản lý thông tin cá nhân</p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick System Status -->
+            <div class="system-status">
+                <h2>
+                    <i class="fas fa-heartbeat"></i>
+                    Trạng thái hệ thống
+                </h2>
+
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="status-info">
+                            <h4>Cơ sở dữ liệu</h4>
+                            <span class="status online" id="db-status">
+                                <i class="fas fa-circle"></i>
+                                Hoạt động
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="status-item">
+                        <div class="status-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="status-info">
+                            <h4>Email Service</h4>
+                            <span class="status online" id="email-status">
+                                <i class="fas fa-circle"></i>
+                                Hoạt động
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="status-item">
+                        <div class="status-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="status-info">
+                            <h4>Bảo mật</h4>
+                            <span class="status online" id="security-status">
+                                <i class="fas fa-circle"></i>
+                                An toàn
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="status-item">
+                        <div class="status-icon">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                        <div class="status-info">
+                            <h4>Dung lượng ổ đĩa</h4>
+                            <span class="status warning" id="storage-status">
+                                <i class="fas fa-circle"></i>
+                                68% đã sử dụng
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-actions">
+                    <button class="btn-refresh" id="refresh-status">
+                        <i class="fas fa-sync-alt"></i>
+                        Làm mới trạng thái
+                    </button>
+                    <a href="admin_system.html" class="btn-details">
+                        <i class="fas fa-info-circle"></i>
+                        Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Simple Notification -->
+    <div id="notification" class="notification hidden">
+        <div class="notification-content">
+            <i class="notification-icon"></i>
+            <span class="notification-message"></span>
+        </div>
+        <button class="notification-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/loadContent.js" defer></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/admin-home.js" defer></script>
+</body>
+</html>

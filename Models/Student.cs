@@ -10,6 +10,7 @@ public partial class Student
     public string UserId { get; set; } = null!;
 
     public string? GradeLevel { get; set; }
+    public string? School { get; set; }
 
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
 

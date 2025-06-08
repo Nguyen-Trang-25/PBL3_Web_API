@@ -1,0 +1,414 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Người Dùng - Tutor Finder Admin</title>
+
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Users Management Section -->
+    <section class="admin-users-management">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h1 class="page-title">
+                        <i class="fas fa-users"></i>
+                        Quản lý người dùng
+                    </h1>
+                    <p class="page-subtitle">Duyệt, quản lý và giám sát tài khoản người dùng</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="addUserBtn">
+                        <i class="fas fa-user-plus"></i>
+                        Thêm người dùng
+                    </button>
+                    <button class="btn btn-secondary" id="exportUsersBtn">
+                        <i class="fas fa-download"></i>
+                        Xuất danh sách
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="users-stats">
+                <div class="stat-card">
+                    <div class="stat-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Tổng người dùng</h3>
+                        <div class="stat-number">10</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon admin">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Admin</h3>
+                        <div class="stat-number">3</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon tutors">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Gia sư</h3>
+                        <div class="stat-number">4</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon students">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Học viên</h3>
+                        <div class="stat-number">3</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="users-controls">
+                <div class="search-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchUsers" placeholder="Tìm kiếm theo tên, email, số điện thoại...">
+                        <button class="search-btn" id="searchBtn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label>Loại tài khoản:</label>
+                        <select id="userTypeFilter">
+                            <option value="all">Tất cả</option>
+                            <option value="student">Học viên</option>
+                            <option value="tutor">Gia sư</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Ngày đăng ký:</label>
+                        <select id="dateFilter">
+                            <option value="all">Tất cả</option>
+                            <option value="today">Hôm nay</option>
+                            <option value="week">7 ngày qua</option>
+                            <option value="month">30 ngày qua</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="btn btn-primary" id="applyFilters">
+                            <i class="fas fa-filter"></i>
+                            Lọc
+                        </button>
+                        <button class="btn btn-outline" id="resetFilters">
+                            <i class="fas fa-undo"></i>
+                            Đặt lại
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Batch Actions -->
+            <div class="batch-actions" id="batchActions" style="display: none;">
+                <div class="batch-info">
+                    <span id="selectedCount">0</span> người dùng được chọn
+                </div>
+                <div class="batch-buttons">
+                    <button class="btn btn-danger" id="batchDelete">
+                        <i class="fas fa-trash"></i>
+                        Xóa hàng loạt
+                    </button>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="users-table-container">
+                <div class="table-header">
+                    <h2>Danh sách người dùng</h2>
+                    <div class="table-actions">
+                        <button class="btn btn-outline" id="refreshTable">
+                            <i class="fas fa-sync-alt"></i>
+                            Làm mới
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll">
+                                </th>
+                                <th>Người dùng</th>
+                                <th>Loại tài khoản</th>
+                                <th>Email</th>
+                                <th>Số điện thoại</th>
+                                <th>Ngày đăng ký</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="table-pagination">
+                    <div class="pagination-info">
+                        Hiển thị <span id="showingStart">1</span> - <span id="showingEnd">10</span>
+                        trong tổng số <span id="totalUsers">10</span> người dùng
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="page-btn" id="prevPage" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn" id="nextPage">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="page-size">
+                        <label>Hiển thị:</label>
+                        <select id="pageSize">
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span>mỗi trang</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- User Detail Modal -->
+    <div class="modal-overlay" id="userDetailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Chi tiết người dùng</h2>
+                <button class="modal-close" id="closeUserDetail">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="user-detail-content">
+                    <div class="user-profile">
+                        <div class="profile-avatar">
+                            <img id="modalUserAvatar" src="" alt="Avatar" style="display: none;">
+                            <div id="modalAvatarPlaceholder" class="avatar-placeholder-large">NA</div>
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="modalUserName">Tên người dùng</h3>
+                            <span id="modalUserType" class="user-type">Loại tài khoản</span>
+                            <span id="modalUserStatus" class="status">Trạng thái</span>
+                        </div>
+                    </div>
+
+                    <div class="user-details-grid">
+                        <div class="detail-item">
+                            <label>Email:</label>
+                            <span id="modalUserEmail">email@example.com</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Số điện thoại:</label>
+                            <span id="modalUserPhone">0123456789</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Ngày đăng ký:</label>
+                            <span id="modalUserDate">01/01/2025</span>
+                        </div>
+
+                    <div class="user-tabs">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-tab="info">Thông tin</button>
+                            <button class="tab-btn" data-tab="activity">Hoạt động</button>
+                            <button class="tab-btn" data-tab="reports">Báo cáo</button>
+                        </div>
+
+                        <div class="tab-content active" id="info">
+                            <div class="info-section">
+                                <h4>Thông tin cá nhân</h4>
+                                <div class="info-grid">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-content" id="activity">
+                            <div class="activity-section">
+                                <h4>Hoạt động gần đây</h4>
+                                <div class="activity-list">
+                                    <div class="activity-item">
+                                        <div class="activity-time">06/06/2025 14:30</div>
+                                        <div class="activity-desc">Đăng nhập vào hệ thống</div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <div class="activity-time">05/06/2025 10:15</div>
+                                        <div class="activity-desc">Cập nhật thông tin cá nhân</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-content" id="reports">
+                            <div class="reports-section">
+                                <h4>Báo cáo về người dùng</h4>
+                                <div class="reports-list">
+                                    <p>Không có báo cáo nào</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="editUserFromModal">
+                    <i class="fas fa-edit"></i>
+                    Chỉnh sửa
+                </button>
+            </div>
+        </div>
+    </div>
+        </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal-overlay" id="editUserModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="editUserModalTitle">Chỉnh sửa thông tin người dùng</h2>
+                <button class="modal-close" id="closeEditUser">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="edit-user-form" id="editUserForm">
+                    <input type="hidden" id="editUserId" name="userId">
+
+                    <div class="form-sections">
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <h3>
+                                <i class="fas fa-user"></i>
+                                Thông tin cơ bản
+                            </h3>
+                            <div class="form-content">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="editFullName">
+                                            Họ và tên <span class="required">*</span>
+                                        </label>
+                                        <input type="text" id="editFullName" name="fullName" required
+                                               placeholder="Nhập họ và tên đầy đủ">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="editEmail">
+                                            Email <span class="required">*</span>
+                                        </label>
+                                        <input type="email" id="editEmail" name="email" required
+                                               placeholder="example@gmail.com">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="editPhone">
+                                            Số điện thoại <span class="required">*</span>
+                                        </label>
+                                        <input type="tel" id="editPhone" name="phone" required
+                                               placeholder="0123456789">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="editUserType">
+                                            Loại tài khoản <span class="required">*</span>
+                                        </label>
+                                        <select id="editUserType" name="userType" required>
+                                            <option value="">Chọn loại tài khoản</option>
+                                            <option value="student">Học viên</option>
+                                            <option value="tutor">Gia sư</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-row single-column">
+                                    <div class="form-group">
+                                        <label for="editAddress">Địa chỉ</label>
+                                        <textarea id="editAddress" name="address" rows="3"
+                                                  placeholder="Nhập địa chỉ chi tiết"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="cancelEditUser">
+                    <i class="fas fa-times"></i>
+                    Hủy
+                </button>
+                <button type="submit" form="editUserForm" class="btn btn-primary" id="saveEditUser">
+                    <i class="fas fa-save"></i>
+                    Lưu thay đổi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal small">
+            <div class="modal-header">
+                <h2 id="confirmTitle">Xác nhận</h2>
+                <button class="modal-close" id="closeConfirm">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelAction">Hủy</button>
+                <button class="btn btn-danger" id="confirmAction">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/loadContent.js" defer></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/admin-users.js"defer></script>
+</body>
+</html>

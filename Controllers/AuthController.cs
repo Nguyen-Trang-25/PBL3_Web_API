@@ -88,6 +88,7 @@ namespace FindTutor_MVC.Controllers
         }
 
 
+
         [HttpPost("ConfirmRegister")]
         public async Task<IActionResult> ConfirmRegister([FromBody] ConfirmRegisterDto dto)
         {
@@ -118,7 +119,8 @@ namespace FindTutor_MVC.Controllers
                 UserId = newUserId,
                 Phone = pending.Phone,
                 Password = pending.PasswordHash,
-                Role = pending.Role
+                Role = pending.Role,
+                CreatedAt = DateTime.UtcNow
             };
             _context.Users.Add(user);
 

@@ -16,7 +16,7 @@ public partial class User
 
     public string Password { get; set; } = null!;
 
-    public string? Status { get; set; }
+    public string? Status { get; set; } = "active";
 
     public DateTime? CreatedAt { get; set; }
 
@@ -24,9 +24,9 @@ public partial class User
 
     public bool? Gender { get; set; }
 
-    public string? Workplace { get; set; }
+    public string? Address { get; set; }
+    public DateTime? DateOfBirth { get; set; }
 
-    public int? Age { get; set; }
 
     public virtual ICollection<Message> MessageReceivers { get; set; } = new List<Message>();
 
