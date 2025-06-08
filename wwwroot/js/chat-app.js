@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 // ===== CHAT APPLICATION JAVASCRIPT - UPDATED VERSION =====
-=======
-﻿// ===== CHAT APPLICATION JAVASCRIPT - UPDATED VERSION =====
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
 // File: js/chat-app.js
 
 class ChatApplication {
@@ -10,7 +6,6 @@ class ChatApplication {
         this.conversations = [];
         this.currentConversation = null;
         this.currentUser = {
-<<<<<<< HEAD
             id: localStorage.getItem('userId'),
             name: 'Tôi',
             avatar: 'ME',
@@ -20,15 +15,6 @@ class ChatApplication {
 
         console.log(this.currentUser)
 
-=======
-            id: 'current_user',
-            name: 'Tôi',
-            avatar: 'ME',
-            initials: 'ME',
-            role: 'tutor' // Mặc định, sẽ được cập nhật từ session/localStorage
-        };
-
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         // Elements
         this.elements = {
             conversationsList: document.getElementById('conversationsList'),
@@ -60,12 +46,8 @@ class ChatApplication {
         this.autoResizeTextarea();
         this.detectUserRole();
         this.setupHomeButton();
-<<<<<<< HEAD
         this.loadConversations();
         //this.loadSampleData();
-=======
-        this.loadSampleData();
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
 
         console.log('Chat Application initialized successfully');
     }
@@ -73,11 +55,7 @@ class ChatApplication {
     // ===== PHÁT HIỆN VAI TRÒ NGƯỜI DÙNG =====
     detectUserRole() {
         // Thử lấy từ localStorage hoặc sessionStorage
-<<<<<<< HEAD
         const userRole = localStorage.getItem('role') || sessionStorage.getItem('role');
-=======
-        const userRole = localStorage.getItem('userRole') || sessionStorage.getItem('userRole');
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
 
         if (userRole) {
             this.currentUser.role = userRole;
@@ -114,11 +92,7 @@ class ChatApplication {
                 homeUrl = 'home_student.html';
                 break;
             default:
-<<<<<<< HEAD
                 homeUrl = 'index.html';
-=======
-                homeUrl = 'home.html';
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         }
 
         this.elements.backHomeBtn.href = homeUrl;
@@ -251,7 +225,6 @@ class ChatApplication {
         `;
     }
 
-<<<<<<< HEAD
     async loadConversations() {
         try {
             console.log("đang tải chat")
@@ -284,339 +257,6 @@ class ChatApplication {
         }
     }
 
-
-    //loadSampleData() {
-    //    // Sample conversations data với timestamps thực tế
-    //    const now = new Date();
-
-    //    this.conversations = [
-    //        {
-    //            id: 'conv_1',
-    //            participant: {
-    //                id: 'tutor_1',
-    //                name: 'Thầy Nguyễn Văn Hùng',
-    //                initials: 'H',
-    //                status: 'online',
-    //                role: 'Gia sư Toán học',
-    //                lastSeen: null
-    //            },
-    //            lastMessage: 'Em có hiểu bài tập này chưa?',
-    //            lastTime: '2 phút trước',
-    //            unreadCount: 2,
-    //            messages: [
-    //                {
-    //                    id: 'msg_1',
-    //                    senderId: 'tutor_1',
-    //                    text: 'Chào em! Thầy sẵn sàng hỗ trợ em học toán.',
-    //                    timestamp: new Date(now.getTime() - 3600000), // 1 giờ trước
-    //                    status: 'read'
-    //                },
-    //                {
-    //                    id: 'msg_2',
-    //                    senderId: 'current_user',
-    //                    text: 'Chào thầy! Em có một bài tập khó muốn hỏi ạ.',
-    //                    timestamp: new Date(now.getTime() - 3000000), // 50 phút trước
-    //                    status: 'read'
-    //                },
-    //                {
-    //                    id: 'msg_3',
-    //                    senderId: 'tutor_1',
-    //                    text: 'Em có hiểu bài tập này chưa?',
-    //                    timestamp: new Date(now.getTime() - 120000), // 2 phút trước - GẦN NHẤT
-    //                    status: 'delivered'
-    //                }
-    //            ]
-    //        },
-    //        {
-    //            id: 'conv_2',
-    //            participant: {
-    //                id: 'tutor_2',
-    //                name: 'Cô Trần Thị Lan',
-    //                initials: 'L',
-    //                status: 'online',
-    //                role: 'Gia sư Tiếng Anh',
-    //                lastSeen: null
-    //            },
-    //            lastMessage: 'Great job on your homework!',
-    //            lastTime: '15 phút trước',
-    //            unreadCount: 0,
-    //            messages: [
-    //                {
-    //                    id: 'msg_4',
-    //                    senderId: 'tutor_2',
-    //                    text: 'Hello! How are you today?',
-    //                    timestamp: new Date(now.getTime() - 1800000), // 30 phút trước
-    //                    status: 'read'
-    //                },
-    //                {
-    //                    id: 'msg_5',
-    //                    senderId: 'current_user',
-    //                    text: 'I\'m fine, thank you! Ready for today\'s lesson.',
-    //                    timestamp: new Date(now.getTime() - 1200000), // 20 phút trước
-    //                    status: 'read'
-    //                },
-    //                {
-    //                    id: 'msg_6',
-    //                    senderId: 'tutor_2',
-    //                    text: 'Great job on your homework!',
-    //                    timestamp: new Date(now.getTime() - 900000), // 15 phút trước
-    //                    status: 'read'
-    //                }
-    //            ]
-    //        },
-    //        {
-    //            id: 'conv_3',
-    //            participant: {
-    //                id: 'student_1',
-    //                name: 'Phạm Minh Tâm',
-    //                initials: 'T',
-    //                status: 'offline',
-    //                role: 'Học viên lớp 12',
-    //                lastSeen: 'Hoạt động 1 giờ trước'
-    //            },
-    //            lastMessage: 'Cảm ơn thầy đã giúp em!',
-    //            lastTime: '1 giờ trước',
-    //            unreadCount: 0,
-    //            messages: [
-    //                {
-    //                    id: 'msg_7',
-    //                    senderId: 'student_1',
-    //                    text: 'Thầy ơi, em chưa hiểu phần này lắm ạ.',
-    //                    timestamp: new Date(now.getTime() - 7200000), // 2 giờ trước
-    //                    status: 'read'
-    //                },
-    //                {
-    //                    id: 'msg_8',
-    //                    senderId: 'current_user',
-    //                    text: 'Không sao em, thầy sẽ giải thích lại cho em hiểu.',
-    //                    timestamp: new Date(now.getTime() - 6600000), // 1.8 giờ trước
-    //                    status: 'read'
-    //                },
-    //                {
-    //                    id: 'msg_9',
-    //                    senderId: 'student_1',
-    //                    text: 'Cảm ơn thầy đã giúp em!',
-    //                    timestamp: new Date(now.getTime() - 3600000), // 1 giờ trước
-    //                    status: 'read'
-    //                }
-    //            ]
-    //        },
-    //        {
-    //            id: 'conv_4',
-    //            participant: {
-    //                id: 'parent_1',
-    //                name: 'Chị Nguyễn Thị Mai',
-    //                initials: 'M',
-    //                status: 'offline',
-    //                role: 'Phụ huynh',
-    //                lastSeen: 'Hoạt động 3 giờ trước'
-    //            },
-    //            lastMessage: 'Con em học có tiến bộ không ạ?',
-    //            lastTime: '3 giờ trước',
-    //            unreadCount: 1,
-    //            messages: [
-    //                {
-    //                    id: 'msg_10',
-    //                    senderId: 'parent_1',
-    //                    text: 'Chào thầy! Em muốn hỏi về tình hình học tập của con.',
-    //                    timestamp: new Date(now.getTime() - 14400000), // 4 giờ trước
-    //                    status: 'read'
-    //                },
-    //                {
-    //                    id: 'msg_11',
-    //                    senderId: 'current_user',
-    //                    text: 'Chào chị! Con chị học rất chăm chỉ và có tiến bộ rõ rệt.',
-    //                    timestamp: new Date(now.getTime() - 12000000), // 3.3 giờ trước
-    //                    status: 'read'
-    //                },
-    //                {
-    //                    id: 'msg_12',
-    //                    senderId: 'parent_1',
-    //                    text: 'Con em học có tiến bộ không ạ?',
-    //                    timestamp: new Date(now.getTime() - 10800000), // 3 giờ trước
-    //                    status: 'delivered'
-    //                }
-    //            ]
-    //        }
-    //    ];
-
-    //    this.renderConversations();
-
-    //    // ===== TỰ ĐỘNG CHỌN CUỘC TRÒ CHUYỆN GẦN NHẤT =====
-    //    setTimeout(() => {
-    //        this.autoSelectRecentConversation();
-    //    }, 100); // Delay nhỏ để đảm bảo DOM đã render xong
-
-    //    console.log('Sample data loaded:', this.conversations.length, 'conversations');
-    //}
-
-=======
-    loadSampleData() {
-        // Sample conversations data với timestamps thực tế
-        const now = new Date();
-
-        this.conversations = [
-            {
-                id: 'conv_1',
-                participant: {
-                    id: 'tutor_1',
-                    name: 'Thầy Nguyễn Văn Hùng',
-                    initials: 'H',
-                    status: 'online',
-                    role: 'Gia sư Toán học',
-                    lastSeen: null
-                },
-                lastMessage: 'Em có hiểu bài tập này chưa?',
-                lastTime: '2 phút trước',
-                unreadCount: 2,
-                messages: [
-                    {
-                        id: 'msg_1',
-                        senderId: 'tutor_1',
-                        text: 'Chào em! Thầy sẵn sàng hỗ trợ em học toán.',
-                        timestamp: new Date(now.getTime() - 3600000), // 1 giờ trước
-                        status: 'read'
-                    },
-                    {
-                        id: 'msg_2',
-                        senderId: 'current_user',
-                        text: 'Chào thầy! Em có một bài tập khó muốn hỏi ạ.',
-                        timestamp: new Date(now.getTime() - 3000000), // 50 phút trước
-                        status: 'read'
-                    },
-                    {
-                        id: 'msg_3',
-                        senderId: 'tutor_1',
-                        text: 'Em có hiểu bài tập này chưa?',
-                        timestamp: new Date(now.getTime() - 120000), // 2 phút trước - GẦN NHẤT
-                        status: 'delivered'
-                    }
-                ]
-            },
-            {
-                id: 'conv_2',
-                participant: {
-                    id: 'tutor_2',
-                    name: 'Cô Trần Thị Lan',
-                    initials: 'L',
-                    status: 'online',
-                    role: 'Gia sư Tiếng Anh',
-                    lastSeen: null
-                },
-                lastMessage: 'Great job on your homework!',
-                lastTime: '15 phút trước',
-                unreadCount: 0,
-                messages: [
-                    {
-                        id: 'msg_4',
-                        senderId: 'tutor_2',
-                        text: 'Hello! How are you today?',
-                        timestamp: new Date(now.getTime() - 1800000), // 30 phút trước
-                        status: 'read'
-                    },
-                    {
-                        id: 'msg_5',
-                        senderId: 'current_user',
-                        text: 'I\'m fine, thank you! Ready for today\'s lesson.',
-                        timestamp: new Date(now.getTime() - 1200000), // 20 phút trước
-                        status: 'read'
-                    },
-                    {
-                        id: 'msg_6',
-                        senderId: 'tutor_2',
-                        text: 'Great job on your homework!',
-                        timestamp: new Date(now.getTime() - 900000), // 15 phút trước
-                        status: 'read'
-                    }
-                ]
-            },
-            {
-                id: 'conv_3',
-                participant: {
-                    id: 'student_1',
-                    name: 'Phạm Minh Tâm',
-                    initials: 'T',
-                    status: 'offline',
-                    role: 'Học viên lớp 12',
-                    lastSeen: 'Hoạt động 1 giờ trước'
-                },
-                lastMessage: 'Cảm ơn thầy đã giúp em!',
-                lastTime: '1 giờ trước',
-                unreadCount: 0,
-                messages: [
-                    {
-                        id: 'msg_7',
-                        senderId: 'student_1',
-                        text: 'Thầy ơi, em chưa hiểu phần này lắm ạ.',
-                        timestamp: new Date(now.getTime() - 7200000), // 2 giờ trước
-                        status: 'read'
-                    },
-                    {
-                        id: 'msg_8',
-                        senderId: 'current_user',
-                        text: 'Không sao em, thầy sẽ giải thích lại cho em hiểu.',
-                        timestamp: new Date(now.getTime() - 6600000), // 1.8 giờ trước
-                        status: 'read'
-                    },
-                    {
-                        id: 'msg_9',
-                        senderId: 'student_1',
-                        text: 'Cảm ơn thầy đã giúp em!',
-                        timestamp: new Date(now.getTime() - 3600000), // 1 giờ trước
-                        status: 'read'
-                    }
-                ]
-            },
-            {
-                id: 'conv_4',
-                participant: {
-                    id: 'parent_1',
-                    name: 'Chị Nguyễn Thị Mai',
-                    initials: 'M',
-                    status: 'offline',
-                    role: 'Phụ huynh',
-                    lastSeen: 'Hoạt động 3 giờ trước'
-                },
-                lastMessage: 'Con em học có tiến bộ không ạ?',
-                lastTime: '3 giờ trước',
-                unreadCount: 1,
-                messages: [
-                    {
-                        id: 'msg_10',
-                        senderId: 'parent_1',
-                        text: 'Chào thầy! Em muốn hỏi về tình hình học tập của con.',
-                        timestamp: new Date(now.getTime() - 14400000), // 4 giờ trước
-                        status: 'read'
-                    },
-                    {
-                        id: 'msg_11',
-                        senderId: 'current_user',
-                        text: 'Chào chị! Con chị học rất chăm chỉ và có tiến bộ rõ rệt.',
-                        timestamp: new Date(now.getTime() - 12000000), // 3.3 giờ trước
-                        status: 'read'
-                    },
-                    {
-                        id: 'msg_12',
-                        senderId: 'parent_1',
-                        text: 'Con em học có tiến bộ không ạ?',
-                        timestamp: new Date(now.getTime() - 10800000), // 3 giờ trước
-                        status: 'delivered'
-                    }
-                ]
-            }
-        ];
-
-        this.renderConversations();
-
-        // ===== TỰ ĐỘNG CHỌN CUỘC TRÒ CHUYỆN GẦN NHẤT =====
-        setTimeout(() => {
-            this.autoSelectRecentConversation();
-        }, 100); // Delay nhỏ để đảm bảo DOM đã render xong
-
-        console.log('Sample data loaded:', this.conversations.length, 'conversations');
-    }
-
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
     renderConversations() {
         if (!this.elements.conversationsList) return;
 
@@ -664,11 +304,7 @@ class ChatApplication {
         return div;
     }
 
-<<<<<<< HEAD
     async selectConversation(conversationId) {
-=======
-    selectConversation(conversationId) {
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         try {
             // Remove active class from all conversations
             document.querySelectorAll('.conversation-item').forEach(item => {
@@ -683,7 +319,6 @@ class ChatApplication {
 
             // Find and set current conversation
             this.currentConversation = this.conversations.find(conv => conv.id === conversationId);
-<<<<<<< HEAD
             if (!this.currentConversation) {
                 console.warn('Không tìm thấy cuộc trò chuyện với id:', conversationId);
                 return;
@@ -700,7 +335,7 @@ class ChatApplication {
                     console.error("Lỗi khi tải lịch sử tin nhắn:", error);
                 }
             }
-
+            this.startMessagePolling();  // sau khi set currentConversation
             this.updateChatHeader();
             this.renderMessages();
             this.enableMessageInput();
@@ -710,27 +345,11 @@ class ChatApplication {
 
             console.log('Selected conversation:', this.currentConversation.participant.name);
 
-=======
-            if (this.currentConversation) {
-                this.updateChatHeader();
-                this.renderMessages();
-                this.enableMessageInput();
-
-                // Mark messages as read
-                this.markAsRead(conversationId);
-
-                console.log('Selected conversation:', this.currentConversation.participant.name);
-            }
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         } catch (error) {
             console.error('Error selecting conversation:', error);
         }
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
     updateChatHeader() {
         if (!this.currentConversation) return;
 
@@ -760,6 +379,30 @@ class ChatApplication {
             this.elements.participantStatus.className = `participant-status ${statusClass}`;
         }
     }
+
+    startMessagePolling() {
+        if (this.messagePollingInterval) {
+            clearInterval(this.messagePollingInterval);
+        }
+
+        this.messagePollingInterval = setInterval(async () => {
+            if (!this.currentConversation) return;
+
+            try {
+                const response = await fetch(`/api/message/history/${this.currentUser.id}/${this.currentConversation.participant.id}`);
+                const messages = await response.json();
+
+                // Kiểm tra nếu có tin nhắn mới
+                if (messages.length > this.currentConversation.messages.length) {
+                    this.currentConversation.messages = messages;
+                    this.renderMessages();
+                }
+            } catch (error) {
+                console.error('Lỗi khi cập nhật tin nhắn:', error);
+            }
+        }, 3000); // mỗi 3 giây
+    }
+
 
     renderMessages() {
         if (!this.elements.messagesContainer || !this.currentConversation) return;
@@ -802,25 +445,15 @@ class ChatApplication {
 
         const statusIcon = this.getStatusIcon(message.status);
         const messageStatus = isCurrentUser ? `
-<<<<<<< HEAD
         <div class="message-status">
             <span class="status-icon ${message.status || ''}">${statusIcon}</span>
         </div>
     ` : '';
 
-=======
-            <div class="message-status">
-                <span class="status-icon ${message.status}">${statusIcon}</span>
-            </div>
-        ` : '';
-
-        // Create avatar with initials
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         const avatarInitials = isCurrentUser ? this.currentUser.initials : sender.initials;
         const avatarElement = `<div class="message-avatar">${avatarInitials}</div>`;
 
         div.innerHTML = `
-<<<<<<< HEAD
         ${avatarElement}
         <div class="message-content">
             <div class="message-text">${this.escapeHtml(message.content || '')}</div>
@@ -828,23 +461,10 @@ class ChatApplication {
             ${messageStatus}
         </div>
     `;
-=======
-            ${avatarElement}
-            <div class="message-content">
-                <div class="message-text">${this.escapeHtml(message.text)}</div>
-                <div class="message-time">${this.formatTime(message.timestamp)}</div>
-                ${messageStatus}
-            </div>
-        `;
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
 
         return div;
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
     createTypingIndicator() {
         const typingIndicator = document.createElement('div');
         typingIndicator.className = 'typing-indicator';
@@ -885,18 +505,13 @@ class ChatApplication {
         }
     }
 
-<<<<<<< HEAD
     async sendMessage() {
-=======
-    sendMessage() {
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
         if (!this.elements.messageInput || !this.currentConversation) return;
 
         const text = this.elements.messageInput.value.trim();
         if (!text) return;
 
         try {
-<<<<<<< HEAD
             // Tạo đối tượng message theo API server mong muốn
             const messageData = {
                 senderId: this.currentUser.id,
@@ -942,39 +557,11 @@ class ChatApplication {
             this.renderConversations();
 
             // Giữ trạng thái active cho conversation đang chọn
-=======
-            // Create new message
-            const newMessage = {
-                id: 'msg_' + Date.now(),
-                senderId: this.currentUser.id,
-                text: text,
-                timestamp: new Date(),
-                status: 'sent'
-            };
-
-            // Add to current conversation
-            this.currentConversation.messages.push(newMessage);
-
-            // Update conversation preview
-            this.currentConversation.lastMessage = text;
-            this.currentConversation.lastTime = 'Vừa xong';
-
-            // Clear input
-            this.elements.messageInput.value = '';
-            this.elements.messageInput.style.height = 'auto';
-
-            // Re-render
-            this.renderMessages();
-            this.renderConversations();
-
-            // Re-select current conversation to maintain active state
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
             const currentItem = document.querySelector(`[data-conversation-id="${this.currentConversation.id}"]`);
             if (currentItem) {
                 currentItem.classList.add('active');
             }
 
-<<<<<<< HEAD
             console.log('Message sent:', text);
 
             // Nếu bạn có hàm simulateResponse thì vẫn có thể gọi
@@ -985,129 +572,6 @@ class ChatApplication {
             alert('Gửi tin nhắn thất bại, vui lòng thử lại.');
         }
     }
-
-
-    //simulateResponse() {
-    //    if (!this.currentConversation) return;
-
-    //    // Show typing indicator
-    //    setTimeout(() => {
-    //        const typingIndicator = document.getElementById('typingIndicator');
-    //        if (typingIndicator) {
-    //            typingIndicator.classList.add('show');
-    //            this.scrollToBottom();
-    //        }
-    //    }, 500);
-
-    //    // Send response
-    //    setTimeout(() => {
-    //        try {
-    //            const responses = [
-    //                'Cảm ơn em đã chia sẻ!',
-    //                'Thầy hiểu rồi, hãy thử cách này nhé.',
-    //                'Rất tốt! Em đã tiến bộ nhiều.',
-    //                'Có thể em giải thích thêm không?',
-    //                'Đúng rồi! Tiếp tục như vậy nhé.',
-    //                'Em có thắc mắc gì khác không?',
-    //                'Tuyệt vời! Em đã nắm được kiến thức.',
-    //                'Hãy thử làm bài tập này để luyện tập.'
-    //            ];
-
-    //            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-
-    //            const responseMessage = {
-    //                id: 'msg_' + Date.now(),
-    //                senderId: this.currentConversation.participant.id,
-    //                text: randomResponse,
-    //                timestamp: new Date(),
-    //                status: 'delivered'
-    //            };
-
-    //            this.currentConversation.messages.push(responseMessage);
-    //            this.currentConversation.lastMessage = randomResponse;
-    //            this.currentConversation.lastTime = 'Vừa xong';
-
-    //            this.renderMessages();
-    //            this.renderConversations();
-
-    //            // Re-select current conversation
-    //            const currentItem = document.querySelector(`[data-conversation-id="${this.currentConversation.id}"]`);
-    //            if (currentItem) {
-    //                currentItem.classList.add('active');
-    //            }
-
-    //            console.log('Auto response sent:', randomResponse);
-    //        } catch (error) {
-    //            console.error('Error in auto response:', error);
-    //        }
-    //    }, 2000);
-    //}
-=======
-            // Simulate response
-            this.simulateResponse();
-
-            console.log('Message sent:', text);
-        } catch (error) {
-            console.error('Error sending message:', error);
-        }
-    }
-
-    simulateResponse() {
-        if (!this.currentConversation) return;
-
-        // Show typing indicator
-        setTimeout(() => {
-            const typingIndicator = document.getElementById('typingIndicator');
-            if (typingIndicator) {
-                typingIndicator.classList.add('show');
-                this.scrollToBottom();
-            }
-        }, 500);
-
-        // Send response
-        setTimeout(() => {
-            try {
-                const responses = [
-                    'Cảm ơn em đã chia sẻ!',
-                    'Thầy hiểu rồi, hãy thử cách này nhé.',
-                    'Rất tốt! Em đã tiến bộ nhiều.',
-                    'Có thể em giải thích thêm không?',
-                    'Đúng rồi! Tiếp tục như vậy nhé.',
-                    'Em có thắc mắc gì khác không?',
-                    'Tuyệt vời! Em đã nắm được kiến thức.',
-                    'Hãy thử làm bài tập này để luyện tập.'
-                ];
-
-                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-
-                const responseMessage = {
-                    id: 'msg_' + Date.now(),
-                    senderId: this.currentConversation.participant.id,
-                    text: randomResponse,
-                    timestamp: new Date(),
-                    status: 'delivered'
-                };
-
-                this.currentConversation.messages.push(responseMessage);
-                this.currentConversation.lastMessage = randomResponse;
-                this.currentConversation.lastTime = 'Vừa xong';
-
-                this.renderMessages();
-                this.renderConversations();
-
-                // Re-select current conversation
-                const currentItem = document.querySelector(`[data-conversation-id="${this.currentConversation.id}"]`);
-                if (currentItem) {
-                    currentItem.classList.add('active');
-                }
-
-                console.log('Auto response sent:', randomResponse);
-            } catch (error) {
-                console.error('Error in auto response:', error);
-            }
-        }, 2000);
-    }
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
 
     markAsRead(conversationId) {
         const conversation = this.conversations.find(conv => conv.id === conversationId);
@@ -1219,7 +683,6 @@ class ChatApplication {
     }
 
     formatTime(date) {
-<<<<<<< HEAD
         if (!date) return '';
         // Nếu date là chuỗi, chuyển thành Date object
         if (typeof date === 'string') {
@@ -1233,14 +696,6 @@ class ChatApplication {
     }
 
 
-=======
-        return date.toLocaleTimeString('vi-VN', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    }
-
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
     formatDate(date) {
         return date.toLocaleDateString('vi-VN', {
             weekday: 'long',
@@ -1302,7 +757,6 @@ class ChatApplication {
     getUserRole() {
         return this.currentUser.role;
     }
-<<<<<<< HEAD
 
     formatRelativeTime(dateTimeString) {
         const now = new Date();
@@ -1319,8 +773,6 @@ class ChatApplication {
         const diffDays = Math.floor(diffHours / 24);
         return `${diffDays} ngày trước`;
     }
-=======
->>>>>>> aa5f159313fb82aa6db215f6d0abba7b457a202a
 }
 
 // Initialize chat application when DOM is loaded

@@ -243,58 +243,58 @@
                             <span id="modalUserDate">01/01/2025</span>
                         </div>
 
-                    <div class="user-tabs">
-                        <div class="tab-buttons">
-                            <button class="tab-btn active" data-tab="info">Thông tin</button>
-                            <button class="tab-btn" data-tab="activity">Hoạt động</button>
-                            <button class="tab-btn" data-tab="reports">Báo cáo</button>
-                        </div>
-
-                        <div class="tab-content active" id="info">
-                            <div class="info-section">
-                                <h4>Thông tin cá nhân</h4>
-                                <div class="info-grid">
-                                    <!-- Will be populated by JavaScript -->
-                                </div>
+                        <div class="user-tabs">
+                            <div class="tab-buttons">
+                                <button class="tab-btn active" data-tab="info">Thông tin</button>
+                                <button class="tab-btn" data-tab="activity">Hoạt động</button>
+                                <button class="tab-btn" data-tab="reports">Báo cáo</button>
                             </div>
-                        </div>
 
-                        <div class="tab-content" id="activity">
-                            <div class="activity-section">
-                                <h4>Hoạt động gần đây</h4>
-                                <div class="activity-list">
-                                    <div class="activity-item">
-                                        <div class="activity-time">06/06/2025 14:30</div>
-                                        <div class="activity-desc">Đăng nhập vào hệ thống</div>
-                                    </div>
-                                    <div class="activity-item">
-                                        <div class="activity-time">05/06/2025 10:15</div>
-                                        <div class="activity-desc">Cập nhật thông tin cá nhân</div>
+                            <div class="tab-content active" id="info">
+                                <div class="info-section">
+                                    <h4>Thông tin cá nhân</h4>
+                                    <div class="info-grid">
+                                        <!-- Will be populated by JavaScript -->
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="tab-content" id="reports">
-                            <div class="reports-section">
-                                <h4>Báo cáo về người dùng</h4>
-                                <div class="reports-list">
-                                    <p>Không có báo cáo nào</p>
+                            <div class="tab-content" id="activity">
+                                <div class="activity-section">
+                                    <h4>Hoạt động gần đây</h4>
+                                    <div class="activity-list">
+                                        <div class="activity-item">
+                                            <div class="activity-time">06/06/2025 14:30</div>
+                                            <div class="activity-desc">Đăng nhập vào hệ thống</div>
+                                        </div>
+                                        <div class="activity-item">
+                                            <div class="activity-time">05/06/2025 10:15</div>
+                                            <div class="activity-desc">Cập nhật thông tin cá nhân</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-content" id="reports">
+                                <div class="reports-section">
+                                    <h4>Báo cáo về người dùng</h4>
+                                    <div class="reports-list">
+                                        <p>Không có báo cáo nào</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="editUserFromModal">
-                    <i class="fas fa-edit"></i>
-                    Chỉnh sửa
-                </button>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="editUserFromModal">
+                        <i class="fas fa-edit"></i>
+                        Chỉnh sửa
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-        </div>
 
     <!-- Edit User Modal -->
     <div class="modal-overlay" id="editUserModal">
@@ -409,6 +409,8 @@
     <!-- Scripts -->
     <script src="js/loadContent.js" defer></script>
     <script src="js/script.js" defer></script>
-    <script src="js/admin-users.js"defer></script>
+    <script src="js/admin-users.js" defer></script>
+    <script src="/js/forgot-password.js"></script>
+
 </body>
 </html>
