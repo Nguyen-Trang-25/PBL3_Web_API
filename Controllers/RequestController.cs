@@ -232,7 +232,8 @@ namespace BE_Tutor.Controllers
                             rev.StudentId == student.StudentId &&
                             rev.TutorId == r.Applications.FirstOrDefault(a => a.Status == "accepted").TutorId
                         ),
-                        StudentName = r.Student != null ? r.Student.User.Name : null
+                        StudentName = r.Student != null ? r.Student.User.Name : null,
+                        StudentId = r.Student != null ? r.Student.StudentId : null
                     })
                     .ToListAsync();
 
@@ -279,7 +280,9 @@ namespace BE_Tutor.Controllers
                             rev.StudentId == r.StudentId &&
                             rev.TutorId == tutor.TutorId
                         ),
-                        StudentName = r.Student != null ? r.Student.User.Name : null
+                        StudentName = r.Student != null ? r.Student.User.Name : null,
+                        StudentId = r.Student != null ? r.Student.StudentId : null
+
                     })
                     .ToListAsync();
 
@@ -498,5 +501,32 @@ namespace BE_Tutor.Controllers
             return Ok(new { message = "Cập nhật trạng thái thành công." });
         }
 
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllRequests()
+        {
+            var requests = await _context.Requests
+                .Include(r => r.Subject)
+                .Include(r => r.Student)
+                .Select(r => new
+                {
+                    r.RequestId,
+                    r.StudentId,
+                    StudentName = r.Student != null ? r.Student.User.Name : null,
+                    r.SubjectId,
+                    SubjectName = r.Subject != null ? r.Subject.Name : null,
+                    r.Level,
+                    r.Fee,
+                    r.Schedule,
+                    r.Location,
+                    r.GenderTutor,
+                    r.Requirement,
+                    r.LearningFormat,
+                    r.Status,
+                    r.CreatedAt
+                })
+                .ToListAsync();
+
+            return Ok(requests);
+        }
     }
 }

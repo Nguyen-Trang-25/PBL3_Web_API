@@ -1,5 +1,6 @@
 ﻿public class RequestHistoryDto
 {
+    public string StudentId { get; set; }
     public string RequestId { get; set; }
     public string Subject { get; set; }
     public string SubjectName { get; set; }
