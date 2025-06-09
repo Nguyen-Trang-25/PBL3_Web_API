@@ -21,7 +21,7 @@ function initializeUsersManagement() {
     initializeModals();
     initializePagination();
     initializeEditUserModal();
-    initializeAddUserModal();
+    //initializeAddUserModal();
 
     // Load user data
     loadUsers();
@@ -33,6 +33,7 @@ function initializeUsersManagement() {
 // ===== USER DATA MANAGEMENT =====
 console.log("loadUser")
 async function loadUsers() {
+    console.log("show thông tin")
     try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -142,6 +143,15 @@ function initializeSearch() {
     }
 }
 
+function safeString(value) {
+    return (value || '').toString();
+}
+
+function safeStringLower(value) {
+    return (value || '').toString().toLowerCase();
+}
+
+// Cập nhật hàm performSearch
 function performSearch() {
     const searchTerm = document.getElementById('searchUsers').value.toLowerCase().trim();
 
@@ -149,10 +159,10 @@ function performSearch() {
         filteredUsers = [...users];
     } else {
         filteredUsers = users.filter(user => {
-            return user.fullName.toLowerCase().includes(searchTerm) ||
-                user.email.toLowerCase().includes(searchTerm) ||
-                user.phone.includes(searchTerm) ||
-                user.id.toString().includes(searchTerm);
+            return safeStringLower(user.fullName).includes(searchTerm) ||
+                safeStringLower(user.email).includes(searchTerm) ||
+                safeString(user.phone).includes(searchTerm) ||
+                safeString(user.id).includes(searchTerm);
         });
     }
 
@@ -380,7 +390,7 @@ async function showUserDetail(userId) {
                 'Authorization': `Bearer ${localStorage.getItem('token')}` // nếu dùng JWT
             }
         });
-        
+        console.log("Response:", response);
 
         if (!response.ok) {
             const error = await response.json();
@@ -389,10 +399,13 @@ async function showUserDetail(userId) {
         }
 
         const user = await response.json();
+        
+        console.log('User detail from API:', user)
+       // console.log('ngày sinh', DateOfBirth)
 
         // Populate modal with user data
         document.getElementById('modalUserName').textContent = user.fullName;
-        document.getElementById('modalUserEmail').textContent = user.Email;
+        document.getElementById('modalUserEmail').textContent = user.email;
         document.getElementById('modalUserPhone').textContent = user.phone;
         document.getElementById('modalUserDate').textContent = formatDate(user.joinDate);
 
@@ -441,15 +454,16 @@ async function showUserDetail(userId) {
             let infoHTML = `
             <div class="info-item">
                 <label>Địa chỉ:</label>
-                <span>${user.Address || 'Chưa cập nhật'}</span>
+                <span>${user.address || 'Chưa cập nhật'}</span>
             </div>
              <div class="info-item">
                 <label>Email:</label>
-                <span>${user.Email || 'Chưa cập nhật'}</span>
+                <span>${user.email || 'Chưa cập nhật'}</span>
             </div>
             <div class="info-item">
                 <label>Ngày sinh:</label>
-                <span>${user.DateOfBirth ? formatDate(user.DateOfBirth) : 'Chưa cập nhật'}</span>
+                <span>${ user.dateOfBirth
+                    ? formatDate(user.dateOfBirth) : 'Chưa cập nhật'}</span>
             </div>
             <div class="info-item">
                 <label>Giới tính:</label>   
@@ -461,11 +475,11 @@ async function showUserDetail(userId) {
                 infoHTML += `
                 <div class="info-item">
                     <label>Trình độ:</label>
-                    <span>${user.Education || 'Chưa cập nhật'}</span>
+                    <span>${user.education || 'Chưa cập nhật'}</span>
                 </div>
                 <div class="info-item">
                     <label>Kinh nghiệm:</label>
-                    <span>${user.Experience || 'Chưa cập nhật'}</span>
+                    <span>${user.experience || 'Chưa cập nhật'}</span>
                 </div>
                 <div class="info-item">
                     <label>Chuyên môn:</label>
@@ -501,42 +515,89 @@ async function showUserDetail(userId) {
         }
     }
 
-function editUser(userId) {
-    const paddedId = padUserId(userId);
-    const user = users.find(u => String(u.id) === paddedId);
-    if (!user) {
-        showNotification('Không tìm thấy người dùng.', 'error');
+async function editUser(userId) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        showNotification('Bạn cần đăng nhập lại', 'error');
         return;
     }
 
-    populateEditForm(user);
-    showModal('editUserModal');
+    const paddedId = padUserId(userId);
+    try {
+
+        const response = await fetch(`/api/Profile/${paddedId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Không thể lấy thông tin người dùng');
+
+        const user = await response.json();
+        console.log("sẽ populate được")
+        console.log(user.DateOfBirth)
+
+        populateEditForm(user);
+        showModal('editUserModal');
+    } catch (error) {
+        console.error(error);
+        showNotification('Lỗi khi lấy thông tin người dùng', 'error');
+    }
 }
 
-    function deleteUser(userId) {
-        const user = users.find(u => u.id === userId);
-        if (!user) return;
 
-        showConfirmModal(
-            'Xác nhận xóa người dùng',
-            `Bạn có chắc chắn muốn xóa người dùng "${user.fullName}"? Hành động này không thể hoàn tác.`,
-            () => {
-                users = users.filter(u => u.id !== userId);
-                filteredUsers = filteredUsers.filter(u => u.id !== userId);
-                selectedUsers.delete(userId);
+function deleteUser(userId) {
+    console.log("xóa")
+    const paddedUserId = padUserId(userId);
 
-                renderUsersTable();
-                updateStatistics();
-                updatePagination();
-                updateSelectAllState();
-                updateBatchActionsVisibility();
-                updateSelectedCount();
-
-                showNotification('Đã xóa người dùng thành công', 'success');
-            },
-            'danger'
-        );
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.error('Không tìm thấy token, vui lòng đăng nhập lại.');
+        return;
     }
+    const user = users.find(u => u.id === paddedUserId);
+    if (!user) return;
+
+    showConfirmModal(
+        'Xác nhận xóa người dùng',
+        `Bạn có chắc chắn muốn xóa người dùng "${user.fullName}"? Hành động này không thể hoàn tác.`,
+        () => {
+            fetch('/api/Profile/Delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                    
+                },
+                body: JSON.stringify(paddedUserId) // Gửi userId dưới dạng chuỗi JSON đơn
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Xóa thất bại");
+                    return response.json();
+                })
+                .then(data => {
+                    // Cập nhật giao diện sau khi backend xác nhận đã xóa
+                    users = users.filter(u => u.id !== paddedUserId);
+                    filteredUsers = filteredUsers.filter(u => u.id !== paddedUserId);
+                    selectedUsers.delete(paddedUserId);
+
+                    renderUsersTable();
+                    updateStatistics();
+                    updatePagination();
+                    updateSelectAllState();
+                    updateBatchActionsVisibility();
+                    updateSelectedCount();
+
+                    showNotification(data.message || 'Đã xóa người dùng thành công', 'success');
+                })
+                .catch(error => {
+                    showNotification(error.message || 'Có lỗi xảy ra khi xóa người dùng', 'danger');
+                });
+        },
+        'danger'
+    );
+}
 
     // ===== EDIT USER FUNCTIONALITY =====
 
@@ -564,7 +625,7 @@ function editUser(userId) {
         if (editUserForm) {
             editUserForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-                handleEditUserSubmission();
+                handleEditUserSubmission();// khi nhấn submit sẽ gọi backend
             });
         }
 
@@ -577,7 +638,7 @@ function editUser(userId) {
         }
     }
 
-    function populateEditForm(user) {
+    function populateEditForm(user) {// lấy dữ liệu có sẵn trong fe để điền sẵn thông tin hiện trên form 
         document.getElementById('editUserId').value = user.id || '';
         document.getElementById('editFullName').value = user.fullName || '';
         document.getElementById('editEmail').value = user.email || '';
@@ -588,7 +649,13 @@ function editUser(userId) {
         // Add additional fields dynamically
         addAdditionalEditFields(user);
         toggleRoleSpecificSections(user.userType);
-    }
+}
+function formatDateISO(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().slice(0, 10); // yyyy-MM-dd
+}
+
 
     function addAdditionalEditFields(user) {
         const formContent = document.querySelector('.edit-user-form .form-content');
@@ -600,7 +667,8 @@ function editUser(userId) {
         personalInfoRow.innerHTML = `
         <div class="form-group">
             <label for="editDateOfBirth">Ngày sinh</label>
-            <input type="date" id="editDateOfBirth" name="dateOfBirth" value="${user.DateOfBirth || ''}">
+           <input type="date" id="editDateOfBirth" name="DateOfBirth" value="${formatDateISO(user.dateOfBirth)}">
+
         </div>
         <div class="form-group">
             <label for="editGender">Giới tính</label>
@@ -631,11 +699,11 @@ function editUser(userId) {
             <div class="form-row">
                 <div class="form-group">
                     <label for="editEducation">Trình độ học vấn</label>
-                    <input type="text" id="editEducation" name="education" value="${user.Education || ''}" placeholder="VD: Đại học Bách Khoa TP.HCM">
+                    <input type="text" id="editEducation" name="education" value="${user.education || ''}" placeholder="VD: Đại học Bách Khoa TP.HCM">
                 </div>
                 <div class="form-group">
                     <label for="editExperience">Kinh nghiệm</label>
-                    <input type="text" id="editExperience" name="experience" value="${user.Experience || ''}" placeholder="VD: 3 năm">
+                    <input type="text" id="editExperience" name="experience" value="${user.experience || ''}" placeholder="VD: 3 năm">
                 </div>
             </div>
             <div class="form-row">
@@ -743,13 +811,13 @@ async function handleEditUserSubmission() {
                 'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
-                id: userData.userId,
+                Id: userData.userId,
                 fullName: userData.fullName,
                 email: userData.email,
                 phone: userData.phone,
                 address: userData.address,
                 userType: userData.userType,
-                dateOfBirth: userData.dateOfBirth || null,
+                dateOfBirth: userData.DateOfBirth || null,
                 gender: userData.gender !== "" ? (userData.gender === "true") : null,
                 education: userData.education || null,
                 experience: userData.experience || null,
@@ -770,6 +838,7 @@ async function handleEditUserSubmission() {
 
         // Cập nhật lại danh sách người dùng từ server (tùy chọn)
         await loadUsers();
+        await renderUsersTable()
 
     } catch (error) {
         console.error('Lỗi cập nhật:', error);
@@ -845,382 +914,20 @@ async function handleEditUserSubmission() {
 
     // ===== ADD USER FUNCTIONALITY =====
 
-    function initializeAddUserModal() {
-        const addUserBtn = document.getElementById('addUserBtn');
+    //function initializeAddUserModal() {
+    //    const addUserBtn = document.getElementById('addUserBtn');
 
-        if (addUserBtn) {
-            addUserBtn.addEventListener('click', function () {
-                showAddUserModal();
-            });
-        }
+    //    if (addUserBtn) {
+    //        addUserBtn.addEventListener('click', function () {
+    //            showAddUserModal();
+    //        });
+    //    }
 
-        createAddUserModal();
-    }
+    //    createAddUserModal();
+    //}
 
-    function createAddUserModal() {
-        if (document.getElementById('addUserModal')) return;
-
-        const modalHTML = `
-        <div class="modal-overlay" id="addUserModal">
-            <div class="modal">
-                <div class="modal-header">
-                    <h2>Thêm người dùng mới</h2>
-                    <button class="modal-close" id="closeAddUser">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form class="add-user-form" id="addUserForm">
-                        <div class="form-sections">
-                            <div class="form-section">
-                                <h3><i class="fas fa-user"></i> Thông tin cơ bản</h3>
-                                <div class="form-content">
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="addFullName">Họ và tên <span class="required">*</span></label>
-                                            <input type="text" id="addFullName" name="fullName" required placeholder="Nhập họ và tên đầy đủ">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="addEmail">Email <span class="required">*</span></label>
-                                            <input type="email" id="addEmail" name="email" required placeholder="example@gmail.com">
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="addPhone">Số điện thoại <span class="required">*</span></label>
-                                            <input type="tel" id="addPhone" name="phone" required placeholder="0123456789">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="addUserType">Loại tài khoản <span class="required">*</span></label>
-                                            <select id="addUserType" name="userType" required>
-                                                <option value="">Chọn loại tài khoản</option>
-                                                <option value="student">Học viên</option>
-                                                <option value="tutor">Gia sư</option>
-                                                <option value="admin">Admin</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="addDateOfBirth">Ngày sinh</label>
-                                            <input type="date" id="addDateOfBirth" name="dateOfBirth">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="addGender">Giới tính</label>
-                                            <select id="addGender" name="gender">
-                                                <option value="">Chọn giới tính</option>
-                                                <option value="male">Nam</option>
-                                                <option value="female">Nữ</option>                                             
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row single-column">
-                                        <div class="form-group">
-                                            <label for="addAddress">Địa chỉ</label>
-                                            <textarea id="addAddress" name="address" rows="3" placeholder="Nhập địa chỉ chi tiết"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" id="cancelAddUser">
-                        <i class="fas fa-times"></i> Hủy
-                    </button>
-                    <button type="submit" form="addUserForm" class="btn btn-primary" id="saveAddUser">
-                        <i class="fas fa-plus"></i> Thêm người dùng
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        setupAddUserModal();
-    }
-
-    function setupAddUserModal() {
-        const addUserModal = document.getElementById('addUserModal');
-        const closeAddUser = document.getElementById('closeAddUser');
-        const cancelAddUser = document.getElementById('cancelAddUser');
-        const addUserForm = document.getElementById('addUserForm');
-        const addUserType = document.getElementById('addUserType');
-
-        if (closeAddUser) {
-            closeAddUser.addEventListener('click', () => hideModal('addUserModal'));
-        }
-
-        if (cancelAddUser) {
-            cancelAddUser.addEventListener('click', () => hideModal('addUserModal'));
-        }
-
-        if (addUserType) {
-            addUserType.addEventListener('change', function () {
-                toggleAddRoleSpecificSections(this.value);
-            });
-        }
-
-        if (addUserForm) {
-            addUserForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                handleAddUserSubmission();
-            });
-        }
-
-        if (addUserModal) {
-            addUserModal.addEventListener('click', function (e) {
-                if (e.target === this) {
-                    hideModal('addUserModal');
-                }
-            });
-        }
-    }
-
-    function showAddUserModal() {
-        document.getElementById('addUserForm').reset();
-        addRoleSpecificAddSections();
-        toggleAddRoleSpecificSections('');
-        showModal('addUserModal');
-    }
-
-    function addRoleSpecificAddSections() {
-        const formSections = document.querySelector('#addUserModal .form-sections');
-        const existingRoleSections = formSections.querySelectorAll('.role-specific-section');
-        existingRoleSections.forEach(section => section.remove());
-
-        const roleSpecificHTML = `
-        <div class="form-section role-specific-section" id="addTutorInfo" style="display: none;">
-            <h3><i class="fas fa-chalkboard-teacher"></i> Thông tin gia sư</h3>
-            <div class="form-content">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="addEducation">Trình độ học vấn</label>
-                        <input type="text" id="addEducation" name="education" placeholder="VD: Đại học Bách Khoa TP.HCM">
-                    </div>
-                    <div class="form-group">
-                        <label for="addExperience">Kinh nghiệm</label>
-                        <input type="text" id="addExperience" name="experience" placeholder="VD: 3 năm">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="addSubjects">Chuyên môn</label>
-                        <input type="text" id="addSubjects" name="subjects" placeholder="VD: Toán, Lý, Hóa">
-                    </div>                  
-                </div>
-            </div>
-        </div>
-        
-        <div class="form-section role-specific-section" id="addStudentInfo" style="display: none;">
-            <h3><i class="fas fa-graduation-cap"></i> Thông tin học viên</h3>
-            <div class="form-content">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="addGrade">Lớp</label>
-                        <input type="text" id="addGrade" name="grade" placeholder="VD: Lớp 12">
-                    </div>
-                    <div class="form-group">
-                        <label for="addSchool">Trường</label>
-                        <input type="text" id="addSchool" name="school" placeholder="VD: THPT Nguyễn Thái Học">
-                    </div>
-                </div>             
-            </div>
-        </div>      
-        <div class="form-section role-specific-section" id="addAdminInfo" style="display: none;">
-            <h3><i class="fas fa-user-shield"></i> Thông tin admin</h3>
-            <div class="form-content">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="addDepartment">Phòng ban</label>
-                        <input type="text" id="addDepartment" name="department" placeholder="VD: Quản trị hệ thống">
-                    </div>
-                    <div class="form-group">
-                        <label for="addRole">Vai trò</label>
-                        <input type="text" id="addRole" name="role" placeholder="VD: Super Admin">
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-        formSections.insertAdjacentHTML('beforeend', roleSpecificHTML);
-    }
-
-    function toggleAddRoleSpecificSections(userType) {
-        const tutorInfo = document.getElementById('addTutorInfo');
-        const studentInfo = document.getElementById('addStudentInfo');
-        const adminInfo = document.getElementById('addAdminInfo');
-
-        if (tutorInfo) tutorInfo.style.display = 'none';
-        if (studentInfo) studentInfo.style.display = 'none';
-        if (adminInfo) adminInfo.style.display = 'none';
-
-        switch (userType) {
-            case 'tutor':
-                if (tutorInfo) tutorInfo.style.display = 'block';
-                break;
-            case 'student':
-                if (studentInfo) studentInfo.style.display = 'block';
-                break;
-            case 'admin':
-                if (adminInfo) adminInfo.style.display = 'block';
-                break;
-        }
-}
-// Hàm chuyển định dạng "dd/mm/yyyy" thành "yyyy-mm-dd"
-function parseDateInput(input) {
-    const parts = input.split('/');
-    if (parts.length !== 3) return null;
-    const [day, month, year] = parts;
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-}
-
-
-async function handleAddUserSubmission() {
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-        showNotification('Không tìm thấy token. Vui lòng đăng nhập lại.', 'error');
-        return;
-    }
-
-    const formData = new FormData(document.getElementById('addUserForm'));
-    if (!formData) {
-        console.error("Không tìm thấy form với id 'addUserForm'");
-        return;
-    }
-    const userData = Object.fromEntries(formData.entries());
-    console.log("Dữ liệu gửi lên backend:", userData);
-
-
-    if (!validateAddForm(userData)) {
-        return;
-    }
-
-    const saveButton = document.getElementById('saveAddUser');
-    const originalHTML = saveButton.innerHTML;
-    saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
-    saveButton.disabled = true;
-
-
-    // Chuyển giới tính từ chuỗi sang boolean
-    if (userData.gender === '') {
-        userData.gender = null;
-    } else {
-        // Bạn form select có value là "male" hoặc "female"
-        // Nên cần chuyển sang boolean:
-        userData.gender = userData.gender === 'male' ? true : false;
-    }
-    console.log("Final userData gửi lên:", JSON.stringify(userData, null, 2));
-
-    // Chuyển đổi ngày sinh
-    // Chuyển đổi ngày sinh
-    if (!userData.dateOfBirth || userData.dateOfBirth === '') {
-        userData.dateOfBirth = null;
-    } else {
-        const isoFormatted = parseDateInput(userData.dateOfBirth);
-        if (!isoFormatted || isNaN(new Date(isoFormatted).getTime())) {
-            userData.dateOfBirth = null;
-        } else {
-            userData.dateOfBirth = isoFormatted; // yyyy-mm-dd
-        }
-    }
-
-    try {
-        const response = await fetch('/api/Profile/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                 'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(userData)
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || 'Thêm người dùng thất bại');
-        }
-
-        // Nếu backend trả lại userId mới, có thể hiển thị hoặc thêm vào bảng tạm thời
-        const newUser = {
-            id: result.userId,
-            ...userData,
-            status: 'active',
-            joinDate: new Date().toISOString().split('T')[0],
-        };
-
-        users.push(newUser);
-        filteredUsers.push(newUser);
-
-        renderUsersTable();
-        updateStatistics();
-        updatePagination();
-        hideModal('addUserModal');
-        showNotification('Đã thêm người dùng mới thành công', 'success');
-
-    } catch (error) {
-        console.error('Error adding user:', error);
-        showNotification(error.message || 'Có lỗi xảy ra khi thêm người dùng', 'error');
-    } finally {
-        saveButton.innerHTML = originalHTML;
-        saveButton.disabled = false;
-    }
-}
-
-
-    function validateAddForm(userData) {
-        const errors = [];
-
-        if (!userData.fullName || userData.fullName.trim() === '') {
-            errors.push('Họ và tên không được để trống');
-            markFieldAsError('addFullName');
-        } else {
-            markFieldAsValid('addFullName');
-        }
-
-        if (!userData.email || userData.email.trim() === '') {
-            errors.push('Email không được để trống');
-            markFieldAsError('addEmail');
-        } else if (!isValidEmail(userData.email)) {
-            errors.push('Email không hợp lệ');
-            markFieldAsError('addEmail');
-        } else if (users.some(u => u.email === userData.email)) {
-            errors.push('Email đã tồn tại trong hệ thống');
-            markFieldAsError('addEmail');
-        } else {
-            markFieldAsValid('addEmail');
-        }
-
-        if (!userData.phone || userData.phone.trim() === '') {
-            errors.push('Số điện thoại không được để trống');
-            markFieldAsError('addPhone');
-        } else if (!isValidPhone(userData.phone)) {
-            errors.push('Số điện thoại không hợp lệ');
-            markFieldAsError('addPhone');
-        } else if (users.some(u => u.phone === userData.phone)) {
-            errors.push('Số điện thoại đã tồn tại trong hệ thống');
-            markFieldAsError('addPhone');
-        } else {
-            markFieldAsValid('addPhone');
-        }
-
-        if (!userData.userType || userData.userType === '') {
-            errors.push('Vui lòng chọn loại tài khoản');
-            markFieldAsError('addUserType');
-        } else {
-            markFieldAsValid('addUserType');
-        }
-
-        if (errors.length > 0) {
-            showNotification(errors[0], 'error');
-            return false;
-        }
-
-        return true;
-    }
+    
+    
 
     // ===== TABLE RENDERING =====
 

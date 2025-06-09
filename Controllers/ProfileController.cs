@@ -24,243 +24,200 @@ namespace BE_Tutor.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _context.Users
-                .Where(u => u.Status == null || u.Status != "inactive") // 👈 lọc user chưa bị "xóa mềm"
-                .Select(u => new
+            var rawUsers = await _context.Users
+         .Where(u => u.Status == null || u.Status != "inactive")
+         .Include(u => u.Tutors.Where(t => t.IsActive))
+                 .ThenInclude(t => t.SpecialtySubject)
+         .Include(u => u.Students.Where(s => s.IsActive))
+         .ToListAsync();
+
+            var users = rawUsers.Select(u =>
+            {
+                var tutor = u.Tutors.FirstOrDefault();
+                var student = u.Students.FirstOrDefault();
+                var role = u.Role?.ToLower();
+                return new
                 {
                     id = u.UserId,
                     fullName = u.Name,
                     userType = u.Role,
                     email = u.Email,
                     phone = u.Phone,
-                    joinDate = u.CreatedAt
-                })
-                .ToListAsync();
+                    joinDate = u.CreatedAt,
+
+                    // Chỉ thêm nếu là tutor
+                    education = role == "tutor" ? tutor?.Education : null,
+                    experience = role == "tutor" ? tutor?.Experience : null,
+                    subjects = role == "tutor" ? tutor?.SpecialtySubject?.Name : null,
+
+                    // Chỉ thêm nếu là student
+                    grade = role == "student" ? student?.GradeLevel : null,
+                    school = role == "student" ? student?.School : null
+                };
+            }).ToList();
 
             return Ok(users);
         }
 
-        [HttpPost("Add")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> AddUser([FromBody] AddUserdto dto)
-        {
-            if (string.IsNullOrEmpty(dto.Phone))
-                return BadRequest("Số điện thoại là bắt buộc.");
-
-            // Kiểm tra số điện thoại đã tồn tại
-            bool phoneExists = await _context.Users.AnyAsync(u => u.Phone == dto.Phone);
-            if (phoneExists)
-                return Conflict(new { message = "Số điện thoại đã tồn tại." });
-
-            // Sinh UserId dạng 10 số (vd: "0000000001")
-            var lastUser = await _context.Users
-                .OrderByDescending(u => u.UserId)
-                .FirstOrDefaultAsync();
-
-            int nextId = 1;
-            if (lastUser != null && int.TryParse(lastUser.UserId, out int lastId))
+            [HttpPut("Edit")]
+            [Authorize(Roles = "admin")]
+            public async Task<IActionResult> EditUser([FromBody] EditUserDto dto)
             {
-                nextId = lastId + 1;
-            }
-            string newUserId = nextId.ToString("D10");
-
-            // Tạo mật khẩu mặc định và hash bằng BCrypt
-            string defaultPassword = "123456";
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(defaultPassword);
-
-            var newUser = new User
-            {
-                UserId = newUserId,
-                Name = dto.FullName,
-                Email = dto.Email,
-                Phone = dto.Phone,
-                Role = dto.UserType.ToLower(),
-                Address = dto.Address,
-                Gender = dto.Gender,
-                Status = "active",
-                DateOfBirth = dto.DateOfBirth,
-                CreatedAt = DateTime.UtcNow,
-                Password = hashedPassword
-            };
-            _context.Users.Add(newUser);
-            await _context.SaveChangesAsync();
-
-            if (dto.UserType == "tutor")
-            {
-                var tutor = new Tutor
-                {
-                    TutorId = newUserId,
-                    Education = dto.Education,
-                    Experience = dto.Experience
-                };
-
-                if (!string.IsNullOrEmpty(dto.Subjects))
-                {
-                    var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Name == dto.Subjects);
-
-                    if (subject == null)
-                    {
-                        var lastSubject = await _context.Subjects
-                            .OrderByDescending(s => s.SubjectId)
-                            .FirstOrDefaultAsync();
-
-                        var newSubjectId = lastSubject == null
-                            ? "001"
-                            : (int.Parse(lastSubject.SubjectId) + 1).ToString("D3");
-
-                        subject = new Subject
-                        {
-                            SubjectId = newSubjectId,
-                            Name = dto.Subjects
-                        };
-
-                        _context.Subjects.Add(subject);
-                        await _context.SaveChangesAsync();
-                    }
-
-                    tutor.SpecialtySubjectId = subject.SubjectId;
-                }
-
-                newUser.Tutors.Add(tutor);
-            }
-            else if (dto.UserType == "student")
-            {
-                var student = new Student
-                {
-                    StudentId = newUserId,
-                    GradeLevel = dto.Grade,
-                    School = dto.School
-                };
-
-                newUser.Students.Add(student);
-            }
-
-           
-
-            return Ok(new { message = "Thêm người dùng thành công" });
-        }
-
-        [HttpPut("Edit")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> EditUser([FromBody] EditUserDto dto)
-        {
             var user = await _context.Users
-                .Include(u => u.Tutors)
-                    .ThenInclude(t => t.SpecialtySubject)
-                .Include(u => u.Students)
-                .FirstOrDefaultAsync(u => u.UserId == dto.Id);
+              .Include(u => u.Tutors.Where(t => t.IsActive))
+                  .ThenInclude(t => t.SpecialtySubject)
+              .Include(u => u.Students.Where(s => s.IsActive))
+              .FirstOrDefaultAsync(u => u.UserId == dto.Id);
 
             if (user == null)
-                return NotFound("Không tìm thấy người dùng.");
+                    return NotFound("Không tìm thấy người dùng.");
 
-            if (!string.IsNullOrEmpty(dto.FullName))
-                user.Name = dto.FullName;
+                if (!string.IsNullOrEmpty(dto.FullName))
+                    user.Name = dto.FullName;
 
-            if (!string.IsNullOrEmpty(dto.Email))
-                user.Email = dto.Email;
+                if (!string.IsNullOrEmpty(dto.Email))
+                    user.Email = dto.Email;
 
-            if (!string.IsNullOrEmpty(dto.Phone))
-                user.Phone = dto.Phone;
+                if (!string.IsNullOrEmpty(dto.Phone))
+                    user.Phone = dto.Phone;
 
-            if (!string.IsNullOrEmpty(dto.Address))
-                user.Address = dto.Address;
+                if (!string.IsNullOrEmpty(dto.Address))
+                    user.Address = dto.Address;
 
-            if (!string.IsNullOrEmpty(dto.UserType))
-                user.Role = dto.UserType;
+                if (!string.IsNullOrEmpty(dto.UserType))
+                    user.Role = dto.UserType;
 
-            if (dto.DateOfBirth.HasValue)
-                user.DateOfBirth = dto.DateOfBirth.Value;
+                if (dto.DateOfBirth.HasValue)
+                    user.DateOfBirth = dto.DateOfBirth.Value;
 
-            if (dto.Gender.HasValue)
-                user.Gender = dto.Gender.Value;
+                if (dto.Gender.HasValue)
+                    user.Gender = dto.Gender.Value;
 
-            // Cập nhật thông tin role-specific
-            if (dto.UserType == "tutor")
-            {
+                // Cập nhật thông tin role-specific
+                if (dto.UserType == "tutor")
+                {
+                var student = user.Students.FirstOrDefault(s => s.IsActive);
+                if (student != null)
+                {
+                    student.IsActive = false;
+                }
+
+                // Lấy hoặc tạo Tutor
                 var tutor = user.Tutors.FirstOrDefault();
                 if (tutor == null)
                 {
-                    tutor = new Tutor { UserId = user.UserId };
+                    tutor = new Tutor { 
+                        UserId = user.UserId,
+                        TutorId = user.UserId
+                    };
                     user.Tutors.Add(tutor);
                 }
 
+                tutor.IsActive = true;
+
                 if (!string.IsNullOrEmpty(dto.Education))
-                    tutor.Education = dto.Education;
+                        tutor.Education = dto.Education;
 
-                if (!string.IsNullOrEmpty(dto.Experience))
-                    tutor.Experience = dto.Experience;
+                    if (!string.IsNullOrEmpty(dto.Experience))
+                        tutor.Experience = dto.Experience;
 
-                if (!string.IsNullOrEmpty(dto.Subjects))
-                {
-                    // Tìm Subject đã có trong DB theo tên
-                    var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Name == dto.Subjects);
-
-                    if (subject != null)
+                    if (!string.IsNullOrEmpty(dto.Subjects))
                     {
-                        tutor.SpecialtySubjectId = subject.SubjectId;
-                    }
-                    else
-                    {
-                        // Tạo SubjectId mới theo kiểu 3 ký tự số (001, 002,...)
-                        var lastSubject = await _context.Subjects
-                            .OrderByDescending(s => s.SubjectId)
-                            .FirstOrDefaultAsync();
+                        // Tìm Subject đã có trong DB theo tên
+                        var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Name == dto.Subjects);
 
-                        string newId;
-                        if (lastSubject == null)
+                        if (subject != null)
                         {
-                            newId = "001";
+                            tutor.SpecialtySubjectId = subject.SubjectId;
                         }
                         else
                         {
-                            int lastIdNum = int.Parse(lastSubject.SubjectId);
-                            newId = (lastIdNum + 1).ToString("D3"); // "D3" là format 3 chữ số có số 0 đứng trước
+                            // Tạo SubjectId mới theo kiểu 3 ký tự số (001, 002,...)
+                            var lastSubject = await _context.Subjects
+                                .OrderByDescending(s => s.SubjectId)
+                                .FirstOrDefaultAsync();
+
+                            string newId;
+                            if (lastSubject == null)
+                            {
+                                newId = "001";
+                            }
+                            else
+                            {
+                                int lastIdNum = int.Parse(lastSubject.SubjectId);
+                                newId = (lastIdNum + 1).ToString("D3"); // "D3" là format 3 chữ số có số 0 đứng trước
+                            }
+
+                            var newSubject = new Subject
+                            {
+                                SubjectId = newId,
+                                Name = dto.Subjects
+                            };
+
+                            _context.Subjects.Add(newSubject);
+                            await _context.SaveChangesAsync();
+
+                            tutor.SpecialtySubjectId = newSubject.SubjectId;
                         }
-
-                        var newSubject = new Subject
-                        {
-                            SubjectId = newId,
-                            Name = dto.Subjects
-                        };
-
-                        _context.Subjects.Add(newSubject);
-                        await _context.SaveChangesAsync();
-
-                        tutor.SpecialtySubjectId = newSubject.SubjectId;
                     }
+
+                
+                }
+                else if (dto.UserType == "student")
+                {
+                var tutor = user.Tutors.FirstOrDefault(t => t.IsActive);
+                if (tutor != null)
+                {
+                    tutor.IsActive = false;
                 }
 
-                // Xóa hết student nếu có
-                user.Students.Clear();
-            }
-            else if (dto.UserType == "Student")
-            {
+                // Lấy hoặc tạo Student
                 var student = user.Students.FirstOrDefault();
                 if (student == null)
                 {
-                    student = new Student { UserId = user.UserId };
+                    student = new Student
+                    {
+                        UserId = user.UserId,
+                        StudentId = user.UserId
+                    };
                     user.Students.Add(student);
                 }
 
+                student.IsActive = true;
+
                 if (!string.IsNullOrEmpty(dto.Grade))
-                    student.GradeLevel = dto.Grade;
+                        student.GradeLevel = dto.Grade;
 
-                if (!string.IsNullOrEmpty(dto.School))
-                    student.School = dto.School;
+                    if (!string.IsNullOrEmpty(dto.School))
+                        student.School = dto.School;
 
-                // Xóa hết tutor nếu có
-                user.Tutors.Clear();
+                  
+                }
+                
+
+                await _context.SaveChangesAsync();
+                return Ok("Cập nhật người dùng thành công.");
             }
-            else
-            {
-                // Nếu không phải Tutor hoặc Student thì xóa hết cả hai
-                user.Tutors.Clear();
-                user.Students.Clear();
-            }
+        [HttpPost("Delete")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> DeleteUser([FromBody] string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(new { message = "UserId không được để trống." });
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId && (u.Status == null || u.Status != "inactive"));
+
+            if (user == null)
+                return NotFound(new { message = "Người dùng không tồn tại hoặc đã bị xóa." });
+
+            user.Status = "inactive"; // Đánh dấu đã xóa
 
             await _context.SaveChangesAsync();
-            return Ok("Cập nhật người dùng thành công.");
+
+            return Ok(new { message = $"Đã đánh dấu xóa người dùng '{user.Name}' thành công." });
         }
+
 
         [HttpGet("{id}")]
         [Authorize(Roles = "admin")]
@@ -277,25 +234,25 @@ namespace BE_Tutor.Controllers
                 return NotFound(new { message = "Người dùng không tồn tại." });
             }
 
-            var student = user.Students.FirstOrDefault();
-            var tutor = user.Tutors.FirstOrDefault();
+            var student = user.Students.FirstOrDefault(s => s.IsActive);
+            var tutor = user.Tutors.FirstOrDefault(t => t.IsActive);
 
             return Ok(new
             {
                 id = user.UserId,
                 fullName = user.Name ?? "",
-                Email = user.Email ?? "",
+                email = user.Email ?? "",
                 phone = user.Phone,
                 status = user.Status,
                 joinDate = user.CreatedAt,
                 role = user.Role,
                 gender = user.Gender,
-                Address = user.Address ?? "",
-                DateOfBirth = user.DateOfBirth, // DateTime?, trả về chuẩn ISO8601
+                address = user.Address ?? "",
+                DateOfBirth = user.DateOfBirth?.ToString("yyyy-MM-dd"), // DateTime?, trả về chuẩn ISO8601
 
                 // Thông tin thêm cho tutor
-                Education = tutor?.Education ?? "",
-                Experience = tutor?.Experience ?? "",
+                education = tutor?.Education ?? "",
+                experience = tutor?.Experience ?? "",
                 subjects = tutor?.SpecialtySubject?.Name ?? "",
 
                 // Thông tin thêm cho student
@@ -337,20 +294,9 @@ namespace BE_Tutor.Controllers
         }
 
 
-        [HttpDelete("Delete/{id}")]
-            [Authorize(Roles = "admin")]
-            public async Task<IActionResult> DeleteUser(string id)
-            {
-                var user = await _context.Users.FindAsync(id);
-                if (user == null) return NotFound(new { message = "Người dùng không tồn tại." });
-
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
-                return Ok(new { message = "Xóa người dùng thành công." });
-            }
-
-            // ng dung xem pro5 cua minh
-            [HttpGet("GetMyUser")]
+        
+        // ng dung xem pro5 cua minh
+        [HttpGet("GetMyUser")]
             public async Task<IActionResult> GetProfile()
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -395,9 +341,30 @@ namespace BE_Tutor.Controllers
                     await _context.SaveChangesAsync();
                     return Ok(new { message = "Cập nhật thông tin thành công." });
             }
-            
+        [HttpGet("stats")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetDashboardStats()
+        {
+            var totalUsers = await _context.Users.CountAsync(); // Tính cả inactive
+           // var totalCourses = await _context.Classes.CountAsync(); // Nếu bạn dùng bảng tên khác, sửa lại
+            //var totalReviews = await _context.Reviews.CountAsync(); // Tuỳ bảng tên
+
+            // Trạng thái hệ thống có thể là mô phỏng hoặc lấy từ logic khác
+            var systemStatus = "online";
+
+            return Ok(new
+            {
+                users = totalUsers,
+                //courses = totalCourses,
+                //reviews = totalReviews,
+                systemStatus
+            });
         }
+
+
+
     }
+}
 
 
 

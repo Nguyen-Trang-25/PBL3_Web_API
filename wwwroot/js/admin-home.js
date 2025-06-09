@@ -215,21 +215,20 @@ function setupHoverEffects() {
 // Các hàm này có thể được thay thế bằng API thực tế
 
 // Lấy dữ liệu thống kê từ server
+
 async function fetchDashboardStats() {
     try {
-        // Thay thế bằng API call thực tế
-        // const response = await fetch('/api/admin/stats');
-        // const data = await response.json();
+        const response = await fetch('/api/Profile/stats'); // ← Gọi đúng API backend
+        const data = await response.json();
+        console.log(data);
 
-        // Dữ liệu mẫu
-        const mockData = {
-            users: 1245,
-            courses: 78,
-            reviews: 324,
-            systemStatus: 'online'
-        };
+        // Cập nhật UI sau khi nhận dữ liệu
+        document.querySelector('.stat-item:nth-child(1) .stat-number').textContent = formatNumber(data.users);
+        document.querySelector('.stat-item:nth-child(2) .stat-number').textContent = formatNumber(data.courses);
+        document.querySelector('.stat-item:nth-child(3) .stat-number').textContent = formatNumber(data.reviews);
 
-        return mockData;
+        return data;  // Trả về data nếu cần
+
     } catch (error) {
         console.error('Lỗi khi lấy dữ liệu thống kê:', error);
         showNotification('Không thể lấy dữ liệu thống kê', 'error');

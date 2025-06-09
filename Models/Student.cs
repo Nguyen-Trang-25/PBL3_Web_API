@@ -11,10 +11,12 @@ public partial class Student
 
     public string? GradeLevel { get; set; }
     public string? School { get; set; }
+    public bool IsActive { get; set; }
 
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
     public virtual User User { get; set; } = null!;
+    
 }

@@ -17,6 +17,7 @@ public partial class Tutor
 
     public string? SpecialtySubjectId { get; set; }
     public string? Education { get; set; }
+    public bool IsActive { get; set; }
 
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
