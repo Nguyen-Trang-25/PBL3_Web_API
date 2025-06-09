@@ -342,7 +342,7 @@ namespace BE_Tutor.Controllers
                     return Ok(new { message = "Cập nhật thông tin thành công." });
             }
         [HttpGet("stats")]
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         public async Task<IActionResult> GetDashboardStats()
         {
             var totalUsers = await _context.Users.CountAsync(); // Tính cả inactive

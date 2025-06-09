@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Hàm khởi tạo chính
-function initializeAdminHome() {
+async function initializeAdminHome() {
     // Gắn sự kiện cho nút refresh
     setupRefreshButton();
 
@@ -16,6 +16,9 @@ function initializeAdminHome() {
 
     // Log để debug
     console.log('Admin Home đã được khởi tạo');
+    const stats = await fetchDashboardStats();
+    updateDashboardStats(stats);
+
 }
 
 // ===== XỬ LÝ NÚT REFRESH STATUS =====
@@ -215,24 +218,41 @@ function setupHoverEffects() {
 // Các hàm này có thể được thay thế bằng API thực tế
 
 // Lấy dữ liệu thống kê từ server
-
 async function fetchDashboardStats() {
     try {
-        const response = await fetch('/api/Profile/stats'); // ← Gọi đúng API backend
+        const response = await fetch('/api/Profile/stats');  // Đường dẫn API thật của bạn
+        if (!response.ok) throw new Error('Lỗi phản hồi từ server');
         const data = await response.json();
-        console.log(data);
-
-        // Cập nhật UI sau khi nhận dữ liệu
-        document.querySelector('.stat-item:nth-child(1) .stat-number').textContent = formatNumber(data.users);
-        document.querySelector('.stat-item:nth-child(2) .stat-number').textContent = formatNumber(data.courses);
-        document.querySelector('.stat-item:nth-child(3) .stat-number').textContent = formatNumber(data.reviews);
-
-        return data;  // Trả về data nếu cần
-
+        return data;
     } catch (error) {
         console.error('Lỗi khi lấy dữ liệu thống kê:', error);
         showNotification('Không thể lấy dữ liệu thống kê', 'error');
         return null;
+    }
+}
+
+function updateDashboardStats(data) {
+    if (!data) return;
+
+    // Cập nhật số người dùng
+    const usersElement = document.querySelector('.stat-item .stat-icon.users')
+        ?.parentElement.querySelector('.stat-number');
+    if (usersElement && data.users !== undefined) {
+        usersElement.textContent = data.users.toLocaleString();
+    }
+
+    // Cập nhật số lớp học
+    const coursesElement = document.querySelector('.stat-item .stat-icon.courses')
+        ?.parentElement.querySelector('.stat-number');
+    if (coursesElement && data.courses !== undefined) {
+        coursesElement.textContent = data.courses.toLocaleString();
+    }
+
+    // Cập nhật số đánh giá
+    const reviewsElement = document.querySelector('.stat-item .stat-icon.reviews')
+        ?.parentElement.querySelector('.stat-number');
+    if (reviewsElement && data.reviews !== undefined) {
+        reviewsElement.textContent = data.reviews.toLocaleString();
     }
 }
 
