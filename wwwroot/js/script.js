@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             form.reset();
+            window.location.href("/html/home_student.html")
         } catch (err) {
             alert("Gửi yêu cầu thất bại: " + err.message);
         }

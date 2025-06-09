@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ gia sư - Hệ thống gia sư</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="tutor-profile-page">
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Account Form -->
+    <div id="reg-log-container"></div>
+
+    <!-- Main Content -->
+    <main class="tutor-profile-main">
+        <div class="tutor-profile-container">
+            <!-- Back Button -->
+            <div class="back-button-container">
+                <button class="back-btn" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại
+                </button>
+            </div>
+
+            <!-- Tutor Profile Card -->
+            <div class="tutor-profile-card">
+                <!-- Profile Header -->
+                <!-- Profile Header -->
+                <div class="tutor-profile-header">
+                    <div class="tutor-avatar" id="tutorAvatar">
+                        <!-- Avatar will be loaded here -->
+                    </div>
+
+                    <div class="tutor-info-container">
+                        <h1 class="tutor-name" id="tutorName">Thầy Nguyễn Văn Hùng</h1>
+                        <div class="tutor-rating-display" id="tutorRating">
+                            <!-- Rating will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="tutor-actions">
+                        <button class="tutor-action-btn secondary" id="messageBtn">
+                            <i class="fas fa-comments"></i>
+                            Nhắn tin
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="tutor-basic-info">
+                    <h2><i class="fas fa-info-circle"></i> Thông tin cơ bản</h2>
+                    <div class="basic-info-grid" id="basicInfoGrid">
+                        <!-- Basic info will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Quick Review Section -->
+                <div class="quick-review-section">
+                    <h2><i class="fas fa-star"></i> Đánh giá nhanh</h2>
+                    <div class="quick-review-form">
+                        <div class="star-rating-section">
+                            <div class="star-rating" id="quickStarRating">
+                                <i class="fas fa-star" data-rating="1"></i>
+                                <i class="fas fa-star" data-rating="2"></i>
+                                <i class="fas fa-star" data-rating="3"></i>
+                                <i class="fas fa-star" data-rating="4"></i>
+                                <i class="fas fa-star" data-rating="5"></i>
+                            </div>
+                            <span class="rating-text" id="quickRatingText"></span>
+                        </div>
+
+                        <div class="comment-section">
+                            <label for="quickComment">Nhận xét:</label>
+                            <textarea id="quickComment"
+                                      placeholder="Chia sẻ ý kiến của bạn về gia sư này..."
+                                      rows="3"></textarea>
+                        </div>
+
+                        <button class="submit-review-btn" id="submitQuickReview">
+                            <i class="fas fa-paper-plane"></i>
+                            Gửi đánh giá
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Reviews -->
+                <div class="recent-reviews">
+                    <h2><i class="fas fa-comments"></i> Đánh giá gần đây</h2>
+                    <div class="reviews-list" id="recentReviewsList">
+                        <!-- Reviews will be loaded here -->
+                    </div>
+                    <div class="button-container">
+                        <!-- ← Cần có div này -->
+                        <button class="view-all-reviews-btn" id="viewAllReviewsBtn">
+                            Xem tất cả
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- All Reviews Modal -->
+    <div class="modal-overlay" id="allReviewsModal">
+        <div class="modal large">
+            <div class="modal-header">
+                <h2>Tất cả đánh giá</h2>
+                <button class="modal-close" id="closeAllReviewsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="all-reviews-content" id="allReviewsContent">
+                    <!-- All reviews will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/loadContent.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/tutor_profile.js"></script>
+    <script src="/js/forgot-password.js"></script>
+
+</body>
+</html>

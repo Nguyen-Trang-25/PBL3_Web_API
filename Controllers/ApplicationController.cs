@@ -75,7 +75,7 @@ namespace BE_Tutor.Controllers
             if (request != null)
             {
                 request.Status = "applied";
-                await SendSystemMessage(request.StudentId, $"Gia sư {tutor.User.Name} đã ứng tuyển lớp \"{request.Subject.Name}\" {request.Level}.");
+                await SendSystemMessage(model.TutorId, $"Tutor {tutor.User.Name} APPLIED \"{request.Subject.Name}\" {request.Level}.");
             }
             else
             {
@@ -137,7 +137,7 @@ namespace BE_Tutor.Controllers
             var message = new Message
             {
                 MessageId = newId,
-                SenderId = "system", // ID của hệ thống
+                SenderId = "0000000004", // ID của hệ thống
                 ReceiverId = receiverId,
                 Content = content,
                 SentAt = DateTime.UtcNow

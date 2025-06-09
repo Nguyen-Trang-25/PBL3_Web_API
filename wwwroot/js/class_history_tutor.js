@@ -3,42 +3,49 @@
 
 class TutorClassHistory {
     constructor() {
-        this.applications = this.generateSampleData();
-        this.filteredApplications = [...this.applications];
         this.currentModal = null;
         this.currentPage = 1;
         this.itemsPerPage = 6; // Hiển thị 6 lớp học mỗi trang
         this.init();
     }
 
-    init() {
+    async init() {
         this.setupEventListeners();
-        this.loadStatistics();
-        this.loadApplications();
+        await this.loadTutorClassData(); // Chờ dữ liệu xong rồi mới tiếp tục
+        this.loadStatistics();           // Gọi sau khi có dữ liệu
+        this.loadApplications();         // Gọi sau khi có dữ liệu
     }
 
-    //async fetchHistoryData() {
-    //    try {
-    //        const response = await fetch('/api/historyRequest', {
-    //            method: 'GET',
-    //            headers: {
-    //                'Content-Type': 'application/json',
-    //                'Authorization': 'Bearer ' + localStorage.getItem('token') // nếu bạn dùng JWT
-    //            }
-    //        });
 
-    //        if (!response.ok) {
-    //            throw new Error('Không thể lấy dữ liệu lịch sử');
-    //        }
+    async loadTutorClassData() {
+        this.classes = await this.fetchHistoryData();
+        console.log(this.classes)
+        this.applications = this.classes;
+        this.filteredApplications = [...this.applications];
+    }
 
-    //        const data = await response.json();
-    //        console.log(data)
-    //        return data;
-    //    } catch (error) {
-    //        console.error('Lỗi khi tải lịch sử yêu cầu:', error);
-    //        return [];
-    //    }
-    //}
+    async fetchHistoryData() {
+        try {
+            const response = await fetch('/api/request/historyRequest', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token') // nếu bạn dùng JWT
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Không thể lấy dữ liệu lịch sử');
+            }
+
+            const data = await response.json();
+            console.log(data)
+            return data;
+        } catch (error) {
+            console.error('Lỗi khi tải lịch sử yêu cầu:', error);
+            return [];
+        }
+    }
 
     // ===== SAMPLE DATA GENERATION =====
     generateSampleData() {
@@ -154,10 +161,10 @@ class TutorClassHistory {
 
         this.filteredApplications = this.applications.filter(app => {
             // Status filter
-            if (statusFilter && app.status.id !== statusFilter) return false;
+            if (statusFilter && app.status !== statusFilter) return false;
 
             // Subject filter
-            if (subjectFilter && app.subject.id !== subjectFilter) return false;
+            if (subjectFilter && app.subject !== subjectFilter) return false;
 
             // Date filter
             if (dateFilter) {
@@ -220,9 +227,9 @@ class TutorClassHistory {
     loadStatistics() {
         const stats = {
             total: this.filteredApplications.length,
-            pending: this.filteredApplications.filter(app => app.status.id === 'pending').length,
-            accepted: this.filteredApplications.filter(app => app.status.id === 'accepted').length,
-            rejected: this.filteredApplications.filter(app => app.status.id === 'rejected' || app.status.id === 'others_selected' || app.status.id === 'class_cancelled').length
+            pending: this.filteredApplications.filter(app => app.status === 'applied').length,
+            accepted: this.filteredApplications.filter(app => app.status === 'active').length,
+            rejected: this.filteredApplications.filter(app => app.status === 'rejected' || app.status === 'others_selected' || app.status === 'class_cancelled').length
         };
 
         const statsContainer = document.getElementById('tutorStatsContainer');
@@ -245,7 +252,7 @@ class TutorClassHistory {
                 <div class="tutor-stat-icon accepted">
                     <i class="fas fa-check-circle"></i>
                 </div>
-                <div class="tutor-stat-number">${stats.accepted}</div>
+                <div class="tutor-stat-number">${stats.accept}</div>
                 <div class="tutor-stat-label">Đã được chấp nhận</div>
             </div>
             <div class="tutor-stat-card">
@@ -293,14 +300,14 @@ class TutorClassHistory {
         return `
             <div class="tutor-application-card">
                 <div class="tutor-card-header">
-                    <div class="tutor-status-badge ${app.status.id}">
-                        ${app.status.name}
+                    <div class="tutor-status-badge ${app.status}">
+                        ${app.status}
                     </div>
                     <div class="tutor-subject-badge">
                         <i class="${app.subject.icon}"></i>
-                        ${app.subject.name}
+                        ${app.subjectName}
                     </div>
-                    <h3 class="tutor-card-title">${app.title}</h3>
+                    <h3 class="tutor-card-title">${app.subjectName} ${app.level}</h3>
                     <div class="tutor-application-info">
                         <i class="fas fa-calendar"></i>
                         Ứng tuyển ${timeAgo}
@@ -310,7 +317,7 @@ class TutorClassHistory {
                     <div class="tutor-info-grid">
                         <div class="tutor-info-item">
                             <div class="tutor-info-label">Lương tháng</div>
-                            <div class="tutor-info-value">${this.formatCurrency(app.monthlyFee)}</div>
+                            <div class="tutor-info-value">${this.formatCurrency(app.fee)}</div>
                         </div>
                         <div class="tutor-info-item">
                             <div class="tutor-info-label">Lịch dạy</div>
@@ -322,27 +329,27 @@ class TutorClassHistory {
                         </div>
                     </div>
                     <div class="tutor-student-preview">
-                        <div class="tutor-student-name">${app.student.name}</div>
-                        <div class="tutor-student-grade">${app.student.grade}</div>
+                        <div class="tutor-student-name">${app.studentName}</div>
+                        <div class="tutor-student-grade"> Lớp ${+ app.level}</div>
                     </div>
                 </div>
                 <div class="tutor-card-footer">
-                    <button class="tutor-btn primary" onclick="tutorHistory.showApplicationDetail(${app.id})">
+                    <button class="tutor-btn primary" onclick="tutorHistory.showApplicationDetail(${app.studentId})">
                         <i class="fas fa-eye"></i>
                         Chi tiết
                     </button>
-                    <button class="tutor-btn secondary" onclick="tutorHistory.showStudentInfo(${app.id})">
+                    <button class="tutor-btn secondary" onclick="tutorHistory.showStudentInfo(${app.studentId})">
                         <i class="fas fa-user"></i>
                         Học viên
                     </button>
                     ${canContact ? `
-                        <button class="tutor-btn success" onclick="tutorHistory.showContactInfo(${app.id})">
+                        <button class="tutor-btn success" onclick="tutorHistory.showContactInfo(${app.studentId})">
                             <i class="fas fa-phone"></i>
                             Liên hệ
                         </button>
                     ` : ''}
                     ${canWithdraw ? `
-                        <button class="tutor-btn danger" onclick="tutorHistory.showWithdrawModal(${app.id})">
+                        <button class="tutor-btn danger" onclick="tutorHistory.showWithdrawModal(${app.studentId})">
                             <i class="fas fa-times"></i>
                             Rút ứng tuyển
                         </button>
@@ -496,11 +503,11 @@ class TutorClassHistory {
                         <h4><i class="fas fa-clipboard"></i> Thông tin cơ bản</h4>
                         <div class="tutor-detail-row">
                             <span class="label">Môn học:</span>
-                            <span class="value">${app.subject.name}</span>
+                            <span class="value">${app.subjectName}</span>
                         </div>
                         <div class="tutor-detail-row">
                             <span class="label">Trạng thái:</span>
-                            <span class="value">${app.status.name}</span>
+                            <span class="value">${app.statusName}</span>
                         </div>
                         <div class="tutor-detail-row">
                             <span class="label">Ngày đăng:</span>

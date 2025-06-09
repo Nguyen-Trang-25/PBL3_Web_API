@@ -338,8 +338,8 @@ class ClassHistoryManager {
             </div>
             <div class="class-history-stat-card">
                 <i class="class-history-stat-icon fas fa-check-circle"></i>
-                <div class="class-history-stat-number">${stats.reviewing}</div>
-                <div class="class-history-stat-label">Đang xét duyệt</div>
+                <div class="class-history-stat-number">${stats.active}</div>
+                <div class="class-history-stat-label">Đang dạy và học</div>
             </div>
             <div class="class-history-stat-card">
                 <i class="class-history-stat-icon fas fa-graduation-cap"></i>
@@ -353,7 +353,7 @@ class ClassHistoryManager {
         const stats = {
             total: this.filteredClasses.length,
             pending: 0,
-            reviewing: 0,
+            active: 0,
             completed: 0,
             cancelled: 0
         };
@@ -363,14 +363,14 @@ class ClassHistoryManager {
                 case 'no_applications':
                     stats.pending++;
                     break;
-                case 'reviewing':
-                    stats.reviewing++;
+                case 'pending':
+                    stats.pending++;
+                    break;
+                case 'active':
+                    stats.active++;
                     break;
                 case 'completed':
                     stats.completed++;
-                    break;
-                case 'cancelled':
-                    stats.cancelled++;
                     break;
             }
         });
@@ -1282,29 +1282,20 @@ class ClassHistoryManager {
                     </div>
                 </div>
                 
-                ${classItem.selectedTutor ? `
+                        ${classItem.selectedTutor ? `
                 <div class="detail-section full-width">
                     <h4><i class="fas fa-chalkboard-teacher"></i> Thông tin gia sư</h4>
                     <div class="detail-row">
                         <span class="label">Tên gia sư:</span>
-                        <span class="value">${classItem.selectedTutor.name}</span>
+                        <span class="value">${classItem.selectedTutor}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="label">Đánh giá:</span>
-                        <span class="value">${classItem.selectedTutor.rating}/5 sao</span>
+                        <span class="label">Địa chỉ:</span>
+                        <span class="value">${classItem.location}</span>
                     </div>
-                    <div class="detail-row">
-                        <span class="label">Kinh nghiệm:</span>
-                        <span class="value">${classItem.selectedTutor.experience}</span>
-                    </div>
-                    ${classItem.selectedTutor.qualification ? `
-                    <div class="detail-row">
-                        <span class="label">Trình độ:</span>
-                        <span class="value">${classItem.selectedTutor.qualification}</span>
-                    </div>
-                    ` : ''}
                 </div>
-                ` : ''}
+            ` : ''}
+
                 
                 ${classItem.cancelReason ? `
                 <div class="detail-section full-width">
