@@ -1,5 +1,5 @@
-﻿// ===== ADMIN COURSES MANAGEMENT JAVASCRIPT - OBJECT-ORIENTED VERSION =====
-// File: js/admin_courses_oop.js
+﻿// ===== ADMIN COURSES MANAGEMENT JAVASCRIPT - COMPATIBLE WITH EXISTING BE =====
+// File: js/admin_courses_compatible.js
 
 class AdminCoursesManager {
     constructor() {
@@ -9,8 +9,11 @@ class AdminCoursesManager {
         this.currentPage = 1;
         this.itemsPerPage = 10;
         this.selectedCount = 0;
+        this.apiBaseUrl = '/api/request'; // Sử dụng endpoint hiện có
+        this.isLoading = false;
+        this.useerRole;
 
-        // Elements cache - sẽ được thiết lập sau khi DOM ready
+        // Elements cache
         this.elements = {};
 
         this.init();
@@ -21,40 +24,73 @@ class AdminCoursesManager {
         this.loadCourses();
         this.setupEventListeners();
         this.addNotificationStyles();
-        this.updateStatistics();
 
-        console.log('Admin Courses Manager initialized');
+        console.log('Admin Courses Manager initialized - Compatible with existing BE');
+    }
+
+    // ===== API HELPER METHODS - TƯƠNG THÍCH VỚI BE HIỆN TẠI =====
+    async apiRequest(endpoint, options = {}) {
+        const url = `${this.apiBaseUrl}${endpoint}`;
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            }
+        };
+
+        const config = { ...defaultOptions, ...options };
+
+        if (options.headers) {
+            config.headers = { ...defaultOptions.headers, ...options.headers };
+        }
+
+        try {
+            this.setLoadingState(true);
+            const response = await fetch(url, config);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data;
+
+        } catch (error) {
+            console.error('API Request failed:', error);
+            this.showNotification('Lỗi kết nối server: ' + error.message, 'error');
+            throw error;
+        } finally {
+            this.setLoadingState(false);
+        }
+    }
+
+    setLoadingState(loading) {
+        this.isLoading = loading;
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = loading ? 'flex' : 'none';
+        }
     }
 
     // ===== CACHE ELEMENTS =====
     cacheElements() {
         this.elements = {
-            // Checkboxes
             selectAllCheckbox: document.getElementById('selectAll'),
-
-            // Search & Filters
             searchInput: document.getElementById('searchCourses'),
             searchBtn: document.getElementById('searchBtn'),
             statusFilter: document.getElementById('statusFilter'),
             subjectFilter: document.getElementById('subjectFilter'),
             applyFiltersBtn: document.getElementById('applyFilters'),
             resetFiltersBtn: document.getElementById('resetFilters'),
-
-            // Batch Actions
             batchActions: document.getElementById('batchActions'),
             batchCancel: document.getElementById('batchCancel'),
             selectedCount: document.getElementById('selectedCount'),
-
-            // Table & Pagination
             coursesTableBody: document.getElementById('coursesTableBody'),
-
-            // Modals
             courseDetailModal: document.getElementById('courseDetailModal'),
             editCourseModal: document.getElementById('editCourseModal'),
             cancelCourseModal: document.getElementById('cancelCourseModal'),
             confirmModal: document.getElementById('confirmModal'),
-
-            // Action buttons
             exportCoursesBtn: document.getElementById('exportCoursesBtn'),
             refreshTable: document.getElementById('refreshTable')
         };
@@ -73,14 +109,11 @@ class AdminCoursesManager {
     }
 
     setupCheckboxEvents() {
-        // Select all functionality
         if (this.elements.selectAllCheckbox) {
             this.elements.selectAllCheckbox.addEventListener('change', (e) => {
                 this.handleSelectAll(e.target.checked);
             });
         }
-
-        // Individual checkbox functionality will be set up when courses are loaded
     }
 
     setupSearchEvents() {
@@ -95,7 +128,6 @@ class AdminCoursesManager {
                 }
             });
 
-            // Real-time search with debounce
             let searchTimeout;
             this.elements.searchInput.addEventListener('input', () => {
                 clearTimeout(searchTimeout);
@@ -121,36 +153,31 @@ class AdminCoursesManager {
     }
 
     setupCourseActionEvents() {
-        // Event delegation for dynamic buttons
         document.addEventListener('click', (e) => {
             const target = e.target.closest('.action-btn');
             if (!target) return;
 
             const courseId = target.dataset.courseId;
-            const action = target.classList[1]; // Second class is the action type
+            const action = target.classList[1];
 
             this.handleCourseAction(action, courseId);
         });
     }
 
     setupModalEvents() {
-        // Close modal events
         const closeButtons = document.querySelectorAll('[id^="close"], [id^="cancel"]');
         closeButtons.forEach(btn => {
             btn.addEventListener('click', () => this.closeModal());
         });
 
-        // Modal action buttons
         this.setupModalActionButtons();
 
-        // Close modals when clicking outside
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
                 this.closeModal();
             }
         });
 
-        // Close modals with ESC key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.closeModal();
@@ -159,7 +186,6 @@ class AdminCoursesManager {
     }
 
     setupModalActionButtons() {
-        // Edit Course Modal
         const editCourseForm = document.getElementById('editCourseForm');
         if (editCourseForm) {
             editCourseForm.addEventListener('submit', (e) => {
@@ -168,13 +194,11 @@ class AdminCoursesManager {
             });
         }
 
-        // Cancel Course Modal
         const confirmCancelCourse = document.getElementById('confirmCancelCourse');
         if (confirmCancelCourse) {
             confirmCancelCourse.addEventListener('click', () => this.handleCancelCourse());
         }
 
-        // Course Detail Modal Actions
         const editCourseFromModal = document.getElementById('editCourseFromModal');
         const cancelCourseFromModal = document.getElementById('cancelCourseFromModal');
 
@@ -193,6 +217,19 @@ class AdminCoursesManager {
                 this.showCancelCourseModal(courseId);
             });
         }
+
+        // Thêm các button handlers cho modal
+        //const cancelCourseFromModal = document.getElementById('cancelCourseFromModal');
+
+        //if (cancelCourseFromModal) {
+        //    cancelCourseFromModal.addEventListener('click', () => {
+        //        const courseId = this.elements.courseDetailModal?.dataset.courseId;
+        //        if (courseId) {
+        //            this.closeModal();
+        //            this.showCancelCourseModal(courseId);
+        //        }
+        //    });
+        //}
     }
 
     setupPaginationEvents() {
@@ -260,123 +297,153 @@ class AdminCoursesManager {
         }
     }
 
-    // ===== SEARCH & FILTER FUNCTIONALITY =====
-    performSearch() {
-        const searchTerm = this.elements.searchInput.value.toLowerCase().trim();
-        const rows = document.querySelectorAll('#coursesTableBody tr');
-        let visibleCount = 0;
+    // ===== SEARCH & FILTER - SỬ DỤNG API SEARCH HIỆN CÓ =====
+    async performSearch() {
+        const searchTerm = this.elements.searchInput?.value.trim() || '';
+        const statusFilter = this.elements.statusFilter?.value || '';
+        const subjectFilter = this.elements.subjectFilter?.value || '';
 
-        rows.forEach(row => {
-            const courseName = row.querySelector('.course-name')?.textContent.toLowerCase() || '';
-            const courseId = row.querySelector('.course-id')?.textContent.toLowerCase() || '';
-            const tutorName = row.querySelector('.tutor-name')?.textContent.toLowerCase() || '';
-            const studentName = row.querySelector('.student-name')?.textContent.toLowerCase() || '';
-            const subject = row.querySelector('.subject-badge')?.textContent.toLowerCase() || '';
-
-            const isMatch = courseName.includes(searchTerm) ||
-                courseId.includes(searchTerm) ||
-                tutorName.includes(searchTerm) ||
-                studentName.includes(searchTerm) ||
-                subject.includes(searchTerm);
-
-            if (isMatch || searchTerm === '') {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
+        try {
+            // Sử dụng endpoint /search có sẵn từ BE
+            const params = new URLSearchParams();
+            
+            if (searchTerm) {
+                // Tìm kiếm theo tên môn học
+                params.append('subjectName', searchTerm);
             }
-        });
+            
+            if (statusFilter && statusFilter !== 'all') {
+                // Có thể cần filter client-side vì API search không hỗ trợ status filter
+            }
+            
+            if (subjectFilter && subjectFilter !== 'all') {
+                params.append('subjectName', subjectFilter);
+            }
 
-        this.updatePaginationInfo(visibleCount);
+            const response = await this.apiRequest(`/search?${params.toString()}`);
+            
+            // API trả về array trực tiếp, cần convert sang course format
+            this.courses = this.convertRequestsToCourses(response);
+            
+            // Apply client-side status filter nếu cần
+            if (statusFilter && statusFilter !== 'all') {
+                this.courses = this.courses.filter(course => course.status === statusFilter);
+            }
+
+            this.renderCoursesTable();
+            this.updatePaginationInfo(this.courses.length);
+            this.updateStatistics();
+
+        } catch (error) {
+            console.error('Search failed:', error);
+            this.showNotification('Lỗi tìm kiếm, vui lòng thử lại', 'error');
+            
+            // Fallback: load all courses and filter client-side
+            await this.loadCourses();
+            this.filterCoursesClientSide(searchTerm, statusFilter, subjectFilter);
+        }
     }
 
-    applyFilters() {
-        const statusFilter = this.elements.statusFilter.value;
-        const subjectFilter = this.elements.subjectFilter.value;
-        const rows = document.querySelectorAll('#coursesTableBody tr');
-        let visibleCount = 0;
+    filterCoursesClientSide(searchTerm, statusFilter, subjectFilter) {
+        let filtered = [...this.courses];
 
-        rows.forEach(row => {
-            let showRow = true;
+        if (searchTerm) {
+            filtered = filtered.filter(course => 
+                course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                course.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                course.tutor_name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
 
-            // Status filter
-            if (statusFilter !== 'all') {
-                const statusElement = row.querySelector('.status');
-                const statusClass = statusElement?.classList.contains(statusFilter);
-                if (!statusClass) showRow = false;
-            }
+        if (statusFilter && statusFilter !== 'all') {
+            filtered = filtered.filter(course => course.status === statusFilter);
+        }
 
-            // Subject filter
-            if (subjectFilter !== 'all') {
-                const subjectElement = row.querySelector('.subject-badge');
-                const subjectClass = subjectElement?.classList.contains(subjectFilter);
-                if (!subjectClass) showRow = false;
-            }
+        if (subjectFilter && subjectFilter !== 'all') {
+            filtered = filtered.filter(course => course.subject === subjectFilter);
+        }
 
-            if (showRow) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
+        this.filteredCourses = filtered;
+        this.renderFilteredCoursesTable();
+    }
 
-        this.updatePaginationInfo(visibleCount);
+    async applyFilters() {
+        await this.performSearch();
         this.showNotification('Đã áp dụng bộ lọc', 'success');
     }
 
-    resetFilters() {
-        this.elements.statusFilter.value = 'all';
-        this.elements.subjectFilter.value = 'all';
-        this.elements.searchInput.value = '';
+    async resetFilters() {
+        if (this.elements.statusFilter) this.elements.statusFilter.value = 'all';
+        if (this.elements.subjectFilter) this.elements.subjectFilter.value = 'all';
+        if (this.elements.searchInput) this.elements.searchInput.value = '';
+        this.currentPage = 1;
 
-        const rows = document.querySelectorAll('#coursesTableBody tr');
-        rows.forEach(row => {
-            row.style.display = '';
-        });
-
-        this.updatePaginationInfo(rows.length);
+        await this.loadCourses();
         this.showNotification('Đã đặt lại bộ lọc', 'info');
     }
 
-    // ===== BATCH ACTIONS =====
-    performBatchAction(action) {
+    // ===== BATCH ACTIONS - CLIENT SIDE VÌ BE CHƯA HỖ TRỢ =====
+    async performBatchAction(action) {
         const selectedCheckboxes = document.querySelectorAll('.course-checkbox:checked');
-        const selectedCount = selectedCheckboxes.length;
+        const selectedIds = Array.from(selectedCheckboxes).map(cb => {
+            return cb.closest('tr').dataset.courseId;
+        });
 
-        if (selectedCount === 0) {
+        if (selectedIds.length === 0) {
             this.showNotification('Vui lòng chọn ít nhất một lớp học', 'warning');
             return;
         }
 
-        let actionText = 'xóa';
-        let confirmMessage = `Bạn có chắc chắn muốn xóa ${selectedCount} lớp học đã chọn?`;
+        let actionText = action === 'cancel' ? 'xóa' : action;
+        let confirmMessage = `Bạn có chắc chắn muốn ${actionText} ${selectedIds.length} lớp học đã chọn?`;
 
         this.showConfirmModal(
             `Xác nhận ${actionText} hàng loạt`,
             confirmMessage,
-            () => this.executeBatchAction(action, selectedCheckboxes)
+            () => this.executeBatchAction(action, selectedIds)
         );
     }
 
-    executeBatchAction(action, checkboxes) {
-        this.showNotification('Đang xử lý...', 'info');
+    async executeBatchAction(action, courseIds) {
+        let successCount = 0;
+        let failCount = 0;
 
-        setTimeout(() => {
-            checkboxes.forEach(checkbox => {
-                const row = checkbox.closest('tr');
-                this.updateCourseStatus(row, 'cancelled');
-                this.updateCourseActions(row, 'cancelled');
-            });
+        try {
+            this.showNotification('Đang xử lý...', 'info');
+
+            // Xử lý từng item một vì BE chưa hỗ trợ batch
+            for (const courseId of courseIds) {
+                try {
+                    await this.apiRequest(`/delete/${courseId}`, {
+                        method: 'DELETE'
+                    });
+                    successCount++;
+                } catch (error) {
+                    console.error(`Failed to delete ${courseId}:`, error);
+                    failCount++;
+                }
+            }
 
             // Reset selections
             this.elements.selectAllCheckbox.checked = false;
+            const checkboxes = document.querySelectorAll('.course-checkbox:checked');
             checkboxes.forEach(checkbox => checkbox.checked = false);
             this.updateBatchActionsVisibility();
 
-            this.showNotification(`Đã xóa thành công ${checkboxes.length} lớp học`, 'success');
-            this.updateStatistics();
-        }, 1500);
+            // Reload data
+            await this.loadCourses();
+
+            if (successCount > 0) {
+                this.showNotification(`Đã xóa thành công ${successCount} lớp học`, 'success');
+            }
+            if (failCount > 0) {
+                this.showNotification(`Có ${failCount} lớp học không thể xóa`, 'warning');
+            }
+
+        } catch (error) {
+            console.error('Batch action failed:', error);
+            this.showNotification('Có lỗi xảy ra khi xử lý hàng loạt', 'error');
+        }
     }
 
     // ===== COURSE ACTIONS =====
@@ -391,253 +458,159 @@ class AdminCoursesManager {
             case 'cancel':
                 this.showCancelCourseModal(courseId);
                 break;
-            case 'archive':
-                this.archiveCourse(courseId);
-                break;
         }
     }
 
-    updateCourseActions(row, status) {
-        const actionsContainer = row.querySelector('.action-buttons');
-        const courseId = row.dataset.courseId;
+    // ===== COURSE DETAIL - SỬ DỤNG API /{id} CÓ SẴN =====
+    async showCourseDetail(courseId) {
+        try {
+            const response = await this.apiRequest(`/${courseId}`);
+            
+            // Convert response to course format
+            const courseData = this.convertRequestToCourse(response);
+            
+            this.populateCourseDetailModal(courseData);
+            this.elements.courseDetailModal.dataset.courseId = courseId;
+            this.showModal('courseDetailModal');
 
-        actionsContainer.innerHTML = '';
-
-        // Xem chi tiết
-        const viewBtn = this.createCourseActionButton('view', 'fas fa-eye', 'Xem chi tiết', courseId);
-        actionsContainer.appendChild(viewBtn);
-
-        // Chỉnh sửa
-        const editBtn = this.createCourseActionButton('edit', 'fas fa-edit', 'Chỉnh sửa', courseId);
-        actionsContainer.appendChild(editBtn);
-
-        // Xóa lớp học (luôn hiển thị)
-        const cancelBtn = this.createCourseActionButton('cancel', 'fas fa-times', 'Xóa lớp', courseId);
-        actionsContainer.appendChild(cancelBtn);
-    }
-
-    createCourseActionButton(className, iconClass, title, courseId) {
-        const button = document.createElement('button');
-        button.className = `action-btn ${className}`;
-        button.title = title;
-        button.dataset.courseId = courseId;
-        button.innerHTML = `<i class="${iconClass}"></i>`;
-        return button;
-    }
-
-    // ===== COURSE DETAIL FUNCTIONS =====
-    showCourseDetail(courseId) {
-        const row = document.querySelector(`tr[data-course-id="${courseId}"]`);
-        if (!row) return;
-
-        const courseData = this.extractCourseDataFromRow(row);
-        this.populateCourseDetailModal(courseData);
-
-        // Store course ID for modal actions
-        this.elements.courseDetailModal.dataset.courseId = courseId;
-
-        // Show modal
-        this.showModal('courseDetailModal');
-    }
-
-    extractCourseDataFromRow(row) {
-        const courseName = row.querySelector('.course-name')?.textContent.trim() || '';
-        const courseId = row.querySelector('.course-id')?.textContent.trim() || '';
-        const courseSchedule = row.querySelector('.course-schedule')?.textContent.trim() || '';
-        const subject = row.querySelector('.subject-badge')?.textContent.trim() || '';
-        const tutorName = row.querySelector('.tutor-name')?.textContent.trim() || '';
-        const tutorRating = row.querySelector('.rating-text')?.textContent.trim() || '';
-        const studentName = row.querySelector('.student-name')?.textContent.trim() || '';
-        const studentGrade = row.querySelector('.student-grade')?.textContent.trim() || '';
-        const status = row.querySelector('.status')?.textContent.trim() || '';
-        const fee = row.querySelector('.fee-amount')?.textContent.trim() || '';
-        const feeperiod = row.querySelector('.fee-period')?.textContent.trim() || '';
-        const createDate = row.querySelector('td:nth-child(8)')?.textContent.trim() || '';
-
-        return {
-            id: row.dataset.courseId,
-            name: courseName,
-            courseId: courseId,
-            schedule: courseSchedule,
-            subject: subject,
-            tutorName: tutorName,
-            tutorRating: tutorRating,
-            studentName: studentName,
-            studentGrade: studentGrade,
-            status: status,
-            fee: fee,
-            feePeriod: feeperiod,
-            createDate: createDate,
-            // Mock additional data
-            classLevel: courseName.match(/\d+[A-Z]?\d*/) ? courseName.match(/\d+[A-Z]?\d*/)[0] : '12',
-            format: 'Online',
-            startDate: createDate,
-            description: 'Lớp học ôn tập và nâng cao kiến thức'
-        };
+        } catch (error) {
+            console.error('Failed to load course details:', error);
+            this.showNotification('Không thể tải thông tin chi tiết lớp học', 'error');
+        }
     }
 
     populateCourseDetailModal(courseData) {
-        document.getElementById('modalCourseName').textContent = courseData.name;
-        document.getElementById('modalCourseId').textContent = courseData.courseId;
-        document.getElementById('modalCourseFee').textContent = courseData.fee;
-        document.getElementById('modalCourseSubject').textContent = courseData.subject;
-        document.getElementById('modalCourseClass').textContent = 'Lớp ' + courseData.classLevel;
-        document.getElementById('modalCourseSchedule').textContent = courseData.schedule || 'T2, T4, T6 - 19:00-21:00';
-        document.getElementById('modalCourseStartDate').textContent = courseData.startDate;
+        // Helper function to safely set element content
+        const setElementContent = (id, content) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = content;
+            } else {
+                console.warn(`Modal element not found: ${id}`);
+            }
+        };
+
+        setElementContent('modalCourseName', courseData.name);
+        setElementContent('modalCourseId', courseData.course_id);
+        setElementContent('modalCourseFee', this.formatCurrency(courseData.fee));
+        setElementContent('modalCourseSubject', courseData.subject_name);
+        setElementContent('modalCourseClass', 'Lớp ' + courseData.class_level);
+        setElementContent('modalCourseSchedule', courseData.schedule);
+        setElementContent('modalCourseStartDate', this.formatDate(courseData.created_at));
 
         // Gia sư
-        document.getElementById('modalTutorName').textContent = courseData.tutorName || 'Chưa có gia sư';
-        document.getElementById('modalTutorRole').textContent = courseData.tutorName ? 'Gia sư ' + courseData.subject.replace(/.*\s/, '') : 'Đang tìm gia sư';
+        setElementContent('modalTutorName', courseData.tutor_name || 'Chưa có gia sư');
+        setElementContent('modalTutorRole', courseData.tutor_name ? 
+            'Gia sư ' + courseData.subject_name : 'Đang tìm gia sư');
 
         // Học viên
-        document.getElementById('modalStudentName').textContent = courseData.studentName;
-        document.getElementById('modalStudentRole').textContent = 'Lớp ' + courseData.classLevel;
+        setElementContent('modalStudentName', courseData.student_name);
+        setElementContent('modalStudentRole', 'Lớp ' + courseData.class_level);
 
         // Status
         const modalStatus = document.getElementById('modalCourseStatus');
-        modalStatus.textContent = courseData.status;
-        modalStatus.className = 'status ' + this.getCourseStatusClass(courseData.status);
+        if (modalStatus) {
+            modalStatus.textContent = this.getStatusText(courseData.status);
+            modalStatus.className = 'status ' + this.getCourseStatusClass(courseData.status);
+        } else {
+            console.warn('Modal status element not found');
+        }
 
         this.updateCourseModalButtons(courseData.status);
     }
 
-    getCourseStatusClass(status) {
-        if (status.includes('Chờ duyệt') || status.includes('Chưa có gia sư')) return 'pending';
-        if (status.includes('Đã duyệt') || status.includes('Đang chọn gia sư')) return 'active';
-        if (status.includes('Đang diễn ra')) return 'active';
-        if (status.includes('Đã hoàn thành')) return 'completed';
-        if (status.includes('Đã hủy')) return 'cancelled';
-        return 'pending';
-    }
+    // ===== EDIT COURSE - SỬ DỤNG API UPDATE/{id} CÓ SẴN =====
+    async editCourse(courseId) {
+        try {
+            const response = await this.apiRequest(`/${courseId}`);
+            const courseData = this.convertRequestToCourse(response);
+            
+            this.populateEditCourseForm(courseData);
+            this.showModal('editCourseModal');
 
-    updateCourseModalButtons(status) {
-        const cancelBtn = document.getElementById('cancelCourseFromModal');
-
-        // Luôn hiển thị nút xóa
-        if (cancelBtn) {
-            cancelBtn.style.display = 'inline-flex';
-            cancelBtn.innerHTML = '<i class="fas fa-times"></i> Xóa lớp';
+        } catch (error) {
+            console.error('Failed to load course for editing:', error);
+            this.showNotification('Không thể tải thông tin lớp học để chỉnh sửa', 'error');
         }
-    }
-
-    // ===== EDIT COURSE FUNCTIONS =====
-    editCourse(courseId) {
-        const row = document.querySelector(`tr[data-course-id="${courseId}"]`);
-        if (!row) {
-            this.showNotification('Không tìm thấy thông tin lớp học', 'error');
-            return;
-        }
-
-        const courseData = this.extractCourseDataFromRow(row);
-        this.populateEditCourseForm(courseData);
-        this.showModal('editCourseModal');
     }
 
     populateEditCourseForm(courseData) {
-        // Basic course information
-        document.getElementById('editCourseId').value = courseData.id || '';
-        document.getElementById('editCourseName').value = courseData.name || '';
-        document.getElementById('editCourseSubject').value = this.mapSubjectToValue(courseData.subject) || '';
-        document.getElementById('editCourseClass').value = 'Lớp ' + courseData.classLevel || '';
-        document.getElementById('editCourseFormat').value = 'online';
-        document.getElementById('editCourseDescription').value = courseData.description || '';
+        // Helper function to safely set element value
+        const setElementValue = (id, value) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.value = value;
+            } else {
+                console.warn(`Form element not found: ${id}`);
+            }
+        };
 
-        // Schedule & Duration
-        document.getElementById('editCourseStartDate').value = this.convertDateFormat(courseData.startDate) || '';
-        document.getElementById('editCourseSchedule').value = courseData.schedule || 'T2, T4, T6 - 19:00-21:00';
-
-        // Financial information
-        const feeAmount = courseData.fee ? courseData.fee.replace(/[^\d]/g, '') : '';
-        document.getElementById('editCourseFee').value = feeAmount;
-        document.getElementById('editCourseFeePeriod').value = 'month';
-
-        // Status & Management
-        document.getElementById('editCourseStatus').value = this.getCourseStatusClass(courseData.status);
-        document.getElementById('editCoursePriority').value = 'normal';
-        document.getElementById('editCourseAdminNotes').value = '';
+        setElementValue('editCourseId', courseData.id || '');
+        setElementValue('editCourseName', courseData.name || '');
+        setElementValue('editCourseSubject', courseData.subject || '');
+        setElementValue('editCourseClass', courseData.class_level || '');
+        setElementValue('editCourseFormat', courseData.format || 'online');
+        setElementValue('editCourseDescription', courseData.description || '');
+        setElementValue('editCourseStartDate', this.convertDateFormat(courseData.created_at));
+        setElementValue('editCourseSchedule', courseData.schedule || '');
+        setElementValue('editCourseFee', courseData.fee || '');
+        setElementValue('editCourseFeePeriod', 'month');
+        setElementValue('editCourseStatus', courseData.status || 'pending');
+        setElementValue('editCoursePriority', 'normal');
+        setElementValue('editCourseAdminNotes', '');
     }
 
-    mapSubjectToValue(subjectText) {
-        if (subjectText.includes('Toán')) return 'math';
-        if (subjectText.includes('Vật lý')) return 'physics';
-        if (subjectText.includes('Hóa')) return 'chemistry';
-        if (subjectText.includes('Tiếng Anh')) return 'english';
-        if (subjectText.includes('Ngữ văn')) return 'literature';
-        if (subjectText.includes('Sinh')) return 'biology';
-        if (subjectText.includes('Lịch sử')) return 'history';
-        if (subjectText.includes('Địa lý')) return 'geography';
-        return '';
-    }
-
-    convertDateFormat(dateStr) {
-        if (!dateStr) return '';
-        const parts = dateStr.split('/');
-        if (parts.length === 3) {
-            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-        }
-        return '';
-    }
-
-    handleEditCourseSubmission() {
+    async handleEditCourseSubmission() {
         const formData = new FormData(document.getElementById('editCourseForm'));
         const courseData = Object.fromEntries(formData.entries());
 
-        // Validate required fields
         if (!this.validateEditCourseForm(courseData)) {
             return;
         }
 
-        // Show loading state
         const saveButton = document.getElementById('saveEditCourse');
         const originalHTML = saveButton.innerHTML;
         saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
         saveButton.disabled = true;
 
-        // Simulate API call
-        setTimeout(() => {
-            try {
-                // Update the table row with new data
-                this.updateCourseRowWithNewData(courseData);
+        try {
+            // Map form data to API expected format
+            const updateData = {
+                Fee: parseFloat(courseData.fee) || null,
+                Schedule: courseData.schedule,
+                Level: courseData.classLevel,
+                Location: courseData.location || '',
+                Requirement: courseData.description,
+                LearningFormat: courseData.format,
+                GenderTutor: courseData.genderTutor === 'true'
+            };
 
-                // Update modal view if it's open
-                this.updateCourseModalViewIfOpen(courseData);
+            await this.apiRequest(`/update/${courseData.courseId}`, {
+                method: 'PUT',
+                body: JSON.stringify(updateData)
+            });
 
-                // Close edit modal
-                this.closeModal();
+            this.closeModal();
+            await this.loadCourses();
+            this.showNotification('Đã cập nhật thông tin lớp học thành công', 'success');
 
-                // Show success notification
-                this.showNotification('Đã cập nhật thông tin lớp học thành công', 'success');
-
-                // Update statistics
-                this.updateStatistics();
-
-            } catch (error) {
-                console.error('Error updating course:', error);
-                this.showNotification('Có lỗi xảy ra khi cập nhật thông tin', 'error');
-            } finally {
-                // Restore button state
-                saveButton.innerHTML = originalHTML;
-                saveButton.disabled = false;
-            }
-        }, 1500);
+        } catch (error) {
+            console.error('Error updating course:', error);
+            this.showNotification('Có lỗi xảy ra khi cập nhật thông tin', 'error');
+        } finally {
+            saveButton.innerHTML = originalHTML;
+            saveButton.disabled = false;
+        }
     }
 
     validateEditCourseForm(courseData) {
         const errors = [];
 
-        // Required fields validation
         if (!courseData.courseName || courseData.courseName.trim() === '') {
             errors.push('Tên lớp học không được để trống');
             this.markFieldAsError('editCourseName');
         } else {
             this.markFieldAsValid('editCourseName');
-        }
-
-        if (!courseData.subject || courseData.subject === '') {
-            errors.push('Vui lòng chọn môn học');
-            this.markFieldAsError('editCourseSubject');
-        } else {
-            this.markFieldAsValid('editCourseSubject');
         }
 
         if (!courseData.fee || courseData.fee === '') {
@@ -647,14 +620,6 @@ class AdminCoursesManager {
             this.markFieldAsValid('editCourseFee');
         }
 
-        if (!courseData.status || courseData.status === '') {
-            errors.push('Vui lòng chọn trạng thái');
-            this.markFieldAsError('editCourseStatus');
-        } else {
-            this.markFieldAsValid('editCourseStatus');
-        }
-
-        // Show errors if any
         if (errors.length > 0) {
             this.showNotification(errors[0], 'error');
             return false;
@@ -681,105 +646,14 @@ class AdminCoursesManager {
         }
     }
 
-    updateCourseRowWithNewData(courseData) {
-        const row = document.querySelector(`tr[data-course-id="${courseData.courseId}"]`);
-        if (!row) return;
-
-        // Update course name
-        const courseNameElement = row.querySelector('.course-name');
-        if (courseNameElement) {
-            courseNameElement.textContent = courseData.courseName;
-        }
-
-        // Update subject
-        const subjectElement = row.querySelector('.subject-badge');
-        if (subjectElement) {
-            const subjectInfo = this.getSubjectInfo(courseData.subject);
-            subjectElement.className = `subject-badge ${courseData.subject}`;
-            subjectElement.innerHTML = `<i class="${subjectInfo.icon}"></i> ${subjectInfo.name}`;
-        }
-
-        // Update status
-        const statusElement = row.querySelector('.status');
-        if (statusElement) {
-            const statusInfo = this.getStatusInfo(courseData.status);
-            statusElement.className = `status ${courseData.status}`;
-            statusElement.innerHTML = `<i class="${statusInfo.icon}"></i> ${statusInfo.name}`;
-        }
-
-        // Update fee
-        const feeElement = row.querySelector('.fee-amount');
-        if (feeElement) {
-            feeElement.textContent = this.formatCurrency(courseData.fee);
-        }
-
-        // Update action buttons based on new status
-        this.updateCourseActions(row, courseData.status);
-    }
-
-    getSubjectInfo(subject) {
-        const subjects = {
-            'math': { name: 'Toán', icon: 'fas fa-calculator' },
-            'physics': { name: 'Vật lý', icon: 'fas fa-atom' },
-            'chemistry': { name: 'Hóa học', icon: 'fas fa-flask' },
-            'english': { name: 'Tiếng Anh', icon: 'fas fa-language' },
-            'literature': { name: 'Ngữ văn', icon: 'fas fa-book' },
-            'biology': { name: 'Sinh học', icon: 'fas fa-dna' },
-            'history': { name: 'Lịch sử', icon: 'fas fa-landmark' },
-            'geography': { name: 'Địa lý', icon: 'fas fa-globe' }
-        };
-        return subjects[subject] || { name: 'Khác', icon: 'fas fa-book' };
-    }
-
-    getStatusInfo(status) {
-        const statuses = {
-            'pending': { name: 'Chưa có gia sư', icon: 'fas fa-search' },
-            'active': { name: 'Đang chọn gia sư', icon: 'fas fa-users' },
-            'completed': { name: 'Đã hoàn thành', icon: 'fas fa-check-circle' },
-            'cancelled': { name: 'Đã hủy', icon: 'fas fa-times' }
-        };
-        return statuses[status] || { name: 'Không xác định', icon: 'fas fa-question' };
-    }
-
-    updateCourseModalViewIfOpen(courseData) {
-        const courseDetailModal = this.elements.courseDetailModal;
-
-        if (courseDetailModal && courseDetailModal.classList.contains('active') &&
-            courseDetailModal.dataset.courseId === courseData.courseId) {
-
-            // Update modal content
-            const modalCourseName = document.getElementById('modalCourseName');
-            const modalCourseFee = document.getElementById('modalCourseFee');
-            const modalCourseSubject = document.getElementById('modalCourseSubject');
-            const modalCourseStatus = document.getElementById('modalCourseStatus');
-
-            if (modalCourseName) modalCourseName.textContent = courseData.courseName;
-            if (modalCourseFee) modalCourseFee.textContent = this.formatCurrency(courseData.fee);
-            if (modalCourseSubject) modalCourseSubject.textContent = this.getSubjectInfo(courseData.subject).name;
-
-            if (modalCourseStatus) {
-                const statusInfo = this.getStatusInfo(courseData.status);
-                modalCourseStatus.textContent = statusInfo.name;
-                modalCourseStatus.className = `status ${courseData.status}`;
-            }
-
-            // Update modal buttons
-            this.updateCourseModalButtons(this.getStatusInfo(courseData.status).name);
-        }
-    }
-
-    // ===== CANCEL COURSE FUNCTIONS =====
+    // ===== CANCEL COURSE - SỬ DỤNG API DELETE/{id} CÓ SẴN =====
     showCancelCourseModal(courseId) {
-        // Store course ID for cancellation
         this.elements.cancelCourseModal.dataset.courseId = courseId;
-
-        // Clear form
         document.getElementById('cancelCourseForm').reset();
-
         this.showModal('cancelCourseModal');
     }
 
-    handleCancelCourse() {
+    async handleCancelCourse() {
         const courseId = this.elements.cancelCourseModal.dataset.courseId;
         const reason = document.getElementById('cancelReason').value;
         const note = document.getElementById('cancelNote').value;
@@ -789,138 +663,199 @@ class AdminCoursesManager {
             return;
         }
 
-        // Show loading state
         const confirmButton = document.getElementById('confirmCancelCourse');
         const originalHTML = confirmButton.innerHTML;
         confirmButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
         confirmButton.disabled = true;
 
-        // Simulate API call
-        setTimeout(() => {
-            try {
-                // Update course status
-                const row = document.querySelector(`tr[data-course-id="${courseId}"]`);
-                if (row) {
-                    this.updateCourseStatus(row, 'cancelled');
-                    this.updateCourseActions(row, 'cancelled');
-                }
+        try {
+            await this.apiRequest(`/delete/${courseId}`, {
+                method: 'DELETE'
+            });
 
-                // Close modal
-                this.closeModal();
+            this.closeModal();
+            await this.loadCourses();
+            this.showNotification('Đã xóa lớp học thành công', 'success');
 
-                // Show success notification
-                this.showNotification('Đã xóa lớp học thành công', 'success');
-
-                // Update statistics
-                this.updateStatistics();
-
-            } catch (error) {
-                console.error('Error cancelling course:', error);
-                this.showNotification('Có lỗi xảy ra khi xóa lớp học', 'error');
-            } finally {
-                // Restore button state
-                confirmButton.innerHTML = originalHTML;
-                confirmButton.disabled = false;
-            }
-        }, 1500);
-    }
-
-    // ===== COURSE STATUS FUNCTIONS =====
-    archiveCourse(courseId) {
-        const row = document.querySelector(`tr[data-course-id="${courseId}"]`);
-        const courseName = row.querySelector('.course-name')?.textContent || '';
-
-        this.showConfirmModal(
-            'Xác nhận lưu trữ lớp học',
-            `Bạn có chắc chắn muốn lưu trữ lớp học "${courseName}"?`,
-            () => {
-                row.style.opacity = '0.6';
-                this.showNotification('Đã lưu trữ lớp học thành công', 'success');
-            }
-        );
-    }
-
-    updateCourseStatus(row, newStatus) {
-        const statusElement = row.querySelector('.status');
-
-        // Remove old status classes
-        statusElement.classList.remove('pending', 'active', 'completed', 'cancelled');
-
-        // Add new status class
-        statusElement.classList.add(newStatus);
-
-        // Update status text and icon
-        const statusInfo = this.getStatusInfo(newStatus);
-        statusElement.innerHTML = `<i class="${statusInfo.icon}"></i> ${statusInfo.name}`;
-    }
-
-    // ===== MODAL MANAGEMENT =====
-    showModal(modalId) {
-        const modal = this.elements[modalId];
-        if (modal) {
-            modal.classList.add('active');
-            this.currentModal = modal;
-            document.body.style.overflow = 'hidden';
-
-            // Focus management for accessibility
-            const firstFocusable = modal.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
-            if (firstFocusable) {
-                setTimeout(() => firstFocusable.focus(), 100);
-            }
+        } catch (error) {
+            console.error('Error cancelling course:', error);
+            this.showNotification('Có lỗi xảy ra khi xóa lớp học', 'error');
+        } finally {
+            confirmButton.innerHTML = originalHTML;
+            confirmButton.disabled = false;
         }
     }
 
-    closeModal() {
-        if (this.currentModal) {
-            this.currentModal.classList.remove('active');
-            document.body.style.overflow = '';
+    // ===== DATA LOADING - SỬ DỤNG API /all CÓ SẴN =====
+    async loadCourses() {
+        try {
+            const response = await this.apiRequest('/all');
+            
+            // Convert requests to courses format
+            this.courses = this.convertRequestsToCourses(response);
+            
+            this.renderCoursesTable();
+            this.updatePaginationInfo(this.courses.length);
+            this.updateStatistics();
 
-            // Clear any stored data
-            if (this.currentModal.id === 'courseDetailModal') {
-                delete this.currentModal.dataset.courseId;
-            }
-            if (this.currentModal.id === 'cancelCourseModal') {
-                delete this.currentModal.dataset.courseId;
-            }
+        } catch (error) {
+            console.error('Failed to load courses:', error);
+            this.showNotification('Không thể tải danh sách lớp học', 'error');
 
-            this.currentModal = null;
+            this.courses = [];
+            this.renderCoursesTable();
         }
     }
 
-    showConfirmModal(title, message, onConfirm, type = 'primary') {
-        const confirmTitle = document.getElementById('confirmTitle');
-        const confirmMessage = document.getElementById('confirmMessage');
-        const confirmButton = document.getElementById('confirmAction');
+    // ===== DATA CONVERSION - CHUYỂN ĐỔI TỪ REQUEST FORMAT SANG COURSE FORMAT =====
+    convertRequestsToCourses(requests) {
+        if (!Array.isArray(requests)) return [];
+        
+        return requests.map(request => this.convertRequestToCourse(request));
+    }
 
-        if (!confirmTitle || !confirmMessage || !confirmButton) {
-            console.error('Confirm modal elements not found');
+    convertRequestToCourse(request) {
+        return {
+            id: request.RequestId || request.requestId,
+            name: `Lớp ${request.SubjectName || request.subjectName || 'Unknown'} - ${request.Level || request.level || 'N/A'}`,
+            course_id: request.RequestId || request.requestId,
+            subject: request.SubjectId || request.subject || 'UNKNOWN',
+            subject_name: request.SubjectName || request.subjectName || 'Unknown',
+            class_level: request.Level || request.level,
+            student_name: request.StudentName || request.studentName || 'N/A',
+            student_id: request.StudentId || request.studentId,
+            tutor_name: '', // Will be filled from applications if available
+            status: request.Status || request.status || 'pending',
+            fee: request.Fee || request.fee || 0,
+            fee_period: 'tháng',
+            schedule: request.Schedule || request.schedule || 'Linh hoạt',
+            location: request.Location || request.location || '',
+            format: request.LearningFormat || request.learningFormat || 'online',
+            gender_tutor: request.GenderTutor || request.genderTutor,
+            requirement: request.Requirement || request.requirement || '',
+            description: request.Requirement || request.requirement || '',
+            created_at: request.CreatedAt || request.createdAt,
+            start_date: request.CreatedAt || request.createdAt
+        };
+    }
+
+    renderCoursesTable() {
+        if (!this.elements.coursesTableBody) return;
+
+        this.elements.coursesTableBody.innerHTML = '';
+
+        if (this.courses.length === 0) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = `
+                <td colspan="9" class="text-center">
+                    <div class="empty-state">
+                        <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Không có lớp học nào</p>
+                    </div>
+                </td>
+            `;
+            this.elements.coursesTableBody.appendChild(emptyRow);
             return;
         }
 
-        // Set content
-        confirmTitle.textContent = title;
-        confirmMessage.textContent = message;
+        // Apply pagination
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        const paginatedCourses = this.courses.slice(startIndex, endIndex);
 
-        // Set button style
-        confirmButton.className = `btn btn-${type}`;
-
-        // Remove previous event listeners by cloning the button
-        const newConfirmButton = confirmButton.cloneNode(true);
-        confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
-
-        // Add new event listener
-        newConfirmButton.addEventListener('click', () => {
-            try {
-                onConfirm();
-            } catch (error) {
-                console.error('Error in confirm action:', error);
-                this.showNotification('Có lỗi xảy ra, vui lòng thử lại', 'error');
-            }
-            this.closeModal();
+        paginatedCourses.forEach(course => {
+            const row = document.createElement('tr');
+            row.setAttribute('data-course-id', course.id);
+            row.innerHTML = `
+                <td><input type="checkbox" class="course-checkbox"></td>
+                <td class="course-name">${course.name || ''}</td>
+                <td class="subject-badge ${course.subject || ''}">
+                    <i class="${this.getSubjectInfoFromName(course.subject_name).icon}"></i> 
+                    ${this.getSubjectInfoFromName(course.subject_name).name}
+                </td>
+                <td class="tutor-name">${course.tutor_name || 'Chưa có gia sư'}</td>
+                <td class="student-name">${course.student_name || ''}</td>
+                <td class="status ${course.status || 'pending'}">
+                    <i class="${this.getStatusInfo(course.status || 'pending').icon}"></i> 
+                    ${this.getStatusInfo(course.status || 'pending').name}
+                </td>
+                <td>
+                    <span class="fee-amount">${this.formatCurrency(course.fee)}</span>/<span class="fee-period">${course.fee_period || 'tháng'}</span>
+                </td>
+                <td>${this.formatDate(course.created_at || '')}</td>
+                <td class="action-buttons">
+                    <button class="action-btn view" title="Xem chi tiết" data-course-id="${course.id}">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn edit" title="Chỉnh sửa" data-course-id="${course.id}">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn cancel" title="Xóa lớp" data-course-id="${course.id}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
+            `;
+            this.elements.coursesTableBody.appendChild(row);
         });
 
-        // Show modal
-        this.showModal('confirmModal');
+        this.setupIndividualCheckboxes();
+    }
+
+    renderFilteredCoursesTable() {
+        if (!this.elements.coursesTableBody) return;
+
+        this.elements.coursesTableBody.innerHTML = '';
+
+        if (this.filteredCourses.length === 0) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = `
+                <td colspan="9" class="text-center">
+                    <div class="empty-state">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Không tìm thấy kết quả phù hợp</p>
+                    </div>
+                </td>
+            `;
+            this.elements.coursesTableBody.appendChild(emptyRow);
+            return;
+        }
+
+        this.filteredCourses.forEach(course => {
+            const row = document.createElement('tr');
+            row.setAttribute('data-course-id', course.id);
+            row.innerHTML = `
+                <td><input type="checkbox" class="course-checkbox"></td>
+                <td class="course-name">${course.name || ''}</td>
+                <td class="subject-badge ${course.subject || ''}">
+                    <i class="${this.getSubjectInfoFromName(course.subject_name).icon}"></i> 
+                    ${this.getSubjectInfoFromName(course.subject_name).name}
+                </td>
+                <td class="tutor-name">${course.tutor_name || 'Chưa có gia sư'}</td>
+                <td class="student-name">${course.student_name || ''}</td>
+                <td class="status ${course.status || 'pending'}">
+                    <i class="${this.getStatusInfo(course.status || 'pending').icon}"></i> 
+                    ${this.getStatusInfo(course.status || 'pending').name}
+                </td>
+                <td>
+                    <span class="fee-amount">${this.formatCurrency(course.fee)}</span>/<span class="fee-period">${course.fee_period || 'tháng'}</span>
+                </td>
+                <td>${this.formatDate(course.created_at || '')}</td>
+                <td class="action-buttons">
+                    <button class="action-btn view" title="Xem chi tiết" data-course-id="${course.id}">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn edit" title="Chỉnh sửa" data-course-id="${course.id}">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn cancel" title="Xóa lớp" data-course-id="${course.id}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
+            `;
+            this.elements.coursesTableBody.appendChild(row);
+        });
+
+        this.setupIndividualCheckboxes();
     }
 
     // ===== PAGINATION =====
@@ -949,25 +884,35 @@ class AdminCoursesManager {
         }
     }
 
-    changePage(direction) {
-        const currentPage = document.querySelector('.page-btn.active');
-        const currentPageNum = parseInt(currentPage.textContent);
-        const newPageNum = currentPageNum + direction;
+    async changePage(direction) {
+        const totalPages = Math.ceil(this.courses.length / this.itemsPerPage);
+        const newPageNum = this.currentPage + direction;
 
-        if (newPageNum >= 1) {
-            this.goToPage(newPageNum);
+        if (newPageNum >= 1 && newPageNum <= totalPages) {
+            await this.goToPage(newPageNum);
         }
     }
 
-    goToPage(pageNum) {
-        // Remove active class from all page buttons
+    async goToPage(pageNum) {
+        const totalPages = Math.ceil(this.courses.length / this.itemsPerPage);
+        
+        if (pageNum < 1 || pageNum > totalPages) return;
+
+        this.currentPage = pageNum;
+        this.renderCoursesTable();
+        this.updatePaginationUI(pageNum);
+        this.updatePaginationInfo(this.courses.length);
+
+        this.showNotification(`Đã chuyển đến trang ${pageNum}`, 'info');
+    }
+
+    updatePaginationUI(pageNum) {
         document.querySelectorAll('.page-btn').forEach(btn => {
             if (!isNaN(btn.textContent)) {
                 btn.classList.remove('active');
             }
         });
 
-        // Add active class to selected page
         const targetButton = Array.from(document.querySelectorAll('.page-btn')).find(btn =>
             parseInt(btn.textContent) === pageNum
         );
@@ -975,93 +920,175 @@ class AdminCoursesManager {
         if (targetButton) {
             targetButton.classList.add('active');
         }
+    }
 
-        // Update pagination info
+    async changePageSize() {
         const pageSize = parseInt(document.getElementById('pageSize').value);
-        const totalCourses = parseInt(document.getElementById('totalCourses').textContent);
-        const startItem = (pageNum - 1) * pageSize + 1;
-        const endItem = Math.min(pageNum * pageSize, totalCourses);
+        this.itemsPerPage = pageSize;
+        this.currentPage = 1;
 
-        document.getElementById('showingStart').textContent = startItem;
-        document.getElementById('showingEnd').textContent = endItem;
-
-        // In real application, would fetch new data here
-        this.showNotification(`Đã chuyển đến trang ${pageNum}`, 'info');
-    }
-
-    changePageSize() {
-        const pageSize = document.getElementById('pageSize').value;
+        this.renderCoursesTable();
+        this.updatePaginationInfo(this.courses.length);
         this.showNotification(`Đã thay đổi hiển thị thành ${pageSize} mục mỗi trang`, 'info');
-        // In real application, would reload data with new page size
     }
 
-    updatePaginationInfo(visibleCount) {
+    updatePaginationInfo(totalCount) {
+        const showingStart = document.getElementById('showingStart');
         const showingEnd = document.getElementById('showingEnd');
         const totalCourses = document.getElementById('totalCourses');
 
-        if (showingEnd) showingEnd.textContent = visibleCount;
-        if (totalCourses) totalCourses.textContent = visibleCount;
+        const startItem = ((this.currentPage - 1) * this.itemsPerPage) + 1;
+        const endItem = Math.min(this.currentPage * this.itemsPerPage, totalCount);
+
+        if (showingStart) showingStart.textContent = totalCount > 0 ? startItem : 0;
+        if (showingEnd) showingEnd.textContent = endItem;
+        if (totalCourses) totalCourses.textContent = totalCount;
+
+        // Update pagination buttons
+        this.updatePaginationButtons(Math.ceil(totalCount / this.itemsPerPage));
+    }
+
+    updatePaginationButtons(totalPages) {
+        const paginationContainer = document.querySelector('.page-buttons');
+        if (!paginationContainer) return;
+
+        // Clear existing buttons (except prev/next)
+        const existingButtons = paginationContainer.querySelectorAll('.page-btn:not(#prevPage):not(#nextPage)');
+        existingButtons.forEach(btn => btn.remove());
+
+        // Add page buttons
+        const prevButton = document.getElementById('prevPage');
+        const nextButton = document.getElementById('nextPage');
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.className = `page-btn ${i === this.currentPage ? 'active' : ''}`;
+            pageButton.textContent = i;
+            pageButton.addEventListener('click', () => this.goToPage(i));
+
+            if (nextButton) {
+                paginationContainer.insertBefore(pageButton, nextButton);
+            } else {
+                paginationContainer.appendChild(pageButton);
+            }
+        }
+
+        // Update prev/next button states
+        if (prevButton) {
+            prevButton.disabled = this.currentPage === 1;
+        }
+        if (nextButton) {
+            nextButton.disabled = this.currentPage === totalPages;
+        }
     }
 
     // ===== UTILITY FUNCTIONS =====
-    exportCourses() {
+    async exportCourses() {
         this.showConfirmModal(
             'Xuất báo cáo lớp học',
             'Bạn có muốn xuất báo cáo tất cả lớp học ra file Excel?',
             () => {
-                this.showNotification('Đang xuất dữ liệu...', 'info');
-
-                // Simulate export process
-                setTimeout(() => {
-                    this.showNotification('Đã xuất báo cáo lớp học thành công', 'success');
-                }, 2000);
+                try {
+                    // Since BE doesn't have export endpoint, create CSV client-side
+                    this.exportToCSV();
+                } catch (error) {
+                    console.error('Export failed:', error);
+                    this.showNotification('Có lỗi xảy ra khi xuất báo cáo', 'error');
+                }
             }
         );
     }
 
-    refreshData() {
+    exportToCSV() {
+        const headers = [
+            'ID',
+            'Tên lớp',
+            'Môn học',
+            'Gia sư',
+            'Học viên',
+            'Trạng thái',
+            'Học phí',
+            'Lịch học',
+            'Ngày tạo'
+        ];
+
+        const csvContent = [
+            headers.join(','),
+            ...this.courses.map(course => [
+                course.id,
+                `"${course.name}"`,
+                `"${this.getSubjectInfo(course.subject).name}"`,
+                `"${course.tutor_name || 'Chưa có'}"`,
+                `"${course.student_name}"`,
+                `"${this.getStatusInfo(course.status).name}"`,
+                course.fee || 0,
+                `"${course.schedule || 'Linh hoạt'}"`,
+                `"${this.formatDate(course.created_at)}"`
+            ].join(','))
+        ].join('\n');
+
+        // Create and download file
+        const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `courses_export_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        this.showNotification('Đã xuất báo cáo CSV thành công', 'success');
+    }
+
+    async refreshData() {
         const refreshBtn = this.elements.refreshTable;
         if (!refreshBtn) return;
 
         this.showNotification('Đang làm mới dữ liệu...', 'info');
 
-        // Add loading animation to button
         const originalHTML = refreshBtn.innerHTML;
         refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
         refreshBtn.disabled = true;
 
-        // Simulate refresh
-        setTimeout(() => {
-            refreshBtn.innerHTML = originalHTML;
-            refreshBtn.disabled = false;
+        try {
+            this.currentPage = 1;
+            await this.loadCourses();
+            this.updateStatistics();
+
             this.showNotification('Đã làm mới dữ liệu thành công', 'success');
 
-            // Reload table data
-            this.loadCourses();
-            this.updateStatistics();
-        }, 1500);
+        } catch (error) {
+            console.error('Refresh failed:', error);
+            this.showNotification('Có lỗi xảy ra khi làm mới dữ liệu', 'error');
+        } finally {
+            refreshBtn.innerHTML = originalHTML;
+            refreshBtn.disabled = false;
+        }
     }
 
-    // ===== STATISTICS UPDATE =====
+    // ===== STATISTICS UPDATE - CLIENT SIDE =====
     updateStatistics() {
-        const rows = document.querySelectorAll('#coursesTableBody tr');
         let totalCourses = 0;
         let pendingCourses = 0;
         let activeCourses = 0;
         let completedCourses = 0;
 
-        rows.forEach(row => {
-            if (row.style.display !== 'none') {
-                totalCourses++;
-                const statusElement = row.querySelector('.status');
-
-                if (statusElement.classList.contains('pending')) {
+        this.courses.forEach(course => {
+            totalCourses++;
+            switch (course.status) {
+                case 'pending':
+                case 'waiting':
                     pendingCourses++;
-                } else if (statusElement.classList.contains('active')) {
+                    break;
+                case 'active':
+                case 'approved':
                     activeCourses++;
-                } else if (statusElement.classList.contains('completed')) {
+                    break;
+                case 'completed':
+                case 'finished':
                     completedCourses++;
-                }
+                    break;
             }
         });
 
@@ -1077,243 +1104,218 @@ class AdminCoursesManager {
         if (completedCoursesElement) completedCoursesElement.textContent = completedCourses;
     }
 
-    // ===== DATA LOADING =====
-    loadCourses() {
-        if (!this.elements.coursesTableBody) return;
+    // ===== HELPER METHODS =====
+    formatDate(dateString) {
+        if (!dateString) return '';
 
-        this.elements.coursesTableBody.innerHTML = ''; // Clear old data
-
-        const courses = this.generateSampleCourses();
-
-        courses.forEach(course => {
-            const row = document.createElement('tr');
-            row.setAttribute('data-course-id', course.id);
-            row.innerHTML = `
-                <td><input type="checkbox" class="course-checkbox"></td>
-                <td class="course-name">${course.name}</td>
-                <td class="subject-badge ${course.subject}">
-                    <i class="${this.getSubjectInfo(course.subject).icon}"></i> ${this.getSubjectInfo(course.subject).name}
-                </td>
-                <td class="tutor-name">${course.tutor || '—'}</td>
-                <td class="student-name">${course.student}</td>
-                <td class="status ${course.status}">
-                    <i class="${this.getStatusInfo(course.status).icon}"></i> ${this.getStatusInfo(course.status).name}
-                </td>
-                <td>
-                    <span class="fee-amount">${this.formatCurrency(course.fee)}</span>/<span class="fee-period">${course.feePeriod}</span>
-                </td>
-                <td>${course.createDate}</td>
-                <td class="action-buttons">
-                    <button class="action-btn view" title="Xem chi tiết" data-course-id="${course.id}">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="action-btn edit" title="Chỉnh sửa" data-course-id="${course.id}">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="action-btn cancel" title="Xóa lớp" data-course-id="${course.id}">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </td>
-            `;
-            this.elements.coursesTableBody.appendChild(row);
-        });
-
-        // Re-initialize checkboxes for new content
-        this.setupIndividualCheckboxes();
-
-        // Update statistics and pagination
-        this.updateStatistics();
-        this.updatePaginationInfo(courses.length);
-    }
-
-    generateSampleCourses() {
-        return [
-            {
-                id: 'C101',
-                name: 'Lớp Toán 12A1',
-                classLeve: 12,
-                subject: 'math',
-                tutor: 'Nguyễn Văn Minh',
-                student: 'Trần Thị Hằng',
-                status: 'active',
-                fee: 1750000,
-                feePeriod: 'tháng',
-                createDate: '15/03/2025'
-            },
-            {
-                id: 'C102',
-                name: 'Lớp Hóa học 11A2',
-                classLeve: 11,
-                subject: 'chemistry',
-                tutor: 'Lê Thị Thu Hà',
-                student: 'Phạm Đức Nam',
-                status: 'active',
-                fee: 1850000,
-                feePeriod: 'tháng',
-                createDate: '18/03/2025'
-            },
-            {
-                id: 'C103',
-                name: 'Lớp Tiếng Anh 10',
-                classLeve: 10,
-                subject: 'english',
-                tutor: '',
-                student: 'Võ Thị Mai',
-                status: 'pending',
-                fee: 1600000,
-                feePeriod: 'tháng',
-                createDate: '22/03/2025'
-            },
-            {
-                id: 'C104',
-                name: 'Lớp Vật lý 12',
-                classLeve: 12,
-                subject: 'physics',
-                tutor: 'Đặng Phước Khoa',
-                student: 'Nguyễn Hoàng Long',
-                status: 'active',
-                fee: 1900000,
-                feePeriod: 'tháng',
-                createDate: '25/03/2025'
-            },
-            {
-                id: 'C105',
-                name: 'Lớp Ngữ văn 11B',
-                classLeve: 11,
-                subject: 'literature',
-                tutor: '',
-                student: 'Lương Thị Lan',
-                status: 'pending',
-                fee: 1550000,
-                feePeriod: 'tháng',
-                createDate: '28/03/2025'
-            },
-            {
-                id: 'C106',
-                name: 'Lớp Sinh học 10',
-                classLeve: 10,
-                subject: 'biology',
-                tutor: 'Hoàng Minh Tuấn',
-                student: 'Bùi Thị Ngọc',
-                status: 'completed',
-                fee: 1650000,
-                feePeriod: 'tháng',
-                createDate: '02/04/2025'
-            },
-            {
-                id: 'C107',
-                name: 'Lớp Lịch sử 12',
-                classLeve: 12,
-                subject: 'history',
-                tutor: 'Phan Thị Linh',
-                student: 'Đỗ Văn Hùng',
-                status: 'active',
-                fee: 1500000,
-                feePeriod: 'tháng',
-                createDate: '05/04/2025'
-            },
-            {
-                id: 'C108',
-                name: 'Lớp Địa lý 11',
-                classLeve: 11,
-                subject: 'geography',
-                tutor: '',
-                student: 'Trịnh Thị Hoa',
-                status: 'pending',
-                fee: 1700000,
-                feePeriod: 'tháng',
-                createDate: '08/04/2025'
-            },
-            {
-                id: 'C109',
-                name: 'Lớp Toán 10',
-                classLeve: 10,
-                subject: 'math',
-                tutor: 'Vũ Thanh Sơn',
-                student: 'Cao Thị Thúy',
-                status: 'active',
-                fee: 1800000,
-                feePeriod: 'tháng',
-                createDate: '12/04/2025'
-            },
-            {
-                id: 'C110',
-                name: 'Lớp Hóa học 12',
-                classLeve: 12,
-                subject: 'chemistry',
-                tutor: 'Đinh Văn Công',
-                student: 'Lê Thị Yến',
-                status: 'cancelled',
-                fee: 1950000,
-                feePeriod: 'tháng',
-                createDate: '15/04/2025'
-            },
-            {
-                id: 'C111',
-                name: 'Lớp Tiếng Anh giao tiếp',
-                classLeve: 13,
-                subject: 'english',
-                tutor: 'Phạm Thị Xuân',
-                student: 'Ngô Văn Tài',
-                status: 'active',
-                fee: 2000000,
-                feePeriod: 'tháng',
-                createDate: '20/04/2025'
-            },
-            {
-                id: 'C112',
-                name: 'Lớp Vật lý 11',
-                classLeve: 11,
-                subject: 'physics',
-                tutor: '',
-                student: 'Tạ Thị Kim',
-                status: 'pending',
-                fee: 1750000,
-                feePeriod: 'tháng',
-                createDate: '25/04/2025'
-            },
-            {
-                id: 'C113',
-                name: 'Lớp Sinh học 12',
-                classLeve: 12,
-                subject: 'biology',
-                tutor: 'Lý Văn Đức',
-                student: 'Dương Thị Phương',
-                status: 'active',
-                fee: 1600000,
-                feePeriod: 'tháng',
-                createDate: '28/04/2025'
-            },
-            {
-                id: 'C114',
-                name: 'Lớp Ngữ văn 10',
-                classLeve: 10,
-                subject: 'literature',
-                tutor: 'Mai Thị Bích',
-                student: 'Lại Văn Cường',
-                status: 'completed',
-                fee: 1550000,
-                feePeriod: 'tháng',
-                createDate: '02/05/2025'
-            },
-            {
-                id: 'C115',
-                name: 'Lớp Toán nâng cao 12',
-                classLeve: 12,
-                subject: 'math',
-                tutor: '',
-                student: 'Huỳnh Thị Thu',
-                status: 'pending',
-                fee: 1850000,
-                feePeriod: 'tháng',
-                createDate: '05/05/2025'
-            }
-        ];
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            
+            return date.toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        } catch (error) {
+            console.error('Date formatting error:', error);
+            return dateString;
+        }
     }
 
     formatCurrency(amount) {
         if (!amount) return '0 VNĐ';
-        return new Intl.NumberFormat('vi-VN').format(amount) + ' VNĐ';
+        const numAmount = typeof amount === 'string' ? parseInt(amount.replace(/[^\d]/g, '')) : amount;
+        if (isNaN(numAmount)) return '0 VNĐ';
+        
+        return new Intl.NumberFormat('vi-VN').format(numAmount) + ' VNĐ';
+    }
+
+    convertDateFormat(dateStr) {
+        if (!dateStr) return '';
+
+        try {
+            if (dateStr.includes('/')) {
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                }
+            }
+
+            if (dateStr.includes('T')) {
+                return dateStr.split('T')[0];
+            }
+
+            const date = new Date(dateStr);
+            if (!isNaN(date.getTime())) {
+                return date.toISOString().split('T')[0];
+            }
+
+            return dateStr;
+        } catch (error) {
+            console.error('Date conversion error:', error);
+            return '';
+        }
+    }
+
+    getSubjectInfoFromName(subjectName) {
+        console.log('Getting subject info from name:', subjectName);
+        
+        if (!subjectName) return { name: 'Khác', icon: 'fas fa-book' };
+        
+        const name = subjectName.toLowerCase().trim();
+        
+        if (name.includes('toán')) return { name: 'Toán', icon: 'fas fa-calculator' };
+        if (name.includes('vật lý')) return { name: 'Vật lý', icon: 'fas fa-atom' };
+        if (name.includes('hóa')) return { name: 'Hóa học', icon: 'fas fa-flask' };
+        if (name.includes('anh')) return { name: 'Tiếng Anh', icon: 'fas fa-language' };
+        if (name.includes('văn')) return { name: 'Ngữ văn', icon: 'fas fa-book' };
+        if (name.includes('sinh')) return { name: 'Sinh học', icon: 'fas fa-dna' };
+        if (name.includes('lịch sử')) return { name: 'Lịch sử', icon: 'fas fa-landmark' };
+        if (name.includes('địa lý')) return { name: 'Địa lý', icon: 'fas fa-globe' };
+        
+        // Fallback: return original name
+        return { name: subjectName, icon: 'fas fa-book' };
+    }
+
+    getSubjectInfo(subject) {
+        // Log để debug
+        console.log('Getting subject info for:', subject);
+        
+        const subjects = {
+            'MAT': { name: 'Toán', icon: 'fas fa-calculator' },
+            'PHY': { name: 'Vật lý', icon: 'fas fa-atom' },
+            'CHE': { name: 'Hóa học', icon: 'fas fa-flask' },
+            'ENG': { name: 'Tiếng Anh', icon: 'fas fa-language' },
+            'LIT': { name: 'Ngữ văn', icon: 'fas fa-book' },
+            'BIO': { name: 'Sinh học', icon: 'fas fa-dna' },
+            'HIS': { name: 'Lịch sử', icon: 'fas fa-landmark' },
+            'GEO': { name: 'Địa lý', icon: 'fas fa-globe' },
+            'math': { name: 'Toán', icon: 'fas fa-calculator' },
+            'physics': { name: 'Vật lý', icon: 'fas fa-atom' },
+            'chemistry': { name: 'Hóa học', icon: 'fas fa-flask' },
+            'english': { name: 'Tiếng Anh', icon: 'fas fa-language' },
+            'literature': { name: 'Ngữ văn', icon: 'fas fa-book' },
+            'biology': { name: 'Sinh học', icon: 'fas fa-dna' },
+            'history': { name: 'Lịch sử', icon: 'fas fa-landmark' },
+            'geography': { name: 'Địa lý', icon: 'fas fa-globe' },
+            'UNKNOWN': { name: 'Khác', icon: 'fas fa-book' }
+        };
+        
+        return subjects[subject] || { name: subject || 'Khác', icon: 'fas fa-book' };
+    }
+
+    getStatusInfo(status) {
+        const statuses = {
+            'pending': { name: 'Chưa có ứng viên', icon: 'fas fa-clock' },
+            'applied': { name: 'Đã có ứng viên', icon: 'fas fa-user-check' },
+            'active': { name: 'Đang học', icon: 'fas fa-play-circle' },
+            'completed': { name: 'Đã hoàn thành', icon: 'fas fa-check-circle' },
+            'cancel': { name: 'Đã hủy', icon: 'fas fa-trash' }
+        };
+        return statuses[status] || { name: 'Không xác định', icon: 'fas fa-question' };
+    }
+
+    getStatusText(status) {
+        return this.getStatusInfo(status).name;
+    }
+
+    getCourseStatusClass(status) {
+        if (!status) return 'pending';
+        
+        const statusLower = status.toLowerCase();
+        if (statusLower === 'pending') return 'pending';
+        if (statusLower === 'applied') return 'applied';
+        if (statusLower === 'active') return 'active';
+        if (statusLower === 'completed') return 'completed';
+        if (statusLower === 'cancelled') return 'cancelled';
+        
+        // Fallback cho các trạng thái cũ
+        if (statusLower.includes('waiting')) return 'pending';
+        if (statusLower.includes('approved')) return 'active';
+        if (statusLower.includes('finished')) return 'completed';
+        if (statusLower.includes('deleted')) return 'cancelled';
+        
+        return 'pending';
+    }
+
+    updateCourseModalButtons(status) {
+        const editBtn = document.getElementById('editCourseFromModal');
+        const cancelBtn = document.getElementById('cancelCourseFromModal');
+
+        if (editBtn) {
+            editBtn.style.display = ['pending', 'waiting', 'approved'].includes(status) ? 'inline-flex' : 'none';
+        } else {
+            console.warn('Edit button not found in modal');
+        }
+
+        if (cancelBtn) {
+            cancelBtn.style.display = status !== 'deleted' ? 'inline-flex' : 'none';
+            cancelBtn.innerHTML = '<i class="fas fa-times"></i> Xóa lớp';
+        } else {
+            console.warn('Cancel button not found in modal');
+        }
+    }
+
+    // ===== MODAL MANAGEMENT =====
+    showModal(modalId) {
+        const modal = this.elements[modalId];
+        if (modal) {
+            modal.classList.add('active');
+            this.currentModal = modal;
+            document.body.style.overflow = 'hidden';
+
+            const firstFocusable = modal.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (firstFocusable) {
+                setTimeout(() => firstFocusable.focus(), 100);
+            }
+        }
+    }
+
+    closeModal() {
+        if (this.currentModal) {
+            this.currentModal.classList.remove('active');
+            document.body.style.overflow = '';
+
+            if (this.currentModal.id === 'courseDetailModal') {
+                delete this.currentModal.dataset.courseId;
+            }
+            if (this.currentModal.id === 'cancelCourseModal') {
+                delete this.currentModal.dataset.courseId;
+            }
+
+            this.currentModal = null;
+        }
+    }
+
+    showConfirmModal(title, message, onConfirm, type = 'primary') {
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmButton = document.getElementById('confirmAction');
+
+        if (!confirmTitle || !confirmMessage || !confirmButton) {
+            console.error('Confirm modal elements not found');
+            return;
+        }
+
+        confirmTitle.textContent = title;
+        confirmMessage.textContent = message;
+        confirmButton.className = `btn btn-${type}`;
+
+        const newConfirmButton = confirmButton.cloneNode(true);
+        confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+
+        newConfirmButton.addEventListener('click', () => {
+            try {
+                onConfirm();
+            } catch (error) {
+                console.error('Error in confirm action:', error);
+                this.showNotification('Có lỗi xảy ra, vui lòng thử lại', 'error');
+            }
+            this.closeModal();
+        });
+
+        this.showModal('confirmModal');
     }
 
     // ===== NOTIFICATION SYSTEM =====
@@ -1333,17 +1335,15 @@ class AdminCoursesManager {
         const container = document.getElementById('notificationContainer') || document.body;
         container.appendChild(notification);
 
-        // Show notification
         setTimeout(() => {
             notification.classList.add('show');
         }, 100);
 
-        // Auto hide after 4 seconds
+        const duration = type === 'error' ? 6000 : 4000;
         setTimeout(() => {
             this.hideNotification(notification);
-        }, 4000);
+        }, duration);
 
-        // Handle close button
         const closeBtn = notification.querySelector('.notification-close');
         closeBtn.addEventListener('click', () => {
             this.hideNotification(notification);
@@ -1462,8 +1462,178 @@ class AdminCoursesManager {
                     background: rgba(0,0,0,0.1);
                     color: #333;
                 }
+
+                .empty-state {
+                    padding: 40px 20px;
+                    text-align: center;
+                }
+
+                .empty-state i {
+                    opacity: 0.3;
+                }
+
+                #loadingOverlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: none;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 10000;
+                }
+
+                .loading-spinner {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    text-align: center;
+                }
+
+                .loading-spinner i {
+                    font-size: 24px;
+                    color: #007bff;
+                    margin-bottom: 10px;
+                }
+
+                .form-group.error input,
+                .form-group.error select,
+                .form-group.error textarea {
+                    border-color: #dc3545;
+                }
+
+                .form-group.success input,
+                .form-group.success select,
+                .form-group.success textarea {
+                    border-color: #28a745;
+                }
+
+                .action-btn {
+                    background: none;
+                    border: 1px solid #ddd;
+                    padding: 6px 8px;
+                    margin: 0 2px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+
+                .action-btn:hover {
+                    background: #f8f9fa;
+                    border-color: #007bff;
+                    color: #007bff;
+                }
+
+                .action-btn.view:hover {
+                    border-color: #17a2b8;
+                    color: #17a2b8;
+                }
+
+                .action-btn.edit:hover {
+                    border-color: #28a745;
+                    color: #28a745;
+                }
+
+                .action-btn.cancel:hover {
+                    border-color: #dc3545;
+                    color: #dc3545;
+                }
+
+                .status {
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+
+                .status.pending {
+                    background: #fff3cd;
+                    color: #856404;
+                    border: 1px solid #ffeaa7;
+                }
+
+                .status.applied {
+                    background: #d1ecf1;
+                    color: #0c5460;
+                    border: 1px solid #bee5eb;
+                }
+
+                .status.active {
+                    background: #d4edda;
+                    color: #155724;
+                    border: 1px solid #c3e6cb;
+                }
+
+                .status.completed {
+                    background: #e2e3e5;
+                    color: #383d41;
+                    border: 1px solid #d6d8db;
+                }
+
+                .status.cancelled {
+                    background: #f8d7da;
+                    color: #721c24;
+                    border: 1px solid #f5c6cb;
+                }
+
+                .subject-badge {
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    text-align: center;
+                    white-space: nowrap;
+                    background: #e9ecef;
+                    color: #495057;
+                    border: 1px solid #dee2e6;
+                }
+
+                .subject-badge i {
+                    margin-right: 4px;
+                }
+
+                @media (max-width: 768px) {
+                    .notification {
+                        max-width: calc(100vw - 40px);
+                        min-width: calc(100vw - 40px);
+                    }
+                    
+                    .action-buttons {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
+                    }
+                    
+                    .action-btn {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                }
             `;
             document.head.appendChild(style);
+        }
+
+        // Add required DOM elements
+        if (!document.getElementById('loadingOverlay')) {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'loadingOverlay';
+            loadingOverlay.innerHTML = `
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <div>Đang tải...</div>
+                </div>
+            `;
+            document.body.appendChild(loadingOverlay);
+        }
+
+        if (!document.getElementById('notificationContainer')) {
+            const notificationContainer = document.createElement('div');
+            notificationContainer.id = 'notificationContainer';
+            document.body.appendChild(notificationContainer);
         }
     }
 }
@@ -1482,3 +1652,18 @@ document.addEventListener('DOMContentLoaded', () => {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = AdminCoursesManager;
 }
+
+// Global error handlers
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    if (adminCoursesManager) {
+        adminCoursesManager.showNotification('Có lỗi không mong muốn xảy ra', 'error');
+    }
+});
+
+window.addEventListener('error', (event) => {
+    console.error('Global error:', event.error);
+    if (adminCoursesManager) {
+        adminCoursesManager.showNotification('Có lỗi hệ thống xảy ra', 'error');
+    }
+});
