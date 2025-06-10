@@ -294,53 +294,183 @@ namespace BE_Tutor.Controllers
         }
 
 
-        
-        // ng dung xem pro5 cua minh
+        ///View_profile
         [HttpGet("GetMyUser")]
-            public async Task<IActionResult> GetProfile()
+        [Authorize]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var user = await _context.Users
+                .Include(u => u.Tutors)
+                    .ThenInclude(t => t.SpecialtySubject)
+                .Include(u => u.Students)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                return NotFound(new { message = "Không tìm thấy người dùng." });
+
+            if (user.Status != "active")
+                return BadRequest(new { message = "Tài khoản của bạn hiện không hoạt động." });
+
+            var student = user.Students.FirstOrDefault(s => s.IsActive);
+            var tutor = user.Tutors.FirstOrDefault(t => t.IsActive);
+
+            return Ok(new
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var user = await _context.Users
-                    .Where(u => u.UserId == userId)
-                    .Select(u => new
+                id = user.UserId,
+                fullName = user.Name ?? "",
+                email = user.Email ?? "",
+                phone = user.Phone ?? "",
+                gender = user.Gender,
+                address = user.Address ?? "",
+                dateOfBirth = user.DateOfBirth?.ToString("yyyy-MM-dd"),
+                role = user.Role,
+
+                // Nếu là tutor
+                education = tutor?.Education ?? "",
+                experience = tutor?.Experience ?? "",
+                subjects = tutor?.SpecialtySubject?.Name ?? "",
+
+                // Nếu là student
+                grade = student?.GradeLevel ?? "",
+                school = student?.School ?? "",
+
+                userType = student != null ? "student" :
+                           tutor != null ? "tutor" :
+                           user.Role
+            });
+        }
+
+
+        [HttpPut("UpdateProfile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] EditMyProfileDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized("Không thể xác định người dùng.");
+
+            var user = await _context.Users
+                .Include(u => u.Tutors.Where(t => t.IsActive))
+                    .ThenInclude(t => t.SpecialtySubject)
+                .Include(u => u.Students.Where(s => s.IsActive))
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                return NotFound("Không tìm thấy người dùng.");
+
+            if (!string.IsNullOrEmpty(dto.FullName))
+                user.Name = dto.FullName;
+
+            if (!string.IsNullOrEmpty(dto.Email))
+                user.Email = dto.Email;
+
+            if (!string.IsNullOrEmpty(dto.Phone))
+                user.Phone = dto.Phone;
+
+            if (!string.IsNullOrEmpty(dto.Address))
+                user.Address = dto.Address;
+
+            if (dto.DateOfBirth.HasValue)
+                user.DateOfBirth = dto.DateOfBirth.Value;
+
+            if (dto.Gender.HasValue)
+                user.Gender = dto.Gender.Value;
+
+            // Xác định role
+            if (user.Role == "tutor")
+            {
+                // Vô hiệu hóa Student nếu đang tồn tại
+                var student = user.Students.FirstOrDefault(s => s.IsActive);
+                if (student != null)
+                    student.IsActive = false;
+
+                // Lấy hoặc tạo Tutor
+                var tutor = user.Tutors.FirstOrDefault();
+                if (tutor == null)
+                {
+                    tutor = new Tutor
                     {
-                        u.Name,
-                        u.Gender,
-                        u.Phone,
-                        u.Email,
-                        u.Status,
-                        u.CreatedAt
-                    })
-                    .FirstOrDefaultAsync();
+                        UserId = user.UserId,
+                        TutorId = user.UserId
+                    };
+                    user.Tutors.Add(tutor);
+                }
 
-                if (user == null)
-                    return NotFound(new { message = "Không tìm thấy người dùng." });
-                return Ok(user);
+                tutor.IsActive = true;
+
+                if (!string.IsNullOrEmpty(dto.Education))
+                    tutor.Education = dto.Education;
+
+                if (!string.IsNullOrEmpty(dto.Experience))
+                    tutor.Experience = dto.Experience;
+
+                if (!string.IsNullOrEmpty(dto.Subjects))
+                {
+                    var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Name == dto.Subjects);
+
+                    if (subject != null)
+                    {
+                        tutor.SpecialtySubjectId = subject.SubjectId;
+                    }
+                    else
+                    {
+                        var lastSubject = await _context.Subjects
+                            .OrderByDescending(s => s.SubjectId)
+                            .FirstOrDefaultAsync();
+
+                        string newId = lastSubject == null
+                            ? "001"
+                            : (int.Parse(lastSubject.SubjectId) + 1).ToString("D3");
+
+                        var newSubject = new Subject
+                        {
+                            SubjectId = newId,
+                            Name = dto.Subjects
+                        };
+
+                        _context.Subjects.Add(newSubject);
+                        await _context.SaveChangesAsync();
+
+                        tutor.SpecialtySubjectId = newSubject.SubjectId;
+                    }
+                }
             }
-
-            [HttpPut("UpdateMyUser")]
-            public async Task<IActionResult> UpdateMyProfile([FromBody] ViewProfileDto dto)
+            else if (user.Role == "student")
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+                // Vô hiệu hóa Tutor nếu đang tồn tại
+                var tutor = user.Tutors.FirstOrDefault(t => t.IsActive);
+                if (tutor != null)
+                    tutor.IsActive = false;
 
-                if (user == null)
-                    return NotFound(new { message = "Không tìm thấy người dùng." });
-                               
-                if (!string.IsNullOrWhiteSpace(dto.Name))
-                    user.Name = dto.Name;
+                // Lấy hoặc tạo Student
+                var student = user.Students.FirstOrDefault();
+                if (student == null)
+                {
+                    student = new Student
+                    {
+                        UserId = user.UserId,
+                        StudentId = user.UserId
+                    };
+                    user.Students.Add(student);
+                }
 
-                if (!string.IsNullOrWhiteSpace(dto.Email))
-                    user.Email = dto.Email;
+                student.IsActive = true;
 
-                if (dto.Gender.HasValue)
-                    user.Gender = dto.Gender;
+                if (!string.IsNullOrEmpty(dto.Grade))
+                    student.GradeLevel = dto.Grade;
 
-
-                _context.Users.Update(user);
-                    await _context.SaveChangesAsync();
-                    return Ok(new { message = "Cập nhật thông tin thành công." });
+                if (!string.IsNullOrEmpty(dto.School))
+                    student.School = dto.School;
             }
+
+            await _context.SaveChangesAsync();
+            return Ok("Cập nhật hồ sơ cá nhân thành công.");
+        }
+
+
+
         [HttpGet("stats")]
         //[Authorize(Roles = "admin")]
         public async Task<IActionResult> GetDashboardStats()

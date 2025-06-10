@@ -14,38 +14,43 @@
     <section class="edit-profile-form">
         <h2>Chỉnh sửa thông tin cá nhân</h2>
 
-        <form id="profileForm">
+        <form id="profileForm" onsubmit="event.preventDefault();">
             <label for="fullName">Họ và tên:</label>
-            <input type="text" id="fullName" name="fullName" value="Nguyễn Văn A">
+            <input type="text" id="fullName" name="fullName">
 
-            <label for="workplace">Nơi học tập / Làm việc:</label>
-            <input type="text" id="workplace" name="workplace" value="Đại học Bách Khoa">
+            <label for="address">Địa chỉ:</label>
+            <input type="text" id="address" name="address">
 
-            <label for="age">Độ tuổi:</label>
-            <input type="number" id="age" name="age" min="10" max="100" value="25">
+            <label for="dateOfBirth">Ngày sinh:</label>
+            <input type="date" id="dateOfBirth" name="dateOfBirth">
 
             <label for="phone">Số điện thoại:</label>
             <div class="phone-input-container">
-                <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" value="0123456789" readonly>
+                <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" readonly>
                 <button type="button" class="change-phone-btn" onclick="openPhoneChangeModal()">
                     <i class="fas fa-edit"></i> Đổi
                 </button>
             </div>
 
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="user@example.com">
+            <input type="email" id="email" name="email">
 
             <label for="gender">Giới tính:</label>
             <select id="gender" name="gender">
                 <option value="">-- Chọn giới tính --</option>
-                <option value="Nam" selected>Nam</option>
+                <option value="Nam">Nam</option>
                 <option value="Nữ">Nữ</option>
                 <option value="Khác">Khác</option>
             </select>
 
-            <button type="submit">Lưu thay đổi</button>
-        </form>
+            <!-- Trường bổ sung theo vai trò -->
+            <div id="roleSpecificFields"></div>
 
+            <!-- Nút lưu dùng để JS bắt sự kiện -->
+            <button type="button" id="saveProfileBtn" class="save-profile-btn">
+                <i class="fas fa-save"></i> Lưu thay đổi
+            </button>
+        </form>
         <div id="updateResult" class="message-box" style="display: none;">
             <h4>🎉 Cập nhật thành công!</h4>
         </div>
@@ -135,63 +140,10 @@
     <script src="js/otp-handler.js" defer></script>
     <script src="/js/loadContent.js" defer></script>
     <script src="js/forgot-password.js" defer></script>
+    <script src="js/userManager.js" defer></script>
 </body>
 </html>
 
-<script>
-    document.getElementById("profileForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
-        // laytoken
-        const token = localStorage.getItem("token"); // Lấy token từ localStorage
-        if (!token) {
-            alert("Bạn chưa đăng nhập!");
-            return;
-        }
-        // bool? gender
-        let genderValue = null;
-        const gender = document.getElementById("gender").value;
-        if (gender === "Nam") genderValue = true;
-        else if (gender === "Nữ") genderValue = false;
 
-        // lay va gui du  lieu len backend
-        const data = {
-            Name: document.getElementById("fullName").value,
-            workplace: document.getElementById("workplace").value,
-            Age: parseInt(document.getElementById("age").value),
-            Phone: document.getElementById("phone").value,
-            Email: document.getElementById("email").value,
-            Gender: genderValue
-        };
-
-        try {
-            const response = await fetch("http://localhost:7128/api/Profile/UpdateMyUser", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
-
-            });
-            if (response.ok) {
-                const resultDiv = document.getElementById("updateResult");
-                resultDiv.style.display = 'block';
-                this.reset();
-
-                setTimeout(function () {
-                    resultDiv.style.display = 'none';
-                }, 3000);
-            }
-            else {
-                const errorData = await response.json();
-                alert("Cập nhật thất bại: " + (errorData.message || "Lỗi không xác định"));
-            }
-        }
-        catch (error) {
-            alert("Lỗi kết nối: " + error.message);
-        }
-
-    });
-</script>
 
 
