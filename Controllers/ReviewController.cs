@@ -27,28 +27,41 @@ namespace BE_Tutor.Controllers
         {
             try
             {
-                var reviews = await _context.Reviews
-                    .Where(r => r.TutorId == tutorId)
-                    .Include(r => r.Student)
-                    .OrderByDescending(r => r.CreatedAt)
-                    .Select(r => new ReviewDto
-                    {
-                        ReviewId = r.ReviewId,
-                        TutorId = r.TutorId,
-                        StudentId = r.StudentId,
-                        StudentName = r.Student != null ? r.Student.User.Name : "Học viên",
-                        Rating = r.Rating,
-                        Comment = r.Comment,
-                        CreatedAt = r.CreatedAt
-                    })
-                    .ToListAsync();
+            var result = await _context.Tutors
+                .Where(t => t.TutorId == tutorId)
+                .Select(t => new
+                {
+                    TutorId = t.TutorId,
+                    UserId = t.UserId,
+                    Name = t.User != null ? t.User.Name : null,
+                    Email = t.User != null ? t.User.Email : null,
+                    Phone = t.User != null ? t.User.Phone : null,
+                    Gender = t.User != null ? 
+                        (t.User.Gender == true ? "Nam" : (t.User.Gender == false ? "Nữ" : null)) : null,
+                    Address = t.User != null ? t.User.Address : null,
+                    DateOfBirth = t.User != null ? t.User.DateOfBirth : null,
+                    Experience = t.Experience,
+                    Education = t.Education,
+                    SpecialtySubjectId = t.SpecialtySubjectId,
+                    SpecialtySubjectName = t.SpecialtySubject != null ? t.SpecialtySubject : null,
+                    Rating = t.Reviews.Any() ? Math.Round(t.Reviews.Average(r => r.Rating ?? 0), 1) : 0,
+                    TotalReviews = t.Reviews.Count(),
+                    IsActive = t.IsActive,
+                    CreatedAt = t.User != null ? t.User.CreatedAt : null
+                })
+                .FirstOrDefaultAsync();
 
-                return Ok(reviews);
+if (result == null)
+{
+    return NotFound(new { message = "Không tìm thấy gia sư" });
+}
+
+return Ok(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting reviews for tutor {TutorId}", tutorId);
-                return StatusCode(500, new { message = "Lỗi khi tải đánh giá" });
+                _logger.LogError(ex, "Error getting tutor {TutorId}", tutorId);
+                return StatusCode(500, new { message = "Lỗi khi tải thông tin gia sư" });
             }
         }
 

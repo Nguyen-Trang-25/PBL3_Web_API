@@ -227,9 +227,9 @@ class TutorClassHistory {
     loadStatistics() {
         const stats = {
             total: this.filteredApplications.length,
-            pending: this.filteredApplications.filter(app => app.status === 'applied').length,
-            accepted: this.filteredApplications.filter(app => app.status === 'active').length,
-            rejected: this.filteredApplications.filter(app => app.status === 'rejected' || app.status === 'others_selected' || app.status === 'class_cancelled').length
+            pending: this.filteredApplications.filter(app => app.status === 'pending').length,
+            active: this.filteredApplications.filter(app => app.status === 'active').length,
+            completed: this.filteredApplications.filter(app => app.status === 'completed' || app.status === 'others_selected' || app.status === 'class_cancelled').length
         };
 
         const statsContainer = document.getElementById('tutorStatsContainer');
@@ -252,14 +252,14 @@ class TutorClassHistory {
                 <div class="tutor-stat-icon accepted">
                     <i class="fas fa-check-circle"></i>
                 </div>
-                <div class="tutor-stat-number">${stats.accept}</div>
+                <div class="tutor-stat-number">${stats.active}</div>
                 <div class="tutor-stat-label">Đã được chấp nhận</div>
             </div>
             <div class="tutor-stat-card">
                 <div class="tutor-stat-icon rejected">
                     <i class="fas fa-times-circle"></i>
                 </div>
-                <div class="tutor-stat-number">${stats.rejected}</div>
+                <div class="tutor-stat-number">${stats.completed}</div>
                 <div class="tutor-stat-label">Không thành công</div>
             </div>
         `;
@@ -308,10 +308,6 @@ class TutorClassHistory {
                         ${app.subjectName}
                     </div>
                     <h3 class="tutor-card-title">${app.subjectName} ${app.level}</h3>
-                    <div class="tutor-application-info">
-                        <i class="fas fa-calendar"></i>
-                        Ứng tuyển ${timeAgo}
-                    </div>
                 </div>
                 <div class="tutor-card-body">
                     <div class="tutor-info-grid">

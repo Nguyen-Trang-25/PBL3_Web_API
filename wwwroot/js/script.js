@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
             subjectId: form.subject.value,
             level: form.grade.value,
             fee: parseFloat(form.fee.value) || 0,
-            schedule: form.schedule ? form.schedule.value : "chưa xếp",
+            schedule: form.schedule ? form.schedule.value : "chua xep",
             location: form.location.value,
             genderTutor: genderT,
             requirement: form.requirements.value,
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             form.reset();
-            window.location.href("/html/home_student.html")
+            window.location.href = "/home_student.html";
         } catch (err) {
             alert("Gửi yêu cầu thất bại: " + err.message);
         }

@@ -798,6 +798,11 @@ class ClassHistoryManager {
 
     // ===== HANDLE CONFIRM SELECT TUTOR =====
     async handleConfirmSelectTutor() {
+        if (this.selectedClassForConfirm.status != 'applied') {
+            alert("Bạn đã chọn gia sư cho lớp học này rồi");
+            return;
+        }
+
         if (!this.selectedTutorForConfirm || !this.selectedClassForConfirm) return;
 
         // Validate form

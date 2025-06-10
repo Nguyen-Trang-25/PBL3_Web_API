@@ -109,16 +109,15 @@ class TutorProfileManager {
         this.showLoading();
 
         try {
-            // Gọi API để lấy thông tin gia sư
-            const tutorResponse = await fetch(`/api/tutors/${this.tutorId}`);
+            const tutorResponse = await fetch(`/api/review/tutor/${this.tutorId}`);
 
             if (!tutorResponse.ok) {
                 throw new Error('Không tìm thấy thông tin gia sư');
             }
 
             this.tutorData = await tutorResponse.json();
+            console.log(this.tutorData)
 
-            // Gọi API để lấy đánh giá của gia sư
             await this.loadTutorReviews();
 
             // Render giao diện
@@ -202,6 +201,7 @@ class TutorProfileManager {
 
     renderBasicInfo() {
         const data = this.tutorData;
+        console.log(data)
 
         this.elements.basicInfoGrid.innerHTML = `
             <div class="info-item">
@@ -223,7 +223,7 @@ class TutorProfileManager {
                     <i class="fas fa-venus-mars"></i>
                     Giới tính
                 </div>
-                <div class="info-value">${this.getGenderText(data.gender)}</div>
+                <div class="info-value">${data.gender || 'Chưa có thông tin'}</div>
             </div>
             <div class="info-item">
                 <div class="info-label">
@@ -258,24 +258,16 @@ class TutorProfileManager {
                     <i class="fas fa-book"></i>
                     Môn học chuyên môn
                 </div>
-                <div class="info-value">${this.getSubjectsText(data.subjects) || 'Chưa có thông tin'}</div>
+                <div class="info-value">${data.specialtySubjectName || 'Chưa có thông tin'}</div>
             </div>
             <div class="info-item">
                 <div class="info-label">
                     <i class="fas fa-star"></i>
                     Đánh giá
                 </div>
-                <div class="info-value">${data.averageRating || 0}/5 sao (${data.totalReviews || 0} lượt đánh giá)</div>
+                <div class="info-value">${data.rating || 0}/5 sao (${data.totalReviews || 0} lượt đánh giá)</div>
             </div>
-            ${data.description ? `
-            <div class="info-item full-width">
-                <div class="info-label">
-                    <i class="fas fa-info-circle"></i>
-                    Giới thiệu
-                </div>
-                <div class="info-value description">${data.description}</div>
-            </div>
-            ` : ''}
+            
         `;
     }
 
